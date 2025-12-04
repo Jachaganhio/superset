@@ -21,7 +21,6 @@ import { GeoJsonLayer } from '@deck.gl/layers';
 // ignoring the eslint error below since typescript prefers 'geojson' to '@types/geojson'
 // eslint-disable-next-line import/no-unresolved
 import { Feature, Geometry, GeoJsonProperties } from 'geojson';
-import geojsonExtent from '@mapbox/geojson-extent';
 import {
   FilterState,
   HandlerFunction,
@@ -207,9 +206,53 @@ export type DeckGLGeoJsonProps = {
   emitCrossFilters?: boolean;
 };
 
+/**
+ * Simple implementation to get bounding box from GeoJSON coordinates
+ */
+function getGeojsonBounds(feature: any): [number, number, number, number] | null {
+  const coords: number[][] = [];
+
+  function extractCoords(geometry: any) {
+    if (!geometry) return;
+    if (geometry.type === 'Point') {
+      coords.push(geometry.coordinates);
+    } else if (geometry.type === 'MultiPoint' || geometry.type === 'LineString') {
+      coords.push(...geometry.coordinates);
+    } else if (geometry.type === 'MultiLineString' || geometry.type === 'Polygon') {
+      geometry.coordinates.forEach((ring: number[][]) => coords.push(...ring));
+    } else if (geometry.type === 'MultiPolygon') {
+      geometry.coordinates.forEach((polygon: number[][][]) =>
+        polygon.forEach((ring: number[][]) => coords.push(...ring))
+      );
+    } else if (geometry.type === 'GeometryCollection') {
+      geometry.geometries?.forEach(extractCoords);
+    }
+  }
+
+  if (feature.type === 'FeatureCollection') {
+    feature.features?.forEach((f: any) => extractCoords(f.geometry));
+  } else if (feature.type === 'Feature') {
+    extractCoords(feature.geometry);
+  } else {
+    extractCoords(feature);
+  }
+
+  if (coords.length === 0) return null;
+
+  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  coords.forEach(([lng, lat]) => {
+    if (lng < minLng) minLng = lng;
+    if (lng > maxLng) maxLng = lng;
+    if (lat < minLat) minLat = lat;
+    if (lat > maxLat) maxLat = lat;
+  });
+
+  return [minLng, minLat, maxLng, maxLat];
+}
+
 export function getPoints(data: Point[]) {
   return data.reduce((acc: Array<any>, feature: any) => {
-    const bounds = geojsonExtent(feature);
+    const bounds = getGeojsonBounds(feature);
     if (bounds) {
       return [...acc, [bounds[0], bounds[1]], [bounds[2], bounds[3]]];
     }
@@ -265,10 +308,11 @@ const DeckGLGeoJson = (props: DeckGLGeoJsonProps) => {
   return (
     <DeckGLContainerStyledWrapper
       ref={containerRef}
-      mapboxApiAccessToken={payload.data.mapboxApiKey}
+      amapApiKey={payload.data.amapApiKey}
+      amapSecurityKey={payload.data.amapSecurityKey}
       viewport={viewport}
       layers={[layer]}
-      mapStyle={formData.mapbox_style}
+      mapStyle={formData.amap_style}
       setControlValue={setControlValue}
       height={height}
       width={width}

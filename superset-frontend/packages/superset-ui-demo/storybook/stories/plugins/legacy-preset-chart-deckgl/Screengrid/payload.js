@@ -30,7 +30,7 @@ export default {
     granularity_sqla: 'dttm',
     grid_size: 20,
     groupby: [],
-    mapbox_style: 'mapbox://styles/mapbox/dark-v9',
+    amap_style: 'amap://styles/normal',
     point_radius: 'Auto',
     point_radius_fixed: { type: 'fix', value: 2000 },
     point_unit: 'square_m',

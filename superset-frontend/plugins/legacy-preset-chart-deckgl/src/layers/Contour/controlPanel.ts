@@ -28,7 +28,7 @@ import {
   jsDataMutator,
   jsOnclickHref,
   jsTooltip,
-  mapboxStyle,
+  amapStyle,
   spatial,
   viewport,
   tooltipContents,
@@ -54,7 +54,7 @@ const config: ControlPanelConfig = {
       label: t('Map'),
       expanded: true,
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         [autozoom, viewport],
         [
           {

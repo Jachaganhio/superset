@@ -27,13 +27,13 @@ import controlPanel from './controlPanel';
 
 const metadata = new ChartMetadata({
   category: t('Map'),
-  credits: ['https://www.mapbox.com/mapbox-gl-js/api/'],
+  credits: ['https://lbs.amap.com/'],
   description: '',
   exampleGallery: [
     { url: example1, urlDark: example1Dark, description: t('Light mode') },
     { url: example2, urlDark: example2Dark, description: t('Dark mode') },
   ],
-  name: t('MapBox'),
+  name: t('AMap'),
   tags: [
     t('Business'),
     t('Intensity'),
@@ -50,7 +50,7 @@ const metadata = new ChartMetadata({
 export default class MapBoxChartPlugin extends ChartPlugin {
   constructor() {
     super({
-      loadChart: () => import('./MapBox'),
+      loadChart: () => import('./AMap'),
       loadTransformProps: () => import('./transformProps'),
       metadata,
       controlPanel,

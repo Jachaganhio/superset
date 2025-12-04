@@ -37,7 +37,9 @@ ARG BUILD_TRANSLATIONS
 ENV BUILD_TRANSLATIONS=${BUILD_TRANSLATIONS}
 ARG DEV_MODE="false"           # Skip frontend build in dev mode
 ENV DEV_MODE=${DEV_MODE}
-
+# TODO: remove these proxy settings if not needed
+ENV https_proxy="127.0.0.1:7890"
+ENV http_proxy="127.0.0.1:7890"
 COPY docker/ /app/docker/
 # Arguments for build configuration
 ARG NPM_BUILD_CMD="build"
@@ -148,7 +150,9 @@ FROM python-base AS python-common
 
 # Re-declare build arg to receive it in this stage
 ARG LOAD_EXAMPLES_DUCKDB
-
+# TODO: remove these proxy settings if not needed
+ENV https_proxy="127.0.0.1:7890"
+ENV http_proxy="127.0.0.1:7890"
 ENV SUPERSET_HOME="/app/superset_home" \
     HOME="/app/superset_home" \
     SUPERSET_ENV="production" \
@@ -192,7 +196,9 @@ COPY scripts/check-env.py scripts/
 
 # keeping for backward compatibility
 COPY --chmod=755 ./docker/entrypoints/run-server.sh /usr/bin/
-
+# TODO: remove these proxy settings if not needed
+ENV https_proxy="127.0.0.1:7890"
+ENV http_proxy="127.0.0.1:7890"
 # Some debian libs
 RUN /app/docker/apt-install.sh \
       curl \

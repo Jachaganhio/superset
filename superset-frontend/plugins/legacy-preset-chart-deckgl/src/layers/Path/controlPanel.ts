@@ -29,7 +29,7 @@ import {
   lineWidth,
   lineType,
   reverseLongLat,
-  mapboxStyle,
+  amapStyle,
   tooltipContents,
   tooltipTemplate,
 } from '../../utilities/Shared_DeckGL';
@@ -65,7 +65,7 @@ const config: ControlPanelConfig = {
       label: t('Map'),
       expanded: true,
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         [viewport],
         ['color_picker'],
         [lineWidth],

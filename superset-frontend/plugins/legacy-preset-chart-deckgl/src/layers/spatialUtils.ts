@@ -44,7 +44,8 @@ export interface DataRecord {
 export interface BootstrapData {
   common?: {
     conf?: {
-      MAPBOX_API_KEY?: string;
+      AMAP_API_KEY?: string;
+      AMAP_SECURITY_KEY?: string;
     };
   };
 }
@@ -317,9 +318,9 @@ export function processSpatialData(
 
 const NOOP = () => {};
 
-export function getMapboxApiKey(mapboxApiKey?: string): string {
-  if (mapboxApiKey) {
-    return mapboxApiKey;
+export function getAmapApiKey(amapApiKey?: string): string {
+  if (amapApiKey) {
+    return amapApiKey;
   }
 
   if (typeof document !== 'undefined') {
@@ -328,11 +329,34 @@ export function getMapboxApiKey(mapboxApiKey?: string): string {
       const dataBootstrap = appContainer?.getAttribute('data-bootstrap');
       if (dataBootstrap) {
         const bootstrapData: BootstrapData = JSON.parse(dataBootstrap);
-        return bootstrapData?.common?.conf?.MAPBOX_API_KEY || '';
+        return bootstrapData?.common?.conf?.AMAP_API_KEY || '';
       }
     } catch (error) {
       throw new Error(
-        `Failed to read MAPBOX_API_KEY from bootstrap data: ${error}`,
+        `Failed to read AMAP_API_KEY from bootstrap data: ${error}`,
+      );
+    }
+  }
+
+  return '';
+}
+
+export function getAmapSecurityKey(amapSecurityKey?: string): string {
+  if (amapSecurityKey) {
+    return amapSecurityKey;
+  }
+
+  if (typeof document !== 'undefined') {
+    try {
+      const appContainer = document.getElementById('app');
+      const dataBootstrap = appContainer?.getAttribute('data-bootstrap');
+      if (dataBootstrap) {
+        const bootstrapData: BootstrapData = JSON.parse(dataBootstrap);
+        return bootstrapData?.common?.conf?.AMAP_SECURITY_KEY || '';
+      }
+    } catch (error) {
+      throw new Error(
+        `Failed to read AMAP_SECURITY_KEY from bootstrap data: ${error}`,
       );
     }
   }
@@ -382,7 +406,8 @@ export function transformSpatialProps(chartProps: ChartProps) {
       ...queryData,
       data: {
         features,
-        mapboxApiKey: getMapboxApiKey(),
+        amapApiKey: getAmapApiKey(),
+        amapSecurityKey: getAmapSecurityKey(),
         metricLabels: metricLabel ? [metricLabel] : [],
       },
     },

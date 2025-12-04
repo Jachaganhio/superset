@@ -306,10 +306,11 @@ const DeckMulti = (props: DeckMultiProps) => {
   return (
     <DeckGLContainerStyledWrapper
       ref={containerRef}
-      mapboxApiAccessToken={payload.data.mapboxApiKey}
+      amapApiKey={payload.data.amapApiKey}
+      amapSecurityKey={payload.data.amapSecurityKey}
       viewport={viewport}
       layers={layers}
-      mapStyle={formData.mapbox_style}
+      mapStyle={formData.amap_style}
       setControlValue={setControlValue}
       onViewportChange={setViewport}
       height={height}

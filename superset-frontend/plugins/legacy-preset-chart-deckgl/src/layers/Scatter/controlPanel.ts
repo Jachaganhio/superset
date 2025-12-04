@@ -32,7 +32,7 @@ import {
   spatial,
   pointRadiusFixed,
   multiplier,
-  mapboxStyle,
+  amapStyle,
   generateDeckGLColorSchemeControls,
   tooltipContents,
   tooltipTemplate,
@@ -65,7 +65,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Map'),
       expanded: true,
-      controlSetRows: [[mapboxStyle], [autozoom, viewport]],
+      controlSetRows: [[amapStyle], [autozoom, viewport]],
     },
     {
       label: t('Point Size'),

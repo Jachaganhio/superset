@@ -24,6 +24,39 @@ assists people when migrating to a new version.
 
 ## Next
 
+### Breaking Changes - Map API Migration from Mapbox to AMap (高德地图)
+
+All map-related chart types (MapBox and 11 Deck.gl visualizations) have been migrated from Mapbox to AMap (高德地图) API.
+
+#### Configuration Changes Required
+
+**Old Configuration (deprecated):**
+```python
+MAPBOX_API_KEY = "your-mapbox-key"
+```
+
+**New Configuration:**
+```python
+AMAP_API_KEY = "your-amap-key"
+AMAP_SECURITY_KEY = "your-amap-security-key"  # Required for web deployment
+```
+
+To obtain AMap API keys, visit: https://lbs.amap.com/
+
+#### Frontend Changes
+- `mapbox_style` form field renamed to `amap_style`
+- Map style values changed from `mapbox://styles/mapbox/*` to `amap://styles/*`
+- Available AMap styles: `normal`, `dark`, `light`, `whitesmoke`, `fresh`, `grey`, `graffiti`, `macaron`, `blue`, `darkblue`, `wine`
+
+#### Backend Changes
+- `MapboxViz` class renamed to `AmapViz`
+- `mapboxApiKey` payload field changed to `amapApiKey` and `amapSecurityKey`
+
+#### Migration Steps
+1. Obtain AMap API key and security key from https://lbs.amap.com/
+2. Update `superset_config.py` with new `AMAP_API_KEY` and `AMAP_SECURITY_KEY`
+3. Existing charts with `mapbox_style` may need manual update to use `amap_style`
+
 ### MCP Service
 
 The MCP (Model Context Protocol) service enables AI assistants and automation tools to interact programmatically with Superset.

@@ -434,24 +434,22 @@ class D3Format(TypedDict, total=False):
 
 D3_FORMAT: D3Format = {}
 
-# Override the default mapbox tiles
+# Override the default AMap (高德地图) tiles
 # Default values are equivalent to
 # DECKGL_BASE_MAP = [
-#   ['https://tile.openstreetmap.org/{z}/{x}/{y}.png', 'Streets (OSM)'],
-#   ['https://tile.osm.ch/osm-swiss-style/{z}/{x}/{y}.png', 'Topography (OSM)'],
-#   ['mapbox://styles/mapbox/streets-v9', 'Streets'],
-#   ['mapbox://styles/mapbox/dark-v9', 'Dark'],
-#   ['mapbox://styles/mapbox/light-v9', 'Light'],
-#   ['mapbox://styles/mapbox/satellite-streets-v9', 'Satellite Streets'],
-#   ['mapbox://styles/mapbox/satellite-v9', 'Satellite'],
-#   ['mapbox://styles/mapbox/outdoors-v9', 'Outdoors'],
+#   ['amap://styles/normal', '标准'],
+#   ['amap://styles/dark', '幻影黑'],
+#   ['amap://styles/light', '月光银'],
+#   ['amap://styles/whitesmoke', '远山黛'],
+#   ['amap://styles/fresh', '草色青'],
+#   ['amap://styles/grey', '雅士灰'],
+#   ['amap://styles/graffiti', '涂鸦'],
+#   ['amap://styles/macaron', '马卡龙'],
+#   ['amap://styles/blue', '靛青蓝'],
+#   ['amap://styles/darkblue', '极夜蓝'],
+#   ['amap://styles/wine', '酱籽'],
 # ]
-# for adding your own map tiles, you can use the following format:
-# - tile:// + your_personal_url or openstreetmap_url
-#   example:
-#   DECKGL_BASE_MAP = [
-#       ['tile://https://c.tile.openstreetmap.org/{z}/{x}/{y}.png', 'OpenStreetMap']
-#    ]
+# For satellite view, use: ['satellite', '卫星图']
 # Enable CORS and set map url in origins option.
 # Add also map url in connect-src of TALISMAN_CONFIG variable
 DECKGL_BASE_MAP: list[list[str, str]] = None
@@ -1112,8 +1110,10 @@ BACKUP_COUNT = 30
 #     pass
 QUERY_LOGGER = None
 
-# Set this API key to enable Mapbox visualizations
-MAPBOX_API_KEY = os.environ.get("MAPBOX_API_KEY", "")
+# Set these API keys to enable AMap (高德地图) visualizations
+# Get your key from: https://console.amap.com/dev/key/app
+AMAP_API_KEY = os.environ.get("AMAP_API_KEY", "")
+AMAP_SECURITY_KEY = os.environ.get("AMAP_SECURITY_KEY", "")
 
 # Maximum number of rows returned for any analytical database query
 SQL_MAX_ROW = 100000
@@ -1894,22 +1894,33 @@ TALISMAN_CONFIG = {
             # "https://cdn.brandfolder.io", # Uncomment when SLACK_ENABLE_AVATARS is True  # noqa: E501
             "ows.terrestris.de",
             "https://cdn.document360.io",
+            # AMap (高德地图) 相关域名
+            "https://webapi.amap.com",
+            "https://*.amap.com",
+            "https://*.is.autonavi.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
             "'self'",
-            "https://api.mapbox.com",
-            "https://events.mapbox.com",
-            "https://tile.openstreetmap.org",
-            "https://tile.osm.ch",
-            "https://a.basemaps.cartocdn.com",
+            # AMap (高德地图) API 域名
+            "https://webapi.amap.com",
+            "https://restapi.amap.com",
+            "https://vdata.amap.com",
+            "https://*.is.autonavi.com",
         ],
         "object-src": "'none'",
         "style-src": [
             "'self'",
             "'unsafe-inline'",
         ],
-        "script-src": ["'self'", "'strict-dynamic'"],
+        "script-src": [
+            "'self'",
+            "'strict-dynamic'",
+            # AMap (高德地图) JS SDK
+            "https://webapi.amap.com",
+            "https://restapi.amap.com",
+            "https://vdata.amap.com",
+        ],
     },
     "content_security_policy_nonce_in": ["script-src"],
     "force_https": False,
@@ -1929,22 +1940,34 @@ TALISMAN_DEV_CONFIG = {
             "https://cdn.brandfolder.io",
             "ows.terrestris.de",
             "https://cdn.document360.io",
+            # AMap (高德地图) 相关域名
+            "https://webapi.amap.com",
+            "https://*.amap.com",
+            "https://*.is.autonavi.com",
         ],
         "worker-src": ["'self'", "blob:"],
         "connect-src": [
             "'self'",
-            "https://api.mapbox.com",
-            "https://events.mapbox.com",
-            "https://tile.openstreetmap.org",
-            "https://tile.osm.ch",
-            "https://a.basemaps.cartocdn.com",
+            # AMap (高德地图) API 域名
+            "https://webapi.amap.com",
+            "https://restapi.amap.com",
+            "https://vdata.amap.com",
+            "https://*.is.autonavi.com",
         ],
         "object-src": "'none'",
         "style-src": [
             "'self'",
             "'unsafe-inline'",
         ],
-        "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        "script-src": [
+            "'self'",
+            "'unsafe-inline'",
+            "'unsafe-eval'",
+            # AMap (高德地图) JS SDK
+            "https://webapi.amap.com",
+            "https://restapi.amap.com",
+            "https://vdata.amap.com",
+        ],
     },
     "content_security_policy_nonce_in": ["script-src"],
     "force_https": False,

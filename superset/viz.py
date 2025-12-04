@@ -1372,13 +1372,13 @@ class HorizonViz(NVD3TimeSeriesViz):
     )
 
 
-class MapboxViz(BaseViz):
-    """Rich maps made with Mapbox"""
+class AmapViz(BaseViz):
+    """Rich maps made with AMap (高德地图)"""
 
     viz_type = "mapbox"
-    verbose_name = _("Mapbox")
+    verbose_name = _("AMap")
     is_timeseries = False
-    credits = "<a href=https://www.mapbox.com/mapbox-gl-js/api/>Mapbox GL JS</a>"
+    credits = "<a href=https://lbs.amap.com/>AMap JS API</a>"
 
     @deprecated(deprecated_in="3.0")
     def query_obj(self) -> QueryObjectDict:
@@ -1507,8 +1507,9 @@ class MapboxViz(BaseViz):
         return {
             "geoJSON": geo_json,
             "hasCustomMetric": has_custom_metric,
-            "mapboxApiKey": current_app.config["MAPBOX_API_KEY"],
-            "mapStyle": self.form_data.get("mapbox_style"),
+            "amapApiKey": current_app.config["AMAP_API_KEY"],
+            "amapSecurityKey": current_app.config.get("AMAP_SECURITY_KEY", ""),
+            "mapStyle": self.form_data.get("amap_style"),
             "aggregatorName": self.form_data.get("pandas_aggfunc"),
             "clusteringRadius": self.form_data.get("clustering_radius"),
             "pointRadiusUnit": self.form_data.get("point_radius_unit"),
@@ -1516,7 +1517,7 @@ class MapboxViz(BaseViz):
             "bounds": [south_west, north_east],
             "renderWhileDragging": self.form_data.get("render_while_dragging"),
             "tooltip": self.form_data.get("rich_tooltip"),
-            "color": self.form_data.get("mapbox_color"),
+            "color": self.form_data.get("amap_color"),
         }
 
 
@@ -1644,7 +1645,8 @@ class DeckGLMultiLayer(BaseViz):
 
         return {
             "features": features,
-            "mapboxApiKey": current_app.config["MAPBOX_API_KEY"],
+            "amapApiKey": current_app.config["AMAP_API_KEY"],
+            "amapSecurityKey": current_app.config.get("AMAP_SECURITY_KEY", ""),
             "slices": [slc.data for slc in slices if slc.data is not None],
         }
 
@@ -1948,7 +1950,8 @@ class BaseDeckGLViz(BaseViz):
 
         return {
             "features": features,
-            "mapboxApiKey": current_app.config["MAPBOX_API_KEY"],
+            "amapApiKey": current_app.config["AMAP_API_KEY"],
+            "amapSecurityKey": current_app.config.get("AMAP_SECURITY_KEY", ""),
             "metricLabels": self.metric_labels,
         }
 
@@ -2482,7 +2485,8 @@ class DeckArc(BaseDeckGLViz):
             return None
         return {
             "features": super().get_data(df)["features"],
-            "mapboxApiKey": current_app.config["MAPBOX_API_KEY"],
+            "amapApiKey": current_app.config["AMAP_API_KEY"],
+            "amapSecurityKey": current_app.config.get("AMAP_SECURITY_KEY", ""),
         }
 
 

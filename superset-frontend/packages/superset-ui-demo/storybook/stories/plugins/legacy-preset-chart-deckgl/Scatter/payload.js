@@ -29,7 +29,7 @@ export default {
     datasource: '5__table',
     granularity_sqla: 'dttm',
     groupby: [],
-    mapbox_style: 'mapbox://styles/mapbox/light-v9',
+    amap_style: 'amap://styles/normal',
     multiplier: 10,
     point_radius_fixed: { type: 'metric', value: 'count' },
     point_unit: 'square_m',

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateMapboxStylesUrl } from '@superset-ui/core';
+import { t } from '@superset-ui/core';
 import {
   columnChoices,
   ControlPanelConfig,
@@ -205,29 +205,29 @@ const config: ControlPanelConfig = {
         ],
         [
           {
-            name: 'mapbox_style',
+            name: 'amap_style',
             config: {
               type: 'SelectControl',
               label: t('Map Style'),
               clearable: false,
               renderTrigger: true,
-              freeForm: true,
-              validators: [validateMapboxStylesUrl],
               choices: [
-                ['mapbox://styles/mapbox/streets-v9', t('Streets')],
-                ['mapbox://styles/mapbox/dark-v9', t('Dark')],
-                ['mapbox://styles/mapbox/light-v9', t('Light')],
-                [
-                  'mapbox://styles/mapbox/satellite-streets-v9',
-                  t('Satellite Streets'),
-                ],
-                ['mapbox://styles/mapbox/satellite-v9', t('Satellite')],
-                ['mapbox://styles/mapbox/outdoors-v9', t('Outdoors')],
+                ['amap://styles/normal', t('标准')],
+                ['amap://styles/dark', t('幻影黑')],
+                ['amap://styles/light', t('月光银')],
+                ['amap://styles/whitesmoke', t('远山黛')],
+                ['amap://styles/fresh', t('草色青')],
+                ['amap://styles/grey', t('雅士灰')],
+                ['amap://styles/graffiti', t('涂鸦')],
+                ['amap://styles/macaron', t('马卡龙')],
+                ['amap://styles/blue', t('靛青蓝')],
+                ['amap://styles/darkblue', t('极夜蓝')],
+                ['amap://styles/wine', t('酱籽')],
               ],
-              default: 'mapbox://styles/mapbox/light-v9',
+              default: 'amap://styles/normal',
               description: t(
-                'Base layer map style. See Mapbox documentation: %s',
-                'https://docs.mapbox.com/help/glossary/style-url/',
+                'Base layer map style. See AMap documentation: %s',
+                'https://lbs.amap.com/api/javascript-api-v2/guide/bindbindbindbindbindbindbindbindbindbindbindbindbindbindbindbindbindbindbindmap/bindbindbindbindbindmap/bindmap',
               ),
             },
           },

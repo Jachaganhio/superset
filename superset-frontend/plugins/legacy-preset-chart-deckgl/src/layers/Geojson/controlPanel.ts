@@ -31,7 +31,7 @@ import {
   stroked,
   extruded,
   viewport,
-  mapboxStyle,
+  amapStyle,
   autozoom,
   lineWidth,
   tooltipContents,
@@ -55,7 +55,7 @@ const config: ControlPanelConfig = {
     },
     {
       label: t('Map'),
-      controlSetRows: [[mapboxStyle, viewport], [autozoom]],
+      controlSetRows: [[amapStyle, viewport], [autozoom]],
     },
     {
       label: t('GeoJson Settings'),

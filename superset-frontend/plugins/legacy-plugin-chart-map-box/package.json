@@ -26,16 +26,15 @@
     "lib"
   ],
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "@math.gl/web-mercator": "^4.1.0",
     "prop-types": "^15.8.1",
-    "react-map-gl": "^6.1.19",
     "supercluster": "^8.0.1"
   },
   "peerDependencies": {
     "@superset-ui/chart-controls": "*",
     "@superset-ui/core": "*",
     "@apache-superset/core": "*",
-    "mapbox-gl": "*",
     "react": "^17.0.2"
   },
   "publishConfig": {

@@ -50,7 +50,7 @@ export const GeojsonPayload = () => (
       row_limit: 10000,
       reverse_long_lat: false,
       filter_nulls: true,
-      mapbox_style: 'mapbox://styles/mapbox/light-v9',
+      amap_style: 'amap://styles/normal',
       viewport: {
         longitude: 6.85236157047845,
         latitude: 31.222656842808707,
@@ -99,7 +99,7 @@ export const Payload = () => (
       row_limit: 10000,
       reverse_long_lat: false,
       filter_nulls: true,
-      mapbox_style: 'mapbox://styles/mapbox/light-v9',
+      amap_style: 'amap://styles/normal',
       viewport: {
         altitude: 1.5,
         bearing: 37.89506450385642,

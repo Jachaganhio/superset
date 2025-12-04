@@ -32,7 +32,7 @@ import {
   gridSize,
   viewport,
   spatial,
-  mapboxStyle,
+  amapStyle,
   tooltipContents,
   tooltipTemplate,
   legendPosition,
@@ -58,7 +58,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Map'),
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         [viewport],
         ...generateDeckGLColorSchemeControls({
           defaultSchemeType: COLOR_SCHEME_TYPES.categorical_palette,

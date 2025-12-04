@@ -17,20 +17,23 @@
  * under the License.
  */
 import Supercluster from 'supercluster';
-import { DEFAULT_POINT_RADIUS, DEFAULT_MAX_ZOOM } from './MapBox';
+
+// Default values (previously from MapBox component)
+export const DEFAULT_MAX_ZOOM = 16;
+export const DEFAULT_POINT_RADIUS = 60;
 
 const NOOP = () => {};
 
 export default function transformProps(chartProps) {
   const { width, height, formData, hooks, queriesData } = chartProps;
   const { onError = NOOP, setControlValue = NOOP } = hooks;
-  const { bounds, geoJSON, hasCustomMetric, mapboxApiKey } =
+  const { bounds, geoJSON, hasCustomMetric, amapApiKey, amapSecurityKey } =
     queriesData[0].data;
   const {
     clusteringRadius,
     globalOpacity,
     mapboxColor,
-    mapboxStyle,
+    amapStyle,
     pandasAggfunc,
     pointRadius,
     pointRadiusUnit,
@@ -83,8 +86,9 @@ export default function transformProps(chartProps) {
     clusterer,
     globalOpacity,
     hasCustomMetric,
-    mapboxApiKey,
-    mapStyle: mapboxStyle,
+    amapApiKey,
+    amapSecurityKey,
+    mapStyle: amapStyle,
     onViewportChange({ latitude, longitude, zoom }) {
       setControlValue('viewport_longitude', longitude);
       setControlValue('viewport_latitude', latitude);

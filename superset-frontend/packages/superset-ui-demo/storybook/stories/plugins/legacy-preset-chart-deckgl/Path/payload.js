@@ -46,7 +46,7 @@ export const payload = theme => ({
         subject: 'path_json',
       },
     ],
-    mapbox_style: 'mapbox://styles/mapbox/light-v9',
+    amap_style: 'amap://styles/normal',
     viewport: {
       altitude: 1.5,
       bearing: 0,

@@ -17,7 +17,7 @@
  * under the License.
  */
 import { ChartProps, getMetricLabel } from '@superset-ui/core';
-import { getMapboxApiKey, DataRecord } from './spatialUtils';
+import { getAmapApiKey, getAmapSecurityKey, DataRecord } from './spatialUtils';
 
 const NOOP = () => {};
 
@@ -38,7 +38,8 @@ export interface BaseTransformPropsResult {
   payload: {
     data: {
       features: unknown[];
-      mapboxApiKey: string;
+      amapApiKey: string;
+      amapSecurityKey: string;
       metricLabels?: string[];
     };
     [key: string]: unknown;
@@ -92,7 +93,8 @@ export function createBaseTransformResult(
       ...queryData,
       data: {
         features,
-        mapboxApiKey: getMapboxApiKey(),
+        amapApiKey: getAmapApiKey(),
+        amapSecurityKey: getAmapSecurityKey(),
         metricLabels: metricLabels || [],
       },
     },

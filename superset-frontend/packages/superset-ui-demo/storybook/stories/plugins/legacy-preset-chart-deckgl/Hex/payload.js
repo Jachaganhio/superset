@@ -31,7 +31,7 @@ export default {
     granularity_sqla: 'dttm',
     grid_size: 120,
     groupby: [],
-    mapbox_style: 'mapbox://styles/mapbox/satellite-streets-v9',
+    amap_style: 'amap://styles/normal',
     point_radius: 'Auto',
     point_radius_fixed: { type: 'fix', value: 2000 },
     point_radius_unit: 'Pixels',
