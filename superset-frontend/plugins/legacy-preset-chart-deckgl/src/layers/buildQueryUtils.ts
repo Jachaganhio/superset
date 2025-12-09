@@ -92,8 +92,25 @@ export function addColumnsIfNotExists(
   return result;
 }
 
-export function processMetricsArray(metrics: (string | undefined)[]): string[] {
-  return metrics.filter((metric): metric is string => Boolean(metric));
+export function processMetricsArray(metrics: (string | number | undefined)[]): string[] {
+  return metrics
+    .filter((metric): metric is string | number => Boolean(metric))
+    .map(metric => String(metric));
+}
+
+export function isFixedOrMetricMetric(
+  controlValue?: { type?: string; value?: string | number },
+): boolean {
+  if (!controlValue?.value) {
+    return false;
+  }
+
+  if (controlValue.type) {
+    return controlValue.type !== 'fix';
+  }
+
+  const numericValue = Number(controlValue.value);
+  return Number.isNaN(numericValue);
 }
 
 export function extractTooltipColumns(tooltipContents?: unknown[]): string[] {

@@ -33,13 +33,15 @@ import {
   addJsColumnsToColumns,
   processMetricsArray,
   addTooltipColumnsToQuery,
+  isFixedOrMetricMetric,
 } from '../buildQueryUtils';
 
 export interface DeckScatterFormData
   extends Omit<SpatialFormData, 'color_picker'>,
     SqlaFormData {
   point_radius_fixed?: {
-    value?: string;
+    type?: string;
+    value?: string | number;
   };
   multiplier?: number;
   point_unit?: string;
@@ -79,14 +81,19 @@ export default function buildQuery(formData: DeckScatterFormData) {
       columns = withJsColumns as QueryFormColumn[];
       columns = addTooltipColumnsToQuery(columns, tooltip_contents);
 
-      const metrics = processMetricsArray([point_radius_fixed?.value]);
+      // Only add point_radius_fixed to metrics if it's referencing a metric, not a fixed value
+      const useRadiusMetric = isFixedOrMetricMetric(point_radius_fixed);
+      const metricsToAdd = useRadiusMetric && point_radius_fixed?.value
+        ? [String(point_radius_fixed.value)]
+        : [];
+      const metrics = processMetricsArray(metricsToAdd);
       const filters = addSpatialNullFilters(
         spatial,
         ensureIsArray(baseQueryObject.filters || []),
       );
 
-      const orderby = point_radius_fixed?.value
-        ? ([[point_radius_fixed.value, false]] as QueryFormOrderBy[])
+      const orderby = useRadiusMetric && point_radius_fixed?.value
+        ? ([[String(point_radius_fixed.value), false]] as QueryFormOrderBy[])
         : (baseQueryObject.orderby as QueryFormOrderBy[]) || [];
 
       return [

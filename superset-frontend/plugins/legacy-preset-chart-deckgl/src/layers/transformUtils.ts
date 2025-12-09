@@ -17,6 +17,7 @@
  * under the License.
  */
 import { ChartProps, getMetricLabel } from '@superset-ui/core';
+import { isFixedOrMetricMetric } from './buildQueryUtils';
 import { getAmapApiKey, getAmapSecurityKey, DataRecord } from './spatialUtils';
 
 const NOOP = () => {};
@@ -136,9 +137,10 @@ export function addPropertiesToFeature<T extends Record<string, unknown>>(
 }
 
 export function getMetricLabelFromFormData(
-  metric: string | { value?: string } | undefined,
+  metric: string | { type?: string; value?: string | number } | undefined,
 ): string | undefined {
   if (!metric) return undefined;
   if (typeof metric === 'string') return getMetricLabel(metric);
-  return metric.value ? getMetricLabel(metric.value) : undefined;
+  if (!isFixedOrMetricMetric(metric)) return undefined;
+  return metric.value ? getMetricLabel(String(metric.value)) : undefined;
 }

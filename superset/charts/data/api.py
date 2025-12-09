@@ -541,11 +541,89 @@ class ChartDataRestApi(ChartRestApi):
         :returns: The query context
         :raises ValidationError: If the request is incorrect
         """
+        normalized_form_data = self._normalize_form_data(form_data)
 
         try:
-            return ChartDataQueryContextSchema().load(form_data)
+            return ChartDataQueryContextSchema().load(normalized_form_data)
         except KeyError as ex:
             raise ValidationError("Request is incorrect") from ex
+
+    def _normalize_form_data(self, form_data: dict[str, Any]) -> dict[str, Any]:
+        """Coerce legacy single values into lists for multi-select fields."""
+        if not form_data:
+            return form_data
+
+        normalized = form_data.copy()
+        list_fields = (
+            "mapbox_label",
+            "groupby",
+            "columns",
+            "metrics",
+            "adhoc_filters",
+            "order_by_choices",
+            "timeseries_limit_metric",
+        )
+
+        def normalize_lists(target: dict[str, Any]) -> None:
+            for key in list_fields:
+                if key not in target:
+                    continue
+                val = target[key]
+                if val is None:
+                    target[key] = []
+                elif isinstance(val, list):
+                    continue
+                else:
+                    target[key] = [val]
+
+        normalize_lists(normalized)
+
+        queries = normalized.get("queries")
+        if isinstance(queries, list):
+            normalized_queries: list[dict[str, Any]] = []
+            for query in queries:
+                if not isinstance(query, dict):
+                    normalized_queries.append(query)
+                    continue
+
+                normalized_query = query.copy()
+                normalize_lists(normalized_query)
+
+                if "orderby" in normalized_query:
+                    normalized_query["orderby"] = self._normalize_orderby(
+                        normalized_query.get("orderby")
+                    )
+
+                normalized_queries.append(normalized_query)
+
+            normalized["queries"] = normalized_queries
+
+        return normalized
+
+    @staticmethod
+    def _normalize_orderby(orderby: Any) -> list[tuple[Any, bool]] | None:
+        """Normalize orderby into a list of two-tuples acceptable by the schema."""
+        if orderby is None:
+            return None
+
+        items = orderby if isinstance(orderby, list) else [orderby]
+        normalized_orderby: list[tuple[Any, bool]] = []
+
+        for item in items:
+            if isinstance(item, (list, tuple)) and len(item) == 2:
+                col, desc = item
+            else:
+                col, desc = item, False
+
+            if col is None:
+                continue
+
+            if isinstance(col, int):
+                col = str(col)
+
+            normalized_orderby.append((col, bool(desc)))
+
+        return normalized_orderby
 
     def _should_use_streaming(
         self, result: dict[Any, Any], form_data: dict[str, Any] | None = None
