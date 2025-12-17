@@ -94,7 +94,7 @@ const mockProps = {
           ],
         },
       ],
-      mapboxApiKey: 'test-key',
+      amapApiKey: 'test-key',
     },
     form_data: {},
   },

@@ -249,9 +249,9 @@ export const DeckGLContainer = memo(
             }}
             style={{
               position: isAmapStyle ? 'absolute' : 'relative',
-              top: 0,
-              left: 0,
-              zIndex: isAmapStyle ? 1 : 0,
+              top: '0',
+              left: '0',
+              zIndex: (isAmapStyle ? 1 : 0) as any,
               background: isAmapStyle ? 'transparent' : undefined,
             }}
           />

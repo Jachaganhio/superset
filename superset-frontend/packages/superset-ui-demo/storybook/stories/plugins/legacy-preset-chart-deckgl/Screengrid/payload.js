@@ -128,7 +128,7 @@ export default {
       { position: [-122.4258311, 37.7863612], weight: 164, __timestamp: null },
       { position: [-122.4125675, 37.7903477], weight: 161, __timestamp: null },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
     metricLabels: ['count'],
   },

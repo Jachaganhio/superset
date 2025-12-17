@@ -1759,9 +1759,9 @@ class TestDeckGLMultiLayer(SupersetTestCase):
 
         assert isinstance(result, dict)
         assert "features" in result
-        assert "mapboxApiKey" in result
+        assert "amapApiKey" in result
         assert "slices" in result
-        assert result["mapboxApiKey"] == "test_key"
+        assert result["amapApiKey"] == "test_key"
 
     @with_config({"MAPBOX_API_KEY": "test_key"})
     @patch("superset.viz.viz_types")
@@ -1813,7 +1813,7 @@ class TestDeckGLMultiLayer(SupersetTestCase):
         assert isinstance(result, dict)
         assert result["features"] == {}
         assert result["slices"] == []
-        assert result["mapboxApiKey"] == "test_key"
+        assert result["amapApiKey"] == "test_key"
 
     def test_get_base_properties_no_metric(self):
         """Test _get_base_properties when metric_label is None"""

@@ -233,7 +233,7 @@ export function createCategoricalDeckGLComponent(
       <CategoricalDeckGLContainer
         datasource={datasource}
         formData={formData}
-        mapboxApiKey={payload.data.mapboxApiKey}
+        amapApiKey={payload.data.amapApiKey}
         setControlValue={setControlValue}
         viewport={viewport}
         getLayer={getLayer}

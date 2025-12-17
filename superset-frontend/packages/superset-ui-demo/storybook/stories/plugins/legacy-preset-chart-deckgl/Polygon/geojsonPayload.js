@@ -123,7 +123,7 @@ export default {
         elevation: 0,
       },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1IjoiZ2tlZWUiLCJhIjoiY2lvbmN5dXhtMDA4NXRybTJjZWU2ZHVxOSJ9.CJG_6Oz52y5yI5cr3Ct_aQ',
     metricLabels: ['count'],
   },
