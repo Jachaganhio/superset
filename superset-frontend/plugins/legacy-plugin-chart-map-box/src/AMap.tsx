@@ -42,6 +42,9 @@ interface AMapInstance {
   LngLat: new (lng: number, lat: number) => AMapLngLat;
   Pixel: new (x: number, y: number) => AMapPixel;
   Size: new (width: number, height: number) => AMapSize;
+  Circle: new (options: AMapCircleOptions) => AMapCircleInstance;
+  CircleMarker: new (options: AMapCircleMarkerOptions) => AMapCircleMarkerInstance;
+  Text: new (options: AMapTextOptions) => AMapTextInstance;
 }
 
 interface AMapMapOptions {
@@ -63,8 +66,8 @@ interface AMapMapInstance {
   getBounds: () => AMapBounds;
   on: (event: string, handler: (e: AMapEvent) => void) => void;
   off: (event: string, handler: (e: AMapEvent) => void) => void;
-  add: (overlay: AMapMassMarksInstance) => void;
-  remove: (overlay: AMapMassMarksInstance) => void;
+  add: (overlay: any) => void;
+  remove: (overlay: any) => void;
 }
 
 interface AMapLngLat {
@@ -147,6 +150,56 @@ interface ClusterFeature {
   properties: ClusterProperties;
 }
 
+// Minimal Circle/CircleMarker/Text types used in this component
+interface AMapCircleOptions {
+  center: [number, number];
+  radius: number;
+  fillColor?: string;
+  fillOpacity?: number;
+  strokeColor?: string;
+  strokeOpacity?: number;
+  strokeWeight?: number;
+  zIndex?: number;
+}
+
+interface AMapCircleInstance {
+  setMap: (map: AMapMapInstance | null) => void;
+}
+
+interface AMapCircleMarkerOptions {
+  center: [number, number];
+  radius: number;
+  fillColor?: string;
+  fillOpacity?: number;
+  strokeColor?: string;
+  strokeOpacity?: number;
+  strokeWeight?: number;
+  zIndex?: number;
+}
+
+interface AMapCircleMarkerInstance {
+  setMap: (map: AMapMapInstance | null) => void;
+}
+
+interface AMapTextOptions {
+  text: string;
+  position: [number, number];
+  anchor?: 'center' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'top-center' | 'bottom-center' | 'left-center' | 'right-center';
+  style?: {
+    color?: string;
+    fontSize?: number;
+    fontWeight?: string | number;
+    backgroundColor?: string;
+    padding?: string;
+    borderRadius?: number;
+  };
+  zIndex?: number;
+}
+
+interface AMapTextInstance {
+  setMap: (map: AMapMapInstance | null) => void;
+}
+
 export interface AMapProps {
   width: number;
   height: number;
@@ -216,12 +269,12 @@ class AMap extends Component<AMapProps, AMapState> {
 
   private massMarks: AMapMassMarksInstance | null = null;
 
-  private canvasRef: RefObject<HTMLCanvasElement>;
+  // Keep track of overlays we add so we can detach on re-render/unmount
+  private overlays: Array<AMapCircleInstance | AMapCircleMarkerInstance | AMapTextInstance> = [];
 
   constructor(props: AMapProps) {
     super(props);
     this.containerRef = createRef<HTMLDivElement>();
-    this.canvasRef = createRef<HTMLCanvasElement>();
     this.state = {
       mapLoaded: false,
       error: null,
@@ -244,6 +297,7 @@ class AMap extends Component<AMapProps, AMapState> {
   }
 
   componentWillUnmount() {
+    this.clearOverlays();
     if (this.massMarks) {
       this.massMarks.setMap(null);
     }
@@ -271,7 +325,7 @@ class AMap extends Component<AMapProps, AMapState> {
       this.AMapSDK = await AMapLoader.load({
         key: amapApiKey,
         version: '2.0',
-        plugins: ['AMap.Scale', 'AMap.ToolBar'],
+        plugins: ['AMap.Scale', 'AMap.ToolBar', 'AMap.Circle', 'AMap.Text', 'AMap.CircleMarker'],
       });
 
       if (!this.containerRef.current || !this.AMapSDK) return;
@@ -331,8 +385,21 @@ class AMap extends Component<AMapProps, AMapState> {
     this.renderClusters();
   }
 
+  private clearOverlays() {
+    if (this.overlays.length) {
+      this.overlays.forEach(ov => {
+        try {
+          ov.setMap(null);
+        } catch (e) {
+          // ignore
+        }
+      });
+      this.overlays = [];
+    }
+  }
+
   renderClusters() {
-    if (!this.map || !this.canvasRef.current) return;
+    if (!this.map) return;
 
     const {
       clusterer,
@@ -363,106 +430,199 @@ class AMap extends Component<AMapProps, AMapState> {
       bbox,
       Math.round(zoom),
     ) as ClusterFeature[];
+    // Detach previous overlays
+    this.clearOverlays();
 
-    // Render on canvas overlay
-    const canvas = this.canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.globalAlpha = globalOpacity;
-
-    // Get map bounds for coordinate conversion
-    const mapBounds = this.map.getBounds();
-    const sw = mapBounds.getSouthWest();
-    const ne = mapBounds.getNorthEast();
-
-    const lngRange = ne.getLng() - sw.getLng();
-    const latRange = ne.getLat() - sw.getLat();
-
+    // Build native AMap overlays for each cluster/point
     clusters.forEach((cluster: ClusterFeature) => {
       const [lng, lat] = cluster.geometry.coordinates;
 
-      // Convert lng/lat to pixel coordinates
-      const x = ((lng - sw.getLng()) / lngRange) * width;
-      const y = ((ne.getLat() - lat) / latRange) * height;
-
-      if (x < -pointRadius || x > width + pointRadius || y < -pointRadius || y > height + pointRadius) {
-        return;
-      }
-
-      ctx.beginPath();
-
       if (cluster.properties.cluster) {
-        // Render cluster
+        // Cluster bubble as CircleMarker (pixel radius) + Text label
         const pointCount = cluster.properties.point_count || 0;
-        const clusterLabel = this.computeClusterLabel(cluster.properties, aggregatorName);
+        const clusterValue = this.computeClusterLabel(
+          cluster.properties,
+          aggregatorName,
+        );
         const maxRadius = pointRadius;
         const scaledRadius = Math.max(
           10,
           Math.sqrt(pointCount / 10) * maxRadius * 0.3,
         );
 
-        // Draw glow effect
-        const gradient = ctx.createRadialGradient(x, y, 0, x, y, scaledRadius);
-        gradient.addColorStop(0, `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, 0.8)`);
-        gradient.addColorStop(1, `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, 0)`);
+        const circle = new this.AMapSDK!.CircleMarker({
+          center: [lng, lat],
+          radius: scaledRadius,
+          fillColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+            0.8,
+            globalOpacity,
+          )})`,
+          fillOpacity: Math.min(0.8, globalOpacity),
+          strokeColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+            0.9,
+            globalOpacity,
+          )})`,
+          strokeOpacity: Math.min(0.9, globalOpacity),
+          strokeWeight: 1,
+          zIndex: 10,
+        });
+        circle.setMap(this.map!);
+        this.overlays.push(circle);
 
-        ctx.arc(x, y, scaledRadius, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        // Draw label
-        if (clusterLabel !== null) {
-          const fontHeight = Math.max(10, scaledRadius * 0.5);
-          ctx.font = `${fontHeight}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = this.getLuminance(rgb) > 110 ? 'black' : 'white';
-
-          let labelText = String(clusterLabel);
-          if (typeof clusterLabel === 'number' && clusterLabel >= 10000) {
-            labelText = `${Math.round(clusterLabel / 1000)}k`;
-          } else if (typeof clusterLabel === 'number' && clusterLabel >= 1000) {
-            labelText = `${Math.round(clusterLabel / 100) / 10}k`;
+        if (clusterValue !== null) {
+          let labelText = String(clusterValue);
+          if (typeof clusterValue === 'number' && clusterValue >= 10000) {
+            labelText = `${Math.round(clusterValue / 1000)}k`;
+          } else if (
+            typeof clusterValue === 'number' &&
+            clusterValue >= 1000
+          ) {
+            labelText = `${Math.round(clusterValue / 100) / 10}k`;
           }
 
-          ctx.fillText(labelText, x, y);
+          const text = new this.AMapSDK!.Text({
+            text: labelText,
+            position: [lng, lat],
+            anchor: 'center',
+            style: {
+              color: this.getLuminance(rgb) > 110 ? '#000' : '#fff',
+              fontSize: Math.max(10, Math.floor(scaledRadius * 0.5)),
+              fontWeight: 600,
+              backgroundColor: 'transparent',
+            },
+            zIndex: 11,
+          });
+          text.setMap(this.map!);
+          this.overlays.push(text);
         }
       } else {
-        // Render single point
-        let radius = pointRadius / 6;
+        // Single point as CircleMarker (px) or Circle (meters)
+        let radiusPx = pointRadius / 6;
         const radiusProperty = cluster.properties.radius;
         const pointMetric = cluster.properties.metric;
 
         if (radiusProperty !== null && radiusProperty !== undefined) {
-          radius = radiusProperty;
           if (pointRadiusUnit === 'Kilometers') {
-            radius = this.kmToPixels(radius, lat, zoom);
-          } else if (pointRadiusUnit === 'Miles') {
-            radius = this.kmToPixels(radius * 1.60934, lat, zoom);
+            // Use Circle in meters to preserve geodesic sizing
+            const meters = radiusProperty * 1000;
+            const circle = new this.AMapSDK!.Circle({
+              center: [lng, lat],
+              radius: meters,
+              fillColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+                0.6,
+                globalOpacity,
+              )})`,
+              fillOpacity: Math.min(0.6, globalOpacity),
+              strokeColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+                0.9,
+                globalOpacity,
+              )})`,
+              strokeOpacity: Math.min(0.9, globalOpacity),
+              strokeWeight: 1,
+              zIndex: 8,
+            });
+            circle.setMap(this.map!);
+            this.overlays.push(circle);
+
+            if (hasCustomMetric && pointMetric !== null && pointMetric !== undefined) {
+              const text = new this.AMapSDK!.Text({
+                text: String(Math.round((pointMetric as number) * 100) / 100),
+                position: [lng, lat],
+                anchor: 'center',
+                style: {
+                  color: this.getLuminance(rgb) > 110 ? '#000' : '#fff',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  backgroundColor: 'transparent',
+                },
+                zIndex: 9,
+              });
+              text.setMap(this.map!);
+              this.overlays.push(text);
+            }
+            return; // Done for meters case
           }
+          if (pointRadiusUnit === 'Miles') {
+            const meters = radiusProperty * 1609.34;
+            const circle = new this.AMapSDK!.Circle({
+              center: [lng, lat],
+              radius: meters,
+              fillColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+                0.6,
+                globalOpacity,
+              )})`,
+              fillOpacity: Math.min(0.6, globalOpacity),
+              strokeColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+                0.9,
+                globalOpacity,
+              )})`,
+              strokeOpacity: Math.min(0.9, globalOpacity),
+              strokeWeight: 1,
+              zIndex: 8,
+            });
+            circle.setMap(this.map!);
+            this.overlays.push(circle);
+
+            if (hasCustomMetric && pointMetric !== null && pointMetric !== undefined) {
+              const text = new this.AMapSDK!.Text({
+                text: String(Math.round((pointMetric as number) * 100) / 100),
+                position: [lng, lat],
+                anchor: 'center',
+                style: {
+                  color: this.getLuminance(rgb) > 110 ? '#000' : '#fff',
+                  fontSize: 12,
+                  fontWeight: 500,
+                  backgroundColor: 'transparent',
+                },
+                zIndex: 9,
+              });
+              text.setMap(this.map!);
+              this.overlays.push(text);
+            }
+            return; // Done for meters case
+          }
+          // Pixels: radiusProperty is already in px scale context; use as CircleMarker radius
+          radiusPx = radiusProperty || radiusPx;
         }
 
-        if (!radius || radius <= 0) {
-          radius = pointRadius / 6;
+        if (!radiusPx || radiusPx <= 0) {
+          radiusPx = pointRadius / 6;
         }
 
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgb(${rgb[1]}, ${rgb[2]}, ${rgb[3]})`;
-        ctx.fill();
+        const cm = new this.AMapSDK!.CircleMarker({
+          center: [lng, lat],
+          radius: radiusPx,
+          fillColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+            0.6,
+            globalOpacity,
+          )})`,
+          fillOpacity: Math.min(0.6, globalOpacity),
+          strokeColor: `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${Math.min(
+            0.9,
+            globalOpacity,
+          )})`,
+          strokeOpacity: Math.min(0.9, globalOpacity),
+          strokeWeight: 1,
+          zIndex: 8,
+        });
+        cm.setMap(this.map!);
+        this.overlays.push(cm);
 
-        // Draw point label if has metric
         if (hasCustomMetric && pointMetric !== null && pointMetric !== undefined) {
-          const fontHeight = Math.max(8, radius * 0.8);
-          ctx.font = `${fontHeight}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillStyle = this.getLuminance(rgb) > 110 ? 'black' : 'white';
-          ctx.fillText(String(Math.round(pointMetric * 100) / 100), x, y);
+          const text = new this.AMapSDK!.Text({
+            text: String(Math.round((pointMetric as number) * 100) / 100),
+            position: [lng, lat],
+            anchor: 'center',
+            style: {
+              color: this.getLuminance(rgb) > 110 ? '#000' : '#fff',
+              fontSize: Math.max(8, Math.floor(radiusPx * 0.8)),
+              fontWeight: 500,
+              backgroundColor: 'transparent',
+            },
+            zIndex: 9,
+          });
+          text.setMap(this.map!);
+          this.overlays.push(text);
         }
       }
     });
@@ -547,20 +707,10 @@ class AMap extends Component<AMapProps, AMapState> {
           ref={this.containerRef}
           style={{ width: '100%', height: '100%' }}
         />
-        <canvas
-          ref={this.canvasRef}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            pointerEvents: 'none',
-            width,
-            height,
-          }}
-        />
       </div>
     );
   }
 }
 
 export default AMap;
+ 
