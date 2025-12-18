@@ -63,7 +63,7 @@ Plan to replace canvas overlay with native AMap rendering
     # or
     docker compose -f docker-compose.yml up -d
     ```
-  - Access UI: open `http://localhost:8088` and log in with `admin/admin` (default dev creds).
+  - Access UI: open `http://localhost:9000` and log in with `admin/admin` (default dev creds).
   - Exercise an AMap-based chart: pan, zoom, toggle metric labels, and switch radius units (px vs meters).
   - Chrome DevTools validation:
     - Performance: record during pan/zoom; cluster update work should be bounded; avoid long main-thread stalls or forced reflows.
