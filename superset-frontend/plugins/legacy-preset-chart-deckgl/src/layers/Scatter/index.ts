@@ -51,7 +51,7 @@ export default class ScatterChartPlugin extends ChartPlugin {
   constructor() {
     super({
       buildQuery,
-      loadChart: () => import('./Scatter'),
+      loadChart: () => import('./ScatterWrapper'),
       controlPanel,
       metadata,
       transformProps,
