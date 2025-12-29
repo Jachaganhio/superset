@@ -16,14 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps } from '@superset-ui/core';
+import { ChartProps, QueryFormData } from '@superset-ui/core';
+import { AMapScatterPoint } from './amapTypes';
 import ScatterAMap from './ScatterAMap';
 
 /**
  * Wrapper component that converts ChartProps format to ScatterAMap props format
  * This allows ScatterAMap to work with the standard Superset chart plugin interface
  */
-function ScatterAMapWrapper(chartProps: ChartProps) {
+function ScatterAMapWrapper(chartProps: ChartProps<QueryFormData>) {
   const {
     formData,
     height,
@@ -34,8 +35,18 @@ function ScatterAMapWrapper(chartProps: ChartProps) {
     emitCrossFilters,
   } = chartProps;
 
+  type TransformedScatterChartProps = ChartProps<QueryFormData> & {
+    payload?: {
+      data?: {
+        features?: AMapScatterPoint[];
+        amapApiKey?: string;
+        amapSecurityKey?: string;
+      };
+    };
+  };
+
   // Extract the transformed props (these come from transformProps)
-  const transformedProps = chartProps as any;
+  const transformedProps = chartProps as TransformedScatterChartProps;
   
   // Prepare payload in the format ScatterAMap expects
   const payload = {
@@ -46,15 +57,18 @@ function ScatterAMapWrapper(chartProps: ChartProps) {
     },
   };
 
+  const typedFormData = formData as unknown as QueryFormData;
+
   return (
     <ScatterAMap
-      formData={formData}
+      formData={typedFormData}
       payload={payload}
       height={height}
       width={width}
       filterState={filterState}
       onContextMenu={hooks?.onContextMenu}
       emitCrossFilters={emitCrossFilters}
+      setDataMask={hooks?.setDataMask}
       setTooltip={hooks?.setTooltip}
       datasource={datasource}
     />

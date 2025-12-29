@@ -18,7 +18,15 @@
  */
 import { Component, createRef, RefObject } from 'react';
 import AMapLoader from '@amap/amap-jsapi-loader';
-import { JsonObject, QueryFormData, t, CategoricalColorNamespace } from '@superset-ui/core';
+import {
+  CategoricalColorNamespace,
+  FilterState,
+  JsonObject,
+  QueryFormData,
+  SetDataMaskHook,
+  t,
+} from '@superset-ui/core';
+import { PickingInfo } from '@deck.gl/core';
 import { isPointInBonds } from '../../utilities/utils';
 import TooltipRow from '../../TooltipRow';
 import { HIGHLIGHT_COLOR_ARRAY } from '../../utils';
@@ -37,6 +45,7 @@ import {
   clamp,
   rgbaToHex,
 } from './amapUtils';
+import { getCrossFilterDataMask, LayerFormData } from '../../utils/crossFiltersDataMask';
 
 declare global {
   interface Window {
@@ -58,13 +67,12 @@ interface ScatterAMapProps {
     [key: string]: any;
   };
   setTooltip?: (tooltip: any) => void;
+  setDataMask?: SetDataMaskHook;
   height: number;
   width: number;
-  filterState?: {
-    value?: any;
-  };
+  filterState?: FilterState;
   onContextMenu?: (e: MouseEvent) => void;
-  emitCrossFilters?: (filters: any) => void;
+  emitCrossFilters?: boolean;
   datasource?: any;
   [key: string]: any;
 }
@@ -248,8 +256,14 @@ class ScatterAMap extends Component<ScatterAMapProps, ScatterAMapState> {
   private renderPoints() {
     if (!this.map || !this.AMapSDK) return;
 
-    const { formData, payload, setTooltip, filterState, emitCrossFilters } =
-      this.props;
+    const {
+      formData,
+      payload,
+      setTooltip,
+      filterState,
+      emitCrossFilters,
+      setDataMask,
+    } = this.props;
     const fd = formData;
     const features = payload?.data?.features || [];
 
@@ -412,18 +426,26 @@ class ScatterAMap extends Component<ScatterAMapProps, ScatterAMapState> {
       }
 
       // Add click handler for cross-filtering
-      if (emitCrossFilters) {
+      if (emitCrossFilters && setDataMask) {
         overlay.on('click', () => {
-          const data = overlay.getExtData();
-          emitCrossFilters({
-            dataMask: {
-              extraFormData: {},
-              filterState: {
-                value: [data],
-                selectedValues: [],
-              },
-            },
-          });
+          const data = overlay.getExtData() as AMapScatterPoint;
+          const pickingInfo = ({ object: data } as unknown) as PickingInfo;
+
+          try {
+            const crossFilters = getCrossFilterDataMask({
+              data: pickingInfo,
+              filterState,
+              formData: fd as unknown as LayerFormData,
+            });
+            if (crossFilters) {
+              setDataMask(crossFilters.dataMask);
+            }
+          } catch (error) {
+            // Avoid crashing the whole chart on click when formData lacks spatial config
+            // (e.g., if spatial mapping controls are not configured).
+            // eslint-disable-next-line no-console
+            console.error('ScatterAMap cross-filter click failed:', error);
+          }
         });
       }
 
