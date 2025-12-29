@@ -1904,6 +1904,7 @@ TALISMAN_CONFIG = {
             "'self'",
             # AMap (高德地图) API 域名
             "https://webapi.amap.com",
+            "https://jsapi.amap.com",
             "https://restapi.amap.com",
             "https://vdata.amap.com",
             "https://*.is.autonavi.com",
@@ -1950,6 +1951,7 @@ TALISMAN_DEV_CONFIG = {
             "'self'",
             # AMap (高德地图) API 域名
             "https://webapi.amap.com",
+            "https://jsapi.amap.com",
             "https://restapi.amap.com",
             "https://vdata.amap.com",
             "https://*.is.autonavi.com",
