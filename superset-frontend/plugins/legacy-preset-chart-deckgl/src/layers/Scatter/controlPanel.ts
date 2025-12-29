@@ -80,6 +80,7 @@ const config: ControlPanelConfig = {
               default: 'square_m',
               clearable: false,
               choices: [
+                ['pixels', t('Pixels')],
                 ['square_m', t('Square meters')],
                 ['square_km', t('Square kilometers')],
                 ['square_miles', t('Square miles')],

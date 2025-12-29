@@ -112,6 +112,7 @@ export const getLayer: GetLayerType<ScatterplotLayer> = function ({
     getFillColor: (d: ScatterDataItem): [number, number, number, number] =>
       d.color as [number, number, number, number],
     getRadius: (d: ScatterDataItem): number => d.radius,
+    radiusUnits: 'pixels',
     radiusMinPixels: Number(fd.min_radius) || undefined,
     radiusMaxPixels: Number(fd.max_radius) || undefined,
     stroked: false,
@@ -153,6 +154,7 @@ export const getHighlightLayer: GetLayerType<ScatterplotLayer> = function ({
     fp64: true,
     getFillColor: () => HIGHLIGHT_COLOR_ARRAY,
     getRadius: (d: any) => d.radius,
+    radiusUnits: 'pixels',
     radiusMinPixels: Number(fd.min_radius) || undefined,
     radiusMaxPixels: Number(fd.max_radius) || undefined,
     stroked: false,
