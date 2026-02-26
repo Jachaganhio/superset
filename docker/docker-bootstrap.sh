@@ -19,19 +19,19 @@
 set -eo pipefail
 
 # Make python interactive
-if [ "$DEV_MODE" == "true" ]; then
-    if [ "$(whoami)" = "root" ] && command -v uv > /dev/null 2>&1; then
-      # Always ensure superset-core is available
-      echo "Installing superset-core in editable mode"
-      uv pip install --no-deps -e /app/superset-core
+# if [ "$DEV_MODE" == "true" ]; then
+#     if [ "$(whoami)" = "root" ] && command -v uv > /dev/null 2>&1; then
+#       # Always ensure superset-core is available
+#       echo "Installing superset-core in editable mode"
+#       uv pip install --no-deps -e /app/superset-core
 
-      # Only reinstall the main app for non-worker processes
-      if [ "$1" != "worker" ] && [ "$1" != "beat" ]; then
-        echo "Reinstalling the app in editable mode"
-        uv pip install -e .
-      fi
-    fi
-fi
+#       # Only reinstall the main app for non-worker processes
+#       if [ "$1" != "worker" ] && [ "$1" != "beat" ]; then
+#         echo "Reinstalling the app in editable mode"
+#         uv pip install -e .
+#       fi
+#     fi
+# fi
 REQUIREMENTS_LOCAL="/app/docker/requirements-local.txt"
 PORT=${PORT:-8088}
 # If Cypress run – overwrite the password for admin and export env variables
@@ -42,17 +42,17 @@ if [ "$CYPRESS_CONFIG" == "true" ]; then
     PORT=8081
 fi
 # Skip postgres requirements installation for workers to avoid conflicts
-if [[ "$DATABASE_DIALECT" == postgres* ]] && [ "$(whoami)" = "root" ] && [ "$1" != "worker" ] && [ "$1" != "beat" ]; then
-    # older images may not have the postgres dev requirements installed
-    echo "Installing postgres requirements"
-    if command -v uv > /dev/null 2>&1; then
-        # Use uv in newer images
-        uv pip install -e .[postgres]
-    else
-        # Use pip in older images
-        pip install -e .[postgres]
-    fi
-fi
+# if [[ "$DATABASE_DIALECT" == postgres* ]] && [ "$(whoami)" = "root" ] && [ "$1" != "worker" ] && [ "$1" != "beat" ]; then
+#     # older images may not have the postgres dev requirements installed
+#     echo "Installing postgres requirements"
+#     if command -v uv > /dev/null 2>&1; then
+#         # Use uv in newer images
+#         uv pip install -e .[postgres]
+#     else
+#         # Use pip in older images
+#         pip install -e .[postgres]
+#     fi
+# fi
 #
 # Make sure we have dev requirements installed
 #
