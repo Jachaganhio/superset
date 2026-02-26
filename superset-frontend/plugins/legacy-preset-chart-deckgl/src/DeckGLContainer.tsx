@@ -154,7 +154,7 @@ export const DeckGLContainer = memo(
 
     useEffect(() => {
       const timer = setInterval(tick, TICK);
-      return clearInterval(timer);
+      return () => clearInterval(timer);
     }, [tick]);
 
     useEffect(() => {

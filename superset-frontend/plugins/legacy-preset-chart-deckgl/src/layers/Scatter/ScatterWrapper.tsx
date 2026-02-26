@@ -21,15 +21,6 @@ import { lazy, Suspense } from 'react';
 const DeckGLScatter = lazy(() => import('./Scatter'));
 const AMapScatterWrapper = lazy(() => import('./ScatterAMapWrapper'));
 
-interface ScatterWrapperProps {
-  formData: {
-    mapbox_style?: string;
-    amap_style?: string;
-    [key: string]: any;
-  };
-  [key: string]: any;
-}
-
 function shouldUseAMap(mapStyle?: string, amapStyle?: string): boolean {
   // Use AMap if amap_style is set or mapbox_style starts with 'amap://'
   if (amapStyle && amapStyle.startsWith('amap://')) return true;
@@ -37,16 +28,15 @@ function shouldUseAMap(mapStyle?: string, amapStyle?: string): boolean {
   return false;
 }
 
-function ScatterWrapper(props: ScatterWrapperProps) {
+function ScatterWrapper(props: Record<string, any>) {
   const { formData } = props;
-  const useAMap = shouldUseAMap(formData.mapbox_style, formData.amap_style);
+  const useAMap = shouldUseAMap(formData?.mapbox_style, formData?.amap_style);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      {useAMap ? <AMapScatterWrapper {...props} /> : <DeckGLScatter {...props} />}
+      {useAMap ? <AMapScatterWrapper {...(props as any)} /> : <DeckGLScatter {...(props as any)} />}
     </Suspense>
   );
 }
 
 export default ScatterWrapper;
-

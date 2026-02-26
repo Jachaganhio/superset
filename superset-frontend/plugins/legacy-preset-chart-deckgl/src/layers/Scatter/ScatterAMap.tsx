@@ -21,7 +21,6 @@ import AMapLoader from '@amap/amap-jsapi-loader';
 import {
   CategoricalColorNamespace,
   FilterState,
-  JsonObject,
   QueryFormData,
   SetDataMaskHook,
   t,
@@ -95,8 +94,6 @@ function getMetricLabel(metric: any): string {
   }
   return metric?.value || 'Metric';
 }
-
-const NOOP = () => {};
 
 const getAmapStyleUrl = (style: string): string => {
   if (!style || style.startsWith('mapbox://')) {
@@ -190,12 +187,18 @@ class ScatterAMap extends Component<ScatterAMapProps, ScatterAMapState> {
         return;
       }
 
-      const lngs = features.map((f: AMapScatterPoint) => f.position[0]);
-      const lats = features.map((f: AMapScatterPoint) => f.position[1]);
-      const minLng = Math.min(...lngs);
-      const maxLng = Math.max(...lngs);
-      const minLat = Math.min(...lats);
-      const maxLat = Math.max(...lats);
+      let minLng = Infinity;
+      let maxLng = -Infinity;
+      let minLat = Infinity;
+      let maxLat = -Infinity;
+      for (let i = 0; i < features.length; i++) {
+        const lng = (features[i] as AMapScatterPoint).position[0];
+        const lat = (features[i] as AMapScatterPoint).position[1];
+        if (lng < minLng) minLng = lng;
+        if (lng > maxLng) maxLng = lng;
+        if (lat < minLat) minLat = lat;
+        if (lat > maxLat) maxLat = lat;
+      }
 
       const centerLng = (minLng + maxLng) / 2;
       const centerLat = (minLat + maxLat) / 2;
@@ -472,8 +475,8 @@ class ScatterAMap extends Component<ScatterAMapProps, ScatterAMapState> {
     );
 
     const useGeodesic = isGeodesicUnit(fd.point_unit);
-    const highlightColor = rgbaToHex(HIGHLIGHT_COLOR_ARRAY);
-    const highlightOpacity = HIGHLIGHT_COLOR_ARRAY[3] / 255;
+    const highlightColor = rgbaToHex(Array.from(HIGHLIGHT_COLOR_ARRAY));
+    const highlightOpacity = (HIGHLIGHT_COLOR_ARRAY[3] ?? 255) / 255;
 
     dataInside.forEach((feature: AMapScatterPoint) => {
       const [lng, lat] = feature.position;
