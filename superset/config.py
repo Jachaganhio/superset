@@ -1905,6 +1905,7 @@ TALISMAN_CONFIG = {
             # AMap (高德地图) API 域名
             "https://webapi.amap.com",
             "https://jsapi.amap.com",
+            "https://jsapi-service.amap.com",
             "https://restapi.amap.com",
             "https://vdata.amap.com",
             "https://*.is.autonavi.com",
@@ -1919,6 +1920,7 @@ TALISMAN_CONFIG = {
             "'strict-dynamic'",
             # AMap (高德地图) JS SDK
             "https://webapi.amap.com",
+            "https://jsapi-service.amap.com",
             "https://restapi.amap.com",
             "https://vdata.amap.com",
         ],
@@ -1952,6 +1954,7 @@ TALISMAN_DEV_CONFIG = {
             # AMap (高德地图) API 域名
             "https://webapi.amap.com",
             "https://jsapi.amap.com",
+            "https://jsapi-service.amap.com",
             "https://restapi.amap.com",
             "https://vdata.amap.com",
             "https://*.is.autonavi.com",
@@ -1967,6 +1970,7 @@ TALISMAN_DEV_CONFIG = {
             "'unsafe-eval'",
             # AMap (高德地图) JS SDK
             "https://webapi.amap.com",
+            "https://jsapi-service.amap.com",
             "https://restapi.amap.com",
             "https://vdata.amap.com",
         ],
