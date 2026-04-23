@@ -152,7 +152,7 @@ See `superset/mcp_service/PRODUCTION.md` for deployment guides.
 - Architecture: `superset/mcp_service/ARCHITECTURE.md`
 - Security: `superset/mcp_service/SECURITY.md`
 - Production: `superset/mcp_service/PRODUCTION.md`
-- Developer Guide: `superset/mcp_service/CLAUDE.md`
+- Developer Guide: `AGENT.md`
 - Quick Start: `superset/mcp_service/README.md`
 
 ---

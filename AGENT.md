@@ -68,7 +68,7 @@ superset/
 
 ### Apache License Headers
 - **New files require ASF license headers** - When creating new code files, include the standard Apache Software Foundation license header
-- **LLM instruction files are excluded** - Files like AGENTS.md, CLAUDE.md, etc. are in `.rat-excludes` to avoid header token overhead
+- **LLM instruction file is excluded** - `AGENT.md` is in `.rat-excludes` to avoid header token overhead
 
 ### Code Comments
 - **Avoid time-specific language** - Don't use words like "now", "currently", "today" in code comments as they become outdated
@@ -211,14 +211,50 @@ pre-commit run eslint            # Frontend linting
 - **Utilities**: Use helpers from `superset.migrations.shared.utils` for database compatibility
 - **Pattern**: Import utilities instead of raw SQLAlchemy operations
 
-## Platform-Specific Instructions
+## Agent Entry Point
 
-- **[CLAUDE.md](CLAUDE.md)** - For Claude/Anthropic tools
-- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - For GitHub Copilot  
-- **[GEMINI.md](GEMINI.md)** - For Google Gemini tools
-- **[GPT.md](GPT.md)** - For OpenAI/ChatGPT tools
-- **[.cursor/rules/dev-standard.mdc](.cursor/rules/dev-standard.mdc)** - For Cursor editor
+- **Single source of truth**: `AGENT.md` is the only LLM guidance file for this repository.
+- **Supported tools**: OpenCode and GitHub Copilot.
+- **Policy**: Do not add parallel guidance files (`CLAUDE.md`, `GEMINI.md`, `GPT.md`, `AGENTS.md`, or Cursor-specific rule mirrors).
 
 ---
 
 **LLM Note**: This codebase is actively modernizing toward full TypeScript and type safety. Always run `pre-commit run` to validate changes. Follow the ongoing refactors section to avoid deprecated patterns.
+
+## Domain Appendix: MCP Service
+
+These rules apply when working in `superset/mcp_service/`.
+
+- **Registration pattern**: MCP tools, prompts, and resources register via decorators on import; ensure they are imported from `superset/mcp_service/app.py`.
+- **Tool decorators**: Use `@mcp.tool` (without empty parentheses) and `@mcp_auth_hook` for every tool.
+- **Prompt/resource decorators**: Use `@mcp.prompt("name")` and `@mcp.resource("superset://...")`, and ensure module-level imports expose them.
+- **Schema and data access**: Use Pydantic schemas for request/response models and use Superset DAO classes instead of direct DB queries.
+- **Typing style**: Use Python 3.10+ unions (`T | None`) instead of `Optional[T]`.
+- **License header enforcement**: Every Python file in MCP service must include the ASF header.
+
+### MCP Checklist
+
+- Add or update schema in `superset/mcp_service/*/schemas.py`
+- Add implementation under `superset/mcp_service/*/tool/`, `*/prompts/`, or `*/resources/`
+- Export via corresponding `__init__.py` when needed
+- Import module in `superset/mcp_service/app.py` to trigger registration
+- Add or update unit tests in `tests/unit_tests/mcp_service/`
+
+## Task Appendix: JavaScript to TypeScript Migration
+
+These rules apply to JS/JSX -> TS/TSX migrations in `superset-frontend/`.
+
+- **Atomic unit**: Migrate the core file and all related tests/mocks together.
+- **Preserve history**: Use `git mv` for file renames.
+- **No global churn**: Avoid unrelated global import rewrites.
+- **No `any`**: Reuse existing Superset types where possible.
+- **Validation strategy**: Validate migrated files individually with TypeScript and check downstream importers individually.
+- **Linting**: Run ESLint with autofix on changed frontend files.
+
+### JS->TS Checklist
+
+- Identify related files (`*.test.js[x]`, `*.spec.js[x]`, `__mocks__/*`)
+- Rename files with `git mv`
+- Apply explicit types (no `any`)
+- Validate each changed file and key downstream importers
+- Run ESLint on changed files
