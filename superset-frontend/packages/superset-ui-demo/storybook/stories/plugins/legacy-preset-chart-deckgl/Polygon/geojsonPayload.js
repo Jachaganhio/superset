@@ -48,7 +48,7 @@ export default {
     row_limit: 1000,
     reverse_long_lat: false,
     filter_nulls: true,
-    mapbox_style: 'mapbox://styles/mapbox/light-v9',
+    amap_style: 'amap://styles/normal',
     viewport: {
       longitude: 6.85236157047845,
       latitude: 31.222656842808707,
@@ -123,7 +123,7 @@ export default {
         elevation: 0,
       },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1IjoiZ2tlZWUiLCJhIjoiY2lvbmN5dXhtMDA4NXRybTJjZWU2ZHVxOSJ9.CJG_6Oz52y5yI5cr3Ct_aQ',
     metricLabels: ['count'],
   },

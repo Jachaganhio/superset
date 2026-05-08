@@ -78,7 +78,7 @@ export default {
         subject: 'LONGITUDE_DEST',
       },
     ],
-    mapbox_style: 'mapbox://styles/mapbox/light-v9',
+    amap_style: 'amap://styles/normal',
     viewport: {
       altitude: 1.5,
       bearing: 8.546256357301871,
@@ -263,7 +263,7 @@ export default {
         __timestamp: null,
       },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
   },
 };

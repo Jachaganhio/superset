@@ -23,7 +23,8 @@ export type Unit =
   | 'radius_km'
   | 'radius_miles'
   | 'square_km'
-  | 'square_miles';
+  | 'square_miles'
+  | 'pixels';
 
 export const defaultViewport = {
   bearing: 0,
@@ -36,6 +37,9 @@ export const defaultViewport = {
 const METER_TO_MILE = 1609.34;
 
 export function unitToRadius(unit: Unit, num: number) {
+  if (unit === 'pixels') {
+    return num;
+  }
   if (unit === 'square_m') {
     return Math.sqrt(num / Math.PI);
   }

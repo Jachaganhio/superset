@@ -83,7 +83,8 @@ function getCategories(fd: QueryFormData, data: JsonObject[]) {
 export type CategoricalDeckGLContainerProps = {
   datasource: Datasource;
   formData: QueryFormData;
-  mapboxApiKey: string;
+  amapApiKey: string;
+  amapSecurityKey?: string;
   getPoints: (data: JsonObject[]) => Point[];
   height: number;
   width: number;
@@ -325,8 +326,9 @@ const CategoricalDeckGLContainer = (props: CategoricalDeckGLContainerProps) => {
         viewport={viewport}
         layers={getLayers()}
         setControlValue={props.setControlValue}
-        mapStyle={props.formData.mapbox_style}
-        mapboxApiAccessToken={props.mapboxApiKey}
+        mapStyle={props.formData.amap_style}
+        amapApiKey={props.amapApiKey}
+        amapSecurityKey={props.amapSecurityKey}
         width={props.width}
         height={props.height}
       />

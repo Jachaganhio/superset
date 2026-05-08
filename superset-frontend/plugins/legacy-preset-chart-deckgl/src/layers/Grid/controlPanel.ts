@@ -32,7 +32,7 @@ import {
   gridSize,
   viewport,
   spatial,
-  mapboxStyle,
+  amapStyle,
   legendPosition,
   generateDeckGLColorSchemeControls,
 } from '../../utilities/Shared_DeckGL';
@@ -54,7 +54,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Map'),
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         [viewport],
         ...generateDeckGLColorSchemeControls({
           defaultSchemeType: COLOR_SCHEME_TYPES.categorical_palette,
@@ -83,7 +83,7 @@ const config: ControlPanelConfig = {
       validators: [validateNonEmpty],
     },
   },
-  formDataOverrides: formData => ({
+  formDataOverrides: (formData: Record<string, unknown>) => ({
     ...formData,
     size: getStandardizedControls().shiftMetric(),
   }),

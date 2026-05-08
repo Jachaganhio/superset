@@ -31,7 +31,7 @@ import {
   jsDataMutator,
   jsOnclickHref,
   jsTooltip,
-  mapboxStyle,
+  amapStyle,
   spatial,
   viewport,
 } from '../../utilities/Shared_DeckGL';
@@ -53,7 +53,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Map'),
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         ...generateDeckGLColorSchemeControls({
           defaultSchemeType: COLOR_SCHEME_TYPES.categorical_palette,
           disableCategoricalColumn: true,

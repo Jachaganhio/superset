@@ -31,7 +31,7 @@ export default {
     granularity_sqla: 'dttm',
     grid_size: 120,
     groupby: [],
-    mapbox_style: 'mapbox://styles/mapbox/satellite-streets-v9',
+    amap_style: 'amap://styles/normal',
     point_radius: 'Auto',
     point_radius_fixed: { type: 'fix', value: 2000 },
     point_radius_unit: 'Pixels',
@@ -106,7 +106,7 @@ export default {
       { position: [-122.4368896, 37.7822303], weight: 239 },
       { position: [-122.389625, 37.7806302], weight: 237 },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
     metricLabels: ['count'],
   },

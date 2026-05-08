@@ -17,7 +17,7 @@
  * under the License.
  */
 import { t, validateNonEmpty } from '@superset-ui/core';
-import { viewport, mapboxStyle } from '../utilities/Shared_DeckGL';
+import { viewport, amapStyle } from '../utilities/Shared_DeckGL';
 
 export default {
   controlPanelSections: [
@@ -25,7 +25,7 @@ export default {
       label: t('Map'),
       expanded: true,
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         [viewport],
         [
           {

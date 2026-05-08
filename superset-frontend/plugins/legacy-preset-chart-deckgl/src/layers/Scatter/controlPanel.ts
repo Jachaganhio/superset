@@ -32,7 +32,7 @@ import {
   spatial,
   pointRadiusFixed,
   multiplier,
-  mapboxStyle,
+  amapStyle,
   generateDeckGLColorSchemeControls,
 } from '../../utilities/Shared_DeckGL';
 
@@ -61,7 +61,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Map'),
       expanded: true,
-      controlSetRows: [[mapboxStyle], [autozoom, viewport]],
+      controlSetRows: [[amapStyle], [autozoom, viewport]],
     },
     {
       label: t('Point Size'),
@@ -76,6 +76,7 @@ const config: ControlPanelConfig = {
               default: 'square_m',
               clearable: false,
               choices: [
+                ['pixels', t('Pixels')],
                 ['square_m', t('Square meters')],
                 ['square_km', t('Square kilometers')],
                 ['square_miles', t('Square miles')],

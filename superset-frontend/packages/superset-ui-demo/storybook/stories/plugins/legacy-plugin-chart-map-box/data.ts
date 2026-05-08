@@ -5526,7 +5526,7 @@ export const generateData = (theme: SupersetTheme) => ({
     ],
   },
   hasCustomMetric: false,
-  mapboxApiKey:
+  amapApiKey:
     'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
   mapStyle: 'mapbox://styles/mapbox/light-v9',
   aggregatorName: 'sum',

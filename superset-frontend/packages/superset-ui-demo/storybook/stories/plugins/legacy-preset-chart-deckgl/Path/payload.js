@@ -46,7 +46,7 @@ export const payload = theme => ({
         subject: 'path_json',
       },
     ],
-    mapbox_style: 'mapbox://styles/mapbox/light-v9',
+    amap_style: 'amap://styles/normal',
     viewport: {
       altitude: 1.5,
       bearing: 0,
@@ -220,7 +220,7 @@ export const payload = theme => ({
         extraProps: { color: theme.colorWarning },
       },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
     metricLabels: [],
   },

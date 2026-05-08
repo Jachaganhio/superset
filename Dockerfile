@@ -34,7 +34,7 @@ ARG BUILD_TRANSLATIONS
 ENV BUILD_TRANSLATIONS=${BUILD_TRANSLATIONS}
 ARG DEV_MODE="false"           # Skip frontend build in dev mode
 ENV DEV_MODE=${DEV_MODE}
-
+# TODO: remove these proxy settings if not needed
 COPY docker/ /app/docker/
 # Arguments for build configuration
 ARG NPM_BUILD_CMD="build"
@@ -114,7 +114,7 @@ RUN useradd --user-group -d ${SUPERSET_HOME} -m --no-log-init --shell /bin/bash 
 # Some bash scripts needed throughout the layers
 COPY --chmod=755 docker/*.sh /app/docker/
 
-RUN pip install --no-cache-dir --upgrade uv
+RUN pip install uv
 
 # Using uv as it's faster/simpler than pip
 RUN uv venv /app/.venv
@@ -131,7 +131,7 @@ ENV BUILD_TRANSLATIONS=${BUILD_TRANSLATIONS}
 # Install Python dependencies using docker/pip-install.sh
 COPY requirements/translations.txt requirements/
 RUN --mount=type=cache,target=/root/.cache/uv \
-    . /app/.venv/bin/activate && /app/docker/pip-install.sh --requires-build-essential -r requirements/translations.txt
+    . /app/.venv/bin/activate && /app/docker/pip-install.sh --requires-build-essential -r requirements/translations.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 COPY superset/translations/ /app/translations_mo/
 RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
@@ -186,7 +186,7 @@ COPY scripts/check-env.py scripts/
 
 # keeping for backward compatibility
 COPY --chmod=755 ./docker/entrypoints/run-server.sh /usr/bin/
-
+# TODO: remove these proxy settings if not needed
 # Some debian libs
 RUN /app/docker/apt-install.sh \
       curl \
@@ -217,13 +217,18 @@ EXPOSE ${SUPERSET_PORT}
 ######################################################################
 FROM python-common AS lean
 
+RUN /app/docker/apt-install.sh \
+    git \
+    pkg-config \
+    default-libmysqlclient-dev
+    
 # Install Python dependencies using docker/pip-install.sh
 COPY requirements/base.txt requirements/
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     /app/docker/pip-install.sh --requires-build-essential -r requirements/base.txt
 # Install the superset package
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
-    uv pip install -e .
+    uv pip install .
 RUN python -m compileall /app/superset
 
 USER superset
@@ -246,7 +251,7 @@ RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
     /app/docker/pip-install.sh --requires-build-essential -r requirements/development.txt
 # Install the superset package
 RUN --mount=type=cache,target=${SUPERSET_HOME}/.cache/uv \
-    uv pip install -e .
+    uv pip install .
 
 RUN uv pip install .[postgres]
 RUN python -m compileall /app/superset

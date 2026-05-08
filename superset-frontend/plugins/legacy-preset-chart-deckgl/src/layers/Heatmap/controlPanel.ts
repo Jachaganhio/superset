@@ -36,7 +36,7 @@ import {
   jsDataMutator,
   jsOnclickHref,
   jsTooltip,
-  mapboxStyle,
+  amapStyle,
   spatial,
   viewport,
 } from '../../utilities/Shared_DeckGL';
@@ -101,7 +101,7 @@ const config: ControlPanelConfig = {
     {
       label: t('Map'),
       controlSetRows: [
-        [mapboxStyle],
+        [amapStyle],
         [viewport],
         [
           {

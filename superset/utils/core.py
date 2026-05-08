@@ -1170,9 +1170,9 @@ def get_metric_name(metric: Metric, verbose_map: dict[str, Any] | None = None) -
             if column_name:
                 return column_name
 
-    if isinstance(metric, str):
+    if isinstance(metric, (str, int)):
         verbose_map = verbose_map or {}
-        return verbose_map.get(metric, metric)
+        return verbose_map.get(str(metric), str(metric))
 
     raise ValueError(__("Invalid metric object: %(metric)s", metric=str(metric)))
 

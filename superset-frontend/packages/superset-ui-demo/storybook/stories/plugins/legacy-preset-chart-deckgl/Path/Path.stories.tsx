@@ -52,7 +52,7 @@ export const PathChartViz = () => {
         row_limit: 5000,
         filter_nulls: true,
         adhoc_filters: [],
-        mapbox_style: 'mapbox://styles/mapbox/light-v9',
+        amap_style: 'amap://styles/normal',
         viewport: {
           altitude: 1.5,
           bearing: 0,

@@ -51,7 +51,7 @@ export const ScreengridChartViz = () => (
       row_limit: 5000,
       filter_nulls: true,
       adhoc_filters: [],
-      mapbox_style: 'mapbox://styles/mapbox/dark-v9',
+      amap_style: 'amap://styles/normal',
       viewport: {
         bearing: -4.952916738791771,
         latitude: 37.76024135844065,

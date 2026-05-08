@@ -36,9 +36,8 @@ export const HIGHLIGHT_COLOR_ARRAY = [255, 0, 0, 255] as Color;
 
 const DEFAULT_NUM_BUCKETS = 10;
 
-export const MAPBOX_LAYER_PREFIX = 'mapbox://';
+export const AMAP_LAYER_PREFIX = 'amap://styles/';
 export const TILE_LAYER_PREFIX = 'tile://';
-export const OSM_LAYER_KEYWORDS = ['openstreetmap', 'osm'];
 
 export type Buckets = {
   break_points: string[];

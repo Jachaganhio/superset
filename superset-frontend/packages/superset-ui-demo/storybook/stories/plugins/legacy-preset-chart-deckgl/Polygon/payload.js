@@ -49,7 +49,7 @@ export default {
     row_limit: 10000,
     reverse_long_lat: false,
     filter_nulls: true,
-    mapbox_style: 'mapbox://styles/mapbox/light-v9',
+    amap_style: 'amap://styles/normal',
     viewport: {
       altitude: 1.5,
       bearing: 37.89506450385642,
@@ -375,7 +375,7 @@ export default {
         extraProps: { population: 79407, area: 8.9 },
       },
     ],
-    mapboxApiKey:
+    amapApiKey:
       'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
     metricLabels: ['count'],
   },

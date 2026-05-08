@@ -47,7 +47,8 @@ const metadata = new ChartMetadata({
 export default class ScatterChartPlugin extends ChartPlugin {
   constructor() {
     super({
-      loadChart: () => import('./Scatter'),
+      buildQuery,
+      loadChart: () => import('./ScatterWrapper'),
       controlPanel,
       metadata,
       transformProps,

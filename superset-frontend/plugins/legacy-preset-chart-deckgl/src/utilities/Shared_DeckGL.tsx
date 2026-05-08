@@ -24,7 +24,6 @@ import {
   isFeatureEnabled,
   t,
   validateNonEmpty,
-  validateMapboxStylesUrl,
   getCategoricalSchemeRegistry,
   getSequentialSchemeRegistry,
   SequentialScheme,
@@ -51,14 +50,17 @@ export const DEFAULT_DECKGL_COLOR = { r: 158, g: 158, b: 158, a: 1 };
 let deckglTiles: string[][];
 
 export const DEFAULT_DECKGL_TILES = [
-  ['https://tile.openstreetmap.org/{z}/{x}/{y}.png', 'Streets (OSM)'],
-  ['https://tile.osm.ch/osm-swiss-style/{z}/{x}/{y}.png', 'Topography (OSM)'],
-  ['mapbox://styles/mapbox/streets-v9', 'Streets (Mapbox)'],
-  ['mapbox://styles/mapbox/dark-v9', 'Dark (Mapbox)'],
-  ['mapbox://styles/mapbox/light-v9', 'Light (Mapbox)'],
-  ['mapbox://styles/mapbox/satellite-streets-v9', 'Satellite Streets (Mapbox)'],
-  ['mapbox://styles/mapbox/satellite-v9', 'Satellite (Mapbox)'],
-  ['mapbox://styles/mapbox/outdoors-v9', 'Outdoors (Mapbox)'],
+  ['amap://styles/normal', '标准 (高德)'],
+  ['amap://styles/dark', '幻影黑 (高德)'],
+  ['amap://styles/light', '月光银 (高德)'],
+  ['amap://styles/whitesmoke', '远山黛 (高德)'],
+  ['amap://styles/fresh', '草色青 (高德)'],
+  ['amap://styles/grey', '雅士灰 (高德)'],
+  ['amap://styles/graffiti', '涂鸦 (高德)'],
+  ['amap://styles/macaron', '马卡龙 (高德)'],
+  ['amap://styles/blue', '靛青蓝 (高德)'],
+  ['amap://styles/darkblue', '极夜蓝 (高德)'],
+  ['amap://styles/wine', '酱籽 (高德)'],
 ];
 
 const getDeckGLTiles = () => {
@@ -410,21 +412,18 @@ export const reverseLongLat = {
   },
 };
 
-export const mapboxStyle = {
-  name: 'mapbox_style',
+export const amapStyle = {
+  name: 'amap_style',
   config: {
     type: 'SelectControl',
     label: t('Map Style'),
     clearable: false,
     renderTrigger: true,
     freeForm: true,
-    validators: [validateMapboxStylesUrl],
     choices: getDeckGLTiles(),
     default: getDeckGLTiles()[0][0],
     description: t(
-      'Base layer map style. See Mapbox documentation: %s',
-      'Mapbox base layer map style (see Mapbox documentation: %s) or tile server URL.',
-      'https://docs.mapbox.com/help/glossary/style-url/',
+      'AMap base layer map style. See AMap documentation for available styles.',
     ),
   },
 };

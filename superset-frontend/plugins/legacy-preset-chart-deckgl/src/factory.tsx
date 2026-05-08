@@ -188,10 +188,11 @@ export function createDeckGLComponent(
       <div style={{ position: 'relative' }}>
         <DeckGLContainerStyledWrapper
           ref={containerRef}
-          mapboxApiAccessToken={payload.data.mapboxApiKey}
+          amapApiKey={payload.data.amapApiKey}
+          amapSecurityKey={payload.data.amapSecurityKey}
           viewport={viewport}
           layers={layers}
-          mapStyle={formData.mapbox_style}
+          mapStyle={formData.amap_style}
           setControlValue={setControlValue}
           width={width}
           height={height}
@@ -232,7 +233,7 @@ export function createCategoricalDeckGLComponent(
       <CategoricalDeckGLContainer
         datasource={datasource}
         formData={formData}
-        mapboxApiKey={payload.data.mapboxApiKey}
+        amapApiKey={payload.data.amapApiKey}
         setControlValue={setControlValue}
         viewport={viewport}
         getLayer={getLayer}
