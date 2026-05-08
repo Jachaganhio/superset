@@ -17,20 +17,15 @@
  * under the License.
  */
 import { ReactElement, useMemo } from 'react';
-import { formatNumber, formatTime } from '@superset-ui/core';
-import { useTheme } from '@apache-superset/core/ui';
+import { formatNumber, formatTime, useTheme } from '@superset-ui/core';
 import { GridRows } from '@visx/grid';
 import { scaleLinear } from '@visx/scale';
 import {
   Axis,
   LineSeries,
-  BarSeries,
-  AreaSeries,
   Tooltip,
   XYChart,
   buildChartTheme,
-  type SeriesProps,
-  AxisScale,
 } from '@visx/xychart';
 import { extendedDayjs } from '@superset-ui/core/utils/dates';
 import {
@@ -38,7 +33,6 @@ import {
   createYScaleConfig,
   transformChartData,
 } from '../../utils';
-import { SparkType } from '../../types';
 
 interface Entry {
   time: string;
@@ -57,7 +51,6 @@ interface SparklineCellProps {
   showYAxis?: boolean;
   width?: number;
   yAxisBounds?: [number | undefined, number | undefined];
-  sparkType?: SparkType;
 }
 
 const MARGIN = {
@@ -78,7 +71,6 @@ const SparklineCell = ({
   yAxisBounds = [undefined, undefined],
   showYAxis = false,
   entries = [],
-  sparkType = 'line',
 }: SparklineCellProps): ReactElement => {
   const theme = useTheme();
 
@@ -135,17 +127,6 @@ const SparklineCell = ({
   const xAccessor = (d: { x: number; y: number }) => d.x;
   const yAccessor = (d: { x: number; y: number }) => d.y;
 
-  const chartSeriesMap: Record<
-    SparkType,
-    (props: SeriesProps<AxisScale, AxisScale, object>) => JSX.Element
-  > = {
-    line: LineSeries,
-    bar: BarSeries,
-    area: AreaSeries,
-  };
-
-  const SeriesComponent = chartSeriesMap[sparkType] || LineSeries;
-
   if (validData.length === 0) return <div style={{ width, height }} />;
 
   return (
@@ -184,7 +165,7 @@ const SparklineCell = ({
             />
           </>
         )}
-        <SeriesComponent
+        <LineSeries
           data={chartData}
           dataKey={dataKey}
           xAccessor={xAccessor}

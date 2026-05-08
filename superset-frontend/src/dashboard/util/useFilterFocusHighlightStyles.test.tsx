@@ -34,7 +34,6 @@ const TestComponent = ({ chartId }: { chartId: number }) => {
   return <div data-test="test-component" style={styles} />;
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('useFilterFocusHighlightStyles', () => {
   const createMockStore = (customState: any = {}) =>
     createStore(
@@ -52,7 +51,7 @@ describe('useFilterFocusHighlightStyles', () => {
       store,
     });
 
-  test('should return no style if filter not in scope', async () => {
+  it('should return no style if filter not in scope', async () => {
     renderWrapper(10);
 
     const container = screen.getByTestId('test-component');
@@ -61,7 +60,7 @@ describe('useFilterFocusHighlightStyles', () => {
     expect(styles.opacity).toBeFalsy();
   });
 
-  test('should return unfocused styles if chart is not in scope of focused native filter', async () => {
+  it('should return unfocused styles if chart is not in scope of focused native filter', async () => {
     mockGetRelatedCharts.mockReturnValue([]);
     const store = createMockStore({
       nativeFilters: {
@@ -81,7 +80,7 @@ describe('useFilterFocusHighlightStyles', () => {
     expect(parseFloat(styles.opacity)).toBe(0.3);
   });
 
-  test('should return unfocused styles if chart is not in scope of hovered native filter', async () => {
+  it('should return unfocused styles if chart is not in scope of hovered native filter', async () => {
     mockGetRelatedCharts.mockReturnValue([]);
     const store = createMockStore({
       nativeFilters: {
@@ -101,7 +100,7 @@ describe('useFilterFocusHighlightStyles', () => {
     expect(parseFloat(styles.opacity)).toBe(0.3);
   });
 
-  test('should return focused styles if chart is in scope of focused native filter', async () => {
+  it('should return focused styles if chart is in scope of focused native filter', async () => {
     const chartId = 18;
     mockGetRelatedCharts.mockReturnValue([chartId]);
     const store = createMockStore({
@@ -122,7 +121,7 @@ describe('useFilterFocusHighlightStyles', () => {
     expect(parseFloat(styles.opacity)).toBe(1);
   });
 
-  test('should return focused styles if chart is in scope of hovered native filter', async () => {
+  it('should return focused styles if chart is in scope of hovered native filter', async () => {
     const chartId = 18;
     mockGetRelatedCharts.mockReturnValue([chartId]);
     const store = createMockStore({

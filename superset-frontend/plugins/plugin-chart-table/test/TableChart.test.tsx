@@ -25,33 +25,6 @@ import DateWithFormatter from '../src/utils/DateWithFormatter';
 import testData from './testData';
 import { ProviderWrapper } from './testHelpers';
 
-const expectValidAriaLabels = (container: HTMLElement) => {
-  const allCells = container.querySelectorAll('tbody td');
-  const cellsWithLabels = container.querySelectorAll(
-    'tbody td[aria-labelledby]',
-  );
-
-  // Table must render data cells (catch empty table regression)
-  expect(allCells.length).toBeGreaterThan(0);
-
-  // ALL data cells must have aria-labelledby (no unlabeled cells)
-  expect(cellsWithLabels.length).toBe(allCells.length);
-
-  // ALL aria-labelledby values should be valid
-  cellsWithLabels.forEach(cell => {
-    const labelledBy = cell.getAttribute('aria-labelledby');
-    expect(labelledBy).not.toBeNull();
-    expect(labelledBy).toEqual(expect.stringMatching(/\S/));
-    const labelledByValue = labelledBy as string;
-    expect(labelledByValue).not.toMatch(/\s/);
-    expect(labelledByValue).not.toMatch(/[%#△]/);
-    const referencedHeader = container.querySelector(
-      `#${CSS.escape(labelledByValue)}`,
-    );
-    expect(referencedHeader).toBeTruthy();
-  });
-};
-
 test('sanitizeHeaderId should sanitize percent sign', () => {
   expect(sanitizeHeaderId('%pct_nice')).toBe('percentpct_nice');
 });
@@ -629,7 +602,7 @@ describe('plugin-chart-table', () => {
         // Uses originalLabel (e.g., "metric_1") which is sanitized for CSS safety
         const props = transformProps(testData.comparison);
 
-        render(<TableChart {...props} sticky={false} />);
+        const { container } = render(<TableChart {...props} sticky={false} />);
 
         const headers = screen.getAllByRole('columnheader');
 
@@ -659,16 +632,25 @@ describe('plugin-chart-table', () => {
           // IDs should only contain valid characters: alphanumeric, underscore, hyphen
           expect(header.id).toMatch(/^header-[a-zA-Z0-9_-]+$/);
         });
-      });
 
-      test('should validate ARIA references for time-comparison table cells', () => {
-        // Test that ALL cells with aria-labelledby have valid references
-        // This is critical for screen reader accessibility
-        const props = transformProps(testData.comparison);
-
-        const { container } = render(<TableChart {...props} sticky={false} />);
-
-        expectValidAriaLabels(container);
+        // CRITICAL: Verify ALL cells reference valid headers (no broken ARIA)
+        const cellsWithLabels = container.querySelectorAll(
+          'td[aria-labelledby]',
+        );
+        cellsWithLabels.forEach(cell => {
+          const labelledBy = cell.getAttribute('aria-labelledby');
+          // Cells with aria-labelledby must have a valid ID
+          expect(labelledBy).toBeTruthy();
+          // Check that the ID doesn't contain spaces (would be interpreted as multiple IDs)
+          expect(labelledBy).not.toMatch(/\s/);
+          // Check that the ID doesn't contain special characters
+          expect(labelledBy).not.toMatch(/[%#△]/);
+          // Verify the referenced header actually exists
+          const referencedHeader = container.querySelector(
+            `#${CSS.escape(labelledBy!)}`,
+          );
+          expect(referencedHeader).toBeTruthy();
+        });
       });
 
       test('should set meaningful header IDs for regular table columns', () => {
@@ -729,20 +711,25 @@ describe('plugin-chart-table', () => {
           // IDs should only contain valid CSS selector characters
           expect(header.id).toMatch(/^header-[a-zA-Z0-9_-]+$/);
         });
-      });
 
-      test('should validate ARIA references for regular table cells', () => {
-        // Test that ALL cells with aria-labelledby have valid references
-        // This is critical for screen reader accessibility
-        const props = transformProps(testData.advanced);
-
-        const { container } = render(
-          ProviderWrapper({
-            children: <TableChart {...props} sticky={false} />,
-          }),
+        // Test 6: Verify ALL cells reference valid headers (no broken ARIA)
+        const cellsWithLabels = container.querySelectorAll(
+          'td[aria-labelledby]',
         );
-
-        expectValidAriaLabels(container);
+        cellsWithLabels.forEach(cell => {
+          const labelledBy = cell.getAttribute('aria-labelledby');
+          // Cells with aria-labelledby must have a valid ID
+          expect(labelledBy).toBeTruthy();
+          // Verify no spaces (would be interpreted as multiple IDs)
+          expect(labelledBy).not.toMatch(/\s/);
+          // Verify no special characters
+          expect(labelledBy).not.toMatch(/[%#△]/);
+          // Verify the referenced header actually exists
+          const referencedHeader = container.querySelector(
+            `#${CSS.escape(labelledBy!)}`,
+          );
+          expect(referencedHeader).toBeTruthy();
+        });
       });
 
       test('render cell bars properly, and only when it is toggled on in both regular and percent metrics', () => {
@@ -793,297 +780,6 @@ describe('plugin-chart-table', () => {
           }),
         );
         cells = document.querySelectorAll('td');
-      });
-
-      test('render color with string column color formatter(operator begins with)', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'name',
-                        operator: 'begins with',
-                        targetValue: 'J',
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-
-        expect(getComputedStyle(screen.getByText('Joe')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Michael')).background).toBe(
-          '',
-        );
-      });
-
-      test('render color with string column color formatter (operator ends with)', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'name',
-                        operator: 'ends with',
-                        targetValue: 'ia',
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-        expect(getComputedStyle(screen.getByText('Maria')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Joe')).background).toBe('');
-      });
-
-      test('render color with string column color formatter (operator containing)', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'name',
-                        operator: 'containing',
-                        targetValue: 'c',
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-        expect(getComputedStyle(screen.getByText('Michael')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Joe')).background).toBe('');
-      });
-
-      test('render color with string column color formatter (operator not containing)', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'name',
-                        operator: 'not containing',
-                        targetValue: 'i',
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-        expect(getComputedStyle(screen.getByText('Joe')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Michael')).background).toBe(
-          '',
-        );
-      });
-
-      test('render color with string column color formatter (operator =)', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'name',
-                        operator: '=',
-                        targetValue: 'Joe',
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-        expect(getComputedStyle(screen.getByText('Joe')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Michael')).background).toBe(
-          '',
-        );
-      });
-
-      test('render color with string column color formatter (operator None)', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'name',
-                        operator: 'None',
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-        expect(getComputedStyle(screen.getByText('Joe')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Michael')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByText('Maria')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-      });
-
-      test('render color with column color formatter to entire row', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'sum__num',
-                        operator: '>',
-                        targetValue: 2467,
-                        toAllRow: true,
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-
-        expect(getComputedStyle(screen.getByText('Michael')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByTitle('2467063')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByTitle('0.123456')).background).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-      });
-
-      test('display text color using column color formatter', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'sum__num',
-                        operator: '>',
-                        targetValue: 2467,
-                        toTextColor: true,
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-
-        expect(getComputedStyle(screen.getByTitle('2467063')).color).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByTitle('2467')).color).toBe(
-          'rgba(0, 0, 0, 0.88)',
-        );
-      });
-
-      test('display text color using column color formatter for entire row', () => {
-        render(
-          ProviderWrapper({
-            children: (
-              <TableChart
-                {...transformProps({
-                  ...testData.advanced,
-                  rawFormData: {
-                    ...testData.advanced.rawFormData,
-                    conditional_formatting: [
-                      {
-                        colorScheme: '#ACE1C4',
-                        column: 'sum__num',
-                        operator: '>',
-                        targetValue: 2467,
-                        toAllRow: true,
-                        toTextColor: true,
-                      },
-                    ],
-                  },
-                })}
-              />
-            ),
-          }),
-        );
-
-        expect(getComputedStyle(screen.getByText('Michael')).color).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByTitle('2467063')).color).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
-        expect(getComputedStyle(screen.getByTitle('0.123456')).color).toBe(
-          'rgba(172, 225, 196, 1)',
-        );
       });
     });
   });

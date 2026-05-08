@@ -25,7 +25,7 @@ import {
 } from 'spec/helpers/testing-library';
 import { isFeatureEnabled, getExtensionsRegistry } from '@superset-ui/core';
 import Welcome from 'src/pages/Home';
-import setupCodeOverrides from 'src/setup/setupCodeOverrides';
+import setupExtensions from 'src/setup/setupExtensions';
 
 const chartsEndpoint = 'glob:*/api/v1/chart/?*';
 const chartInfoEndpoint = 'glob:*/api/v1/chart/_info?*';
@@ -134,10 +134,12 @@ const mockedProps = {
 };
 
 const mockedPropsWithoutSqlRole = {
-  ...mockedProps,
-  user: {
-    ...mockedProps.user,
-    roles: {},
+  ...{
+    ...mockedProps,
+    user: {
+      ...mockedProps.user,
+      roles: {},
+    },
   },
 };
 
@@ -259,7 +261,7 @@ test('Should render an extension component if one is supplied', async () => {
     <>welcome.banner extension component</>
   ));
 
-  setupCodeOverrides();
+  setupExtensions();
 
   await renderWelcome();
 
@@ -273,7 +275,7 @@ test('Should render a submenu extension component if one is supplied', async () 
 
   extensionsRegistry.set('home.submenu', () => <>submenu extension</>);
 
-  setupCodeOverrides();
+  setupExtensions();
 
   await renderWelcome();
 
@@ -291,7 +293,7 @@ test('Should not make data fetch calls if `welcome.main.replacement` is defined'
     <>welcome.main.replacement extension component</>
   ));
 
-  setupCodeOverrides();
+  setupExtensions();
 
   await renderWelcome();
 

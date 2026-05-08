@@ -17,8 +17,7 @@
  * under the License.
  */
 import { extendedDayjs } from '@superset-ui/core/utils/dates';
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { t, styled } from '@superset-ui/core';
 import {
   TableView,
   EmptyWrapperType,
@@ -74,7 +73,7 @@ export default function AllEntitiesTable({
   const renderTable = (type: objectType) => {
     const data = objects[type].map((o: TaggedObject) => ({
       [type]: <Typography.Link href={o.url}>{o.name}</Typography.Link>,
-      modified: o.changed_on ? extendedDayjs.utc(o.changed_on).fromNow() : '',
+      modified: extendedDayjs.utc(o.changed_on).fromNow(),
       tags: o.tags,
       owners: o.owners,
     }));

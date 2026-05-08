@@ -22,8 +22,12 @@ import {
   ControlType,
   ControlComponentProps as BaseControlComponentProps,
 } from '@superset-ui/chart-controls';
-import { JsonValue, QueryFormData, usePrevious } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import {
+  styled,
+  JsonValue,
+  QueryFormData,
+  usePrevious,
+} from '@superset-ui/core';
 import { ErrorBoundary } from 'src/components';
 import { ExploreActions } from 'src/explore/actions/exploreActions';
 import controlMap from './controls';

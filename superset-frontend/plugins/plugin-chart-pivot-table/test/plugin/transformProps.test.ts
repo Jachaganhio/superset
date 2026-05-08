@@ -17,8 +17,7 @@
  * under the License.
  */
 
-import { ChartProps, QueryFormData } from '@superset-ui/core';
-import { supersetTheme } from '@apache-superset/core/ui';
+import { ChartProps, QueryFormData, supersetTheme } from '@superset-ui/core';
 import transformProps from '../../src/plugin/transformProps';
 import { MetricsLayoutEnum } from '../../src/types';
 

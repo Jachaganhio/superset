@@ -18,8 +18,11 @@
  */
 import { ReactNode } from 'react';
 import { t } from '@superset-ui/core';
-import { Button, type OnClickHandler } from '@superset-ui/core/components';
-import { Alert } from '@apache-superset/core/ui';
+import {
+  Alert,
+  Button,
+  type OnClickHandler,
+} from '@superset-ui/core/components';
 
 export interface ConfirmationAlertProps {
   title: string;

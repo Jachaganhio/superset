@@ -18,7 +18,7 @@
  */
 import { useRef, useCallback, useState } from 'react';
 import { isEqual } from 'lodash';
-import { css } from '@apache-superset/core/ui';
+import { css } from '@superset-ui/core';
 import { Button } from '../Button';
 import { Select } from '../Select';
 import type { DropdownContainerProps, DropdownRef } from './types';

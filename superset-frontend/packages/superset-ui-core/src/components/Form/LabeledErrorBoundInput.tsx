@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 import { Button, Icons, InfoTooltip, Tooltip, Flex } from '..';
 import { Input } from '../Input';
 import { FormLabel } from './FormLabel';

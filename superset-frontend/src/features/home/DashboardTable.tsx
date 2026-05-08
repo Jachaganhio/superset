@@ -118,17 +118,12 @@ function DashboardTable({
     setLoaded(true);
   }, [activeTab]);
 
-  const handleBulkDashboardExport = async (dashboardsToExport: Dashboard[]) => {
+  const handleBulkDashboardExport = (dashboardsToExport: Dashboard[]) => {
     const ids = dashboardsToExport.map(({ id }) => id);
-    setPreparingExport(true);
-    try {
-      await handleResourceExport('dashboard', ids, () => {
-        setPreparingExport(false);
-      });
-    } catch (error) {
+    handleResourceExport('dashboard', ids, () => {
       setPreparingExport(false);
-      addDangerToast(t('There was an issue exporting the selected dashboards'));
-    }
+    });
+    setPreparingExport(true);
   };
 
   const handleDashboardEdit = (edits: Dashboard) =>

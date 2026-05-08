@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { reactify } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { reactify, styled } from '@superset-ui/core';
 import Component from './CountryMap';
 
 const ReactComponent = reactify(Component);

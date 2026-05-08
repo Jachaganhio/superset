@@ -16,113 +16,122 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react-hooks';
+import { useUnsavedChangesPrompt } from 'src/hooks/useUnsavedChangesPrompt';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { useUnsavedChangesPrompt } from '.';
+import { act } from 'spec/helpers/testing-library';
 
-let history = createMemoryHistory({
+const history = createMemoryHistory({
   initialEntries: ['/dashboard'],
-});
-
-beforeEach(() => {
-  history = createMemoryHistory({ initialEntries: ['/dashboard'] });
 });
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <Router history={history}>{children}</Router>
 );
 
-test('should not show modal initially', () => {
-  const { result } = renderHook(
-    () =>
-      useUnsavedChangesPrompt({
-        hasUnsavedChanges: true,
-        onSave: jest.fn(),
-      }),
-    { wrapper },
-  );
+describe('useUnsavedChangesPrompt', () => {
+  it('should not show modal initially', () => {
+    const { result } = renderHook(
+      () =>
+        useUnsavedChangesPrompt({
+          hasUnsavedChanges: true,
+          onSave: jest.fn(),
+        }),
+      { wrapper },
+    );
 
-  expect(result.current.showModal).toBe(false);
-});
+    expect(result.current.showModal).toBe(false);
+  });
 
-test('should block navigation and show modal if there are unsaved changes', () => {
-  const { result } = renderHook(
-    () =>
-      useUnsavedChangesPrompt({
-        hasUnsavedChanges: true,
-        onSave: jest.fn(),
-      }),
-    { wrapper },
-  );
+  it('should block navigation and show modal if there are unsaved changes', () => {
+    const { result } = renderHook(
+      () =>
+        useUnsavedChangesPrompt({
+          hasUnsavedChanges: true,
+          onSave: jest.fn(),
+        }),
+      { wrapper },
+    );
 
-  // Simulate blocked navigation
-  const unblock = history.block((tx: any) => tx);
-  unblock();
-  history.push('/another-page');
+    // Simulate blocked navigation
+    act(() => {
+      const unblock = history.block((tx: any) => tx);
+      unblock();
+      history.push('/another-page');
+    });
 
-  expect(result.current.showModal).toBe(true);
-});
+    expect(result.current.showModal).toBe(true);
+  });
 
-test('should trigger onSave and hide modal on handleSaveAndCloseModal', async () => {
-  const onSave = jest.fn().mockResolvedValue(undefined);
+  it('should trigger onSave and hide modal on handleSaveAndCloseModal', async () => {
+    const onSave = jest.fn().mockResolvedValue(undefined);
 
-  const { result } = renderHook(
-    () =>
-      useUnsavedChangesPrompt({
-        hasUnsavedChanges: true,
-        onSave,
-      }),
-    { wrapper },
-  );
+    const { result } = renderHook(
+      () =>
+        useUnsavedChangesPrompt({
+          hasUnsavedChanges: true,
+          onSave,
+        }),
+      { wrapper },
+    );
 
-  await result.current.handleSaveAndCloseModal();
+    await act(async () => {
+      await result.current.handleSaveAndCloseModal();
+    });
 
-  expect(onSave).toHaveBeenCalled();
-  expect(result.current.showModal).toBe(false);
-});
+    expect(onSave).toHaveBeenCalled();
+    expect(result.current.showModal).toBe(false);
+  });
 
-test('should trigger manual save and not show modal again', async () => {
-  const onSave = jest.fn().mockResolvedValue(undefined);
+  it('should trigger manual save and not show modal again', async () => {
+    const onSave = jest.fn().mockResolvedValue(undefined);
 
-  const { result } = renderHook(
-    () =>
-      useUnsavedChangesPrompt({
-        hasUnsavedChanges: true,
-        onSave,
-      }),
-    { wrapper },
-  );
+    const { result } = renderHook(
+      () =>
+        useUnsavedChangesPrompt({
+          hasUnsavedChanges: true,
+          onSave,
+        }),
+      { wrapper },
+    );
 
-  result.current.triggerManualSave();
+    act(() => {
+      result.current.triggerManualSave();
+    });
 
-  expect(onSave).toHaveBeenCalled();
-  expect(result.current.showModal).toBe(false);
-});
+    expect(onSave).toHaveBeenCalled();
+    expect(result.current.showModal).toBe(false);
+  });
 
-test('should close modal when handleConfirmNavigation is called', () => {
-  const onSave = jest.fn();
+  it('should close modal when handleConfirmNavigation is called', () => {
+    const onSave = jest.fn();
 
-  const { result } = renderHook(
-    () =>
-      useUnsavedChangesPrompt({
-        hasUnsavedChanges: true,
-        onSave,
-      }),
-    { wrapper },
-  );
+    const { result } = renderHook(
+      () =>
+        useUnsavedChangesPrompt({
+          hasUnsavedChanges: true,
+          onSave,
+        }),
+      { wrapper },
+    );
 
-  // First, trigger navigation to show the modal
-  const unblock = history.block((tx: any) => tx);
-  unblock();
-  history.push('/another-page');
+    // First, trigger navigation to show the modal
+    act(() => {
+      const unblock = history.block((tx: any) => tx);
+      unblock();
+      history.push('/another-page');
+    });
 
-  expect(result.current.showModal).toBe(true);
+    expect(result.current.showModal).toBe(true);
 
-  // Then call handleConfirmNavigation to discard changes
-  result.current.handleConfirmNavigation();
+    // Then call handleConfirmNavigation to discard changes
+    act(() => {
+      result.current.handleConfirmNavigation();
+    });
 
-  expect(result.current.showModal).toBe(false);
+    expect(result.current.showModal).toBe(false);
+  });
 });
 
 test('should preserve pathname and state when confirming navigation', () => {

@@ -17,8 +17,7 @@
  * under the License.
  */
 import { useEffect, useState } from 'react';
-import { t } from '@superset-ui/core';
-import { styled, css } from '@apache-superset/core/ui';
+import { styled, css, t } from '@superset-ui/core';
 import { Comparator } from '@superset-ui/chart-controls';
 import { Icons } from '@superset-ui/core/components/Icons';
 import ControlHeader from 'src/explore/components/ControlHeader';
@@ -74,7 +73,6 @@ const ConditionalFormattingControl = ({
   verboseMap,
   removeIrrelevantConditions,
   extraColorChoices,
-  conditionalFormattingFlag,
   ...props
 }: ConditionalFormattingControlProps) => {
   const [conditionalFormattingConfigs, setConditionalFormattingConfigs] =
@@ -175,7 +173,6 @@ const ConditionalFormattingControl = ({
           onChange={onSave}
           destroyTooltipOnHide
           extraColorChoices={extraColorChoices}
-          conditionalFormattingFlag={conditionalFormattingFlag}
         >
           <AddControlLabel>
             <Icons.PlusOutlined

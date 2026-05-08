@@ -248,7 +248,6 @@ export const exportChart = async ({
   resultType = 'full',
   force = false,
   ownState = {},
-  onStartStreamingExport = null,
 }) => {
   let url;
   let payload;
@@ -273,18 +272,7 @@ export const exportChart = async ({
     });
   }
 
-  // Check if streaming export handler is provided (from dashboard Chart.jsx)
-  if (onStartStreamingExport) {
-    // Streaming is handled by the caller - pass URL, payload, and export type
-    onStartStreamingExport({
-      url,
-      payload,
-      exportType: resultFormat,
-    });
-  } else {
-    // Fallback to original behavior for non-streaming exports
-    SupersetClient.postForm(url, { form_data: safeStringify(payload) });
-  }
+  SupersetClient.postForm(url, { form_data: safeStringify(payload) });
 };
 
 export const exploreChart = (formData, requestParams) => {

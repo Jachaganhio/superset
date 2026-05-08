@@ -57,10 +57,6 @@ import { TooltipProps } from '../../components/Tooltip';
 import { GetLayerType } from '../../factory';
 import { COLOR_SCHEME_TYPES } from '../../utilities/utils';
 import { DEFAULT_DECKGL_COLOR } from '../../utilities/Shared_DeckGL';
-import {
-  createTooltipContent,
-  CommonTooltipRows,
-} from '../../utilities/tooltipUtils';
 import { Point } from '../../types';
 
 function getElevation(
@@ -75,32 +71,34 @@ function getElevation(
   return colorScaler(d)[3] === 0 ? 0 : d.elevation;
 }
 
-function defaultTooltipGenerator(
-  o: JsonObject,
-  fd: PolygonFormData,
-  metricLabel: string,
-) {
-  return (
-    <div className="deckgl-tooltip">
-      {o.object?.name && (
-        <TooltipRow label={`${t('name')}: `} value={`${o.object.name}`} />
-      )}
-      {o.object?.[fd?.line_column] && (
-        <TooltipRow
-          label={`${fd.line_column}: `}
-          value={`${o.object[fd.line_column]}`}
-        />
-      )}
-      {CommonTooltipRows.centroid(o)}
-      {CommonTooltipRows.category(o)}
-      {fd?.metric && (
-        <TooltipRow
-          label={`${metricLabel}: `}
-          value={`${o.object?.[metricLabel]}`}
-        />
-      )}
-    </div>
-  );
+function setTooltipContent(formData: PolygonFormData) {
+  return (o: JsonObject) => {
+    const metricLabel = formData?.metric?.label || formData?.metric;
+
+    return (
+      <div className="deckgl-tooltip">
+        {o.object?.name && (
+          <TooltipRow
+            // eslint-disable-next-line prefer-template
+            label={t('name') + ': '}
+            value={`${o.object.name}`}
+          />
+        )}
+        {o.object?.[formData?.line_column] && (
+          <TooltipRow
+            label={`${formData.line_column}: `}
+            value={`${o.object[formData.line_column]}`}
+          />
+        )}
+        {formData?.metric && (
+          <TooltipRow
+            label={`${metricLabel}: `}
+            value={`${o.object?.[metricLabel]}`}
+          />
+        )}
+      </div>
+    );
+  };
 }
 
 export const getLayer: GetLayerType<PolygonLayer> = function ({
@@ -118,7 +116,7 @@ export const getLayer: GetLayerType<PolygonLayer> = function ({
     fd.fill_color_picker;
   const sc: { r: number; g: number; b: number; a: number } =
     fd.stroke_color_picker;
-  const defaultBreakpointColor = fd.default_breakpoint_color;
+  const defaultBreakpointColor = fd.deafult_breakpoint_color;
   let data = [...payload.data.features];
 
   if (fd.js_data_mutator) {
@@ -200,9 +198,12 @@ export const getLayer: GetLayerType<PolygonLayer> = function ({
     return baseColor;
   };
 
-  const tooltipContentGenerator = createTooltipContent(fd, (o: JsonObject) =>
-    defaultTooltipGenerator(o, fd, metricLabel),
-  );
+  const tooltipContentGenerator =
+    fd.line_column &&
+    fd.metric &&
+    ['json', 'geohash', 'zipcode'].includes(fd.line_type)
+      ? setTooltipContent(fd)
+      : () => null;
 
   return new PolygonLayer({
     id: `path-layer-${fd.slice_id}` as const,

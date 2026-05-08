@@ -18,8 +18,7 @@
  */
 
 import { useMemo, useState } from 'react';
-import { t } from '@superset-ui/core';
-import { css, SupersetTheme } from '@apache-superset/core/ui';
+import { css, SupersetTheme, t } from '@superset-ui/core';
 import { Radio } from '@superset-ui/core/components/Radio';
 import { DrillByType } from '../types';
 

@@ -19,6 +19,7 @@
  */
 import { kebabCase, throttle } from 'lodash';
 import d3 from 'd3';
+import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import nv from 'nvd3-fork';
 import PropTypes from 'prop-types';
@@ -33,7 +34,6 @@ import {
   t,
   VizType,
 } from '@superset-ui/core';
-import { extendedDayjs as dayjs } from '@superset-ui/core/utils/dates';
 
 import 'nvd3-fork/build/nv.d3.css';
 

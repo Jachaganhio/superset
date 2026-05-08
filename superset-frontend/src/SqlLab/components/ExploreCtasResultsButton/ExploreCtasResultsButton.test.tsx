@@ -47,18 +47,17 @@ const setup = (props: Partial<ExploreCtasResultsButtonProps>, store?: Store) =>
     },
   );
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('ExploreCtasResultsButton', () => {
   const postFormSpy = jest.spyOn(SupersetClientClass.prototype, 'postForm');
   postFormSpy.mockImplementation(jest.fn());
 
-  test('renders', async () => {
+  it('renders', async () => {
     const { queryByText } = setup({}, mockStore(initialState));
 
     expect(queryByText('Explore')).toBeInTheDocument();
   });
 
-  test('visualize results', async () => {
+  it('visualize results', async () => {
     const { getByText } = setup({}, mockStore(initialState));
 
     postFormSpy.mockClear();
@@ -76,7 +75,7 @@ describe('ExploreCtasResultsButton', () => {
     });
   });
 
-  test('visualize results fails', async () => {
+  it('visualize results fails', async () => {
     const { getByText } = setup({}, mockStore(initialState));
 
     postFormSpy.mockClear();

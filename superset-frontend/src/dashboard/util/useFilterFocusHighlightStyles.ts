@@ -17,21 +17,13 @@
  * under the License.
  */
 import { useMemo } from 'react';
-import { Filter } from '@superset-ui/core';
-import { useTheme } from '@apache-superset/core/ui';
+import { Filter, useTheme } from '@superset-ui/core';
 import { useSelector } from 'react-redux';
+
 import { RootState } from 'src/dashboard/types';
-import { selectChartCustomizationItems } from 'src/dashboard/components/nativeFilters/ChartCustomization/selectors';
-import {
-  getRelatedCharts,
-  getRelatedChartsForChartCustomization,
-} from './getRelatedCharts';
+import { getRelatedCharts } from './getRelatedCharts';
 
-const unfocusedChartStyles = {
-  opacity: 0.3,
-  pointerEvents: 'none' as const,
-};
-
+const unfocusedChartStyles = { opacity: 0.3, pointerEvents: 'none' };
 const EMPTY = {};
 
 const useFilterFocusHighlightStyles = (chartId: number) => {
@@ -48,46 +40,25 @@ const useFilterFocusHighlightStyles = (chartId: number) => {
   );
 
   const nativeFilters = useSelector((state: RootState) => state.nativeFilters);
+
   const slices =
     useSelector((state: RootState) => state.sliceEntities.slices) || {};
-  const chartCustomizationItems = useSelector(selectChartCustomizationItems);
 
   const highlightedFilterId =
     nativeFilters?.focusedFilterId || nativeFilters?.hoveredFilterId;
-  const highlightedChartCustomizationId = (nativeFilters as any)
-    ?.hoveredChartCustomizationId;
 
-  if (!highlightedFilterId && !highlightedChartCustomizationId) {
+  if (!highlightedFilterId) {
     return EMPTY;
   }
 
-  if (highlightedFilterId) {
-    const relatedCharts = getRelatedCharts(
-      highlightedFilterId as string,
-      nativeFilters.filters[highlightedFilterId as string] as Filter,
-      slices,
-    );
+  const relatedCharts = getRelatedCharts(
+    highlightedFilterId as string,
+    nativeFilters.filters[highlightedFilterId as string] as Filter,
+    slices,
+  );
 
-    if (relatedCharts.includes(chartId)) {
-      return focusedChartStyles;
-    }
-  }
-
-  if (highlightedChartCustomizationId) {
-    const customizationItem = chartCustomizationItems.find(
-      item => item.id === highlightedChartCustomizationId,
-    );
-
-    if (customizationItem) {
-      const relatedCharts = getRelatedChartsForChartCustomization(
-        customizationItem,
-        slices,
-      );
-
-      if (relatedCharts.includes(chartId)) {
-        return focusedChartStyles;
-      }
-    }
+  if (highlightedFilterId && relatedCharts.includes(chartId)) {
+    return focusedChartStyles;
   }
 
   // inline styles are used here due to a performance issue when adding/changing a class, which causes a reflow

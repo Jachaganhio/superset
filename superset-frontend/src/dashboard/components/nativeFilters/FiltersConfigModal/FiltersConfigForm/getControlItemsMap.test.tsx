@@ -209,7 +209,6 @@ test('Clicking on checkbox when resetConfig:false', () => {
   expect(setNativeFilterFieldValues).not.toHaveBeenCalled();
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('ColumnSelect filterValues behavior', () => {
   beforeEach(() => {
     (getControlItems as jest.Mock).mockReturnValue([

@@ -33,5 +33,4 @@ export interface EditableTitleProps {
   renderLink?: (title: string) => React.ReactNode;
   maxWidth?: number;
   autoSize?: boolean;
-  onEditingChange?: (isEditing: boolean) => void;
 }

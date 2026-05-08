@@ -18,7 +18,7 @@
  */
 
 import { Global } from '@emotion/react';
-import { css } from '@apache-superset/core/ui';
+import { css } from '@superset-ui/core';
 
 export const SqlLabGlobalStyles = () => (
   <Global

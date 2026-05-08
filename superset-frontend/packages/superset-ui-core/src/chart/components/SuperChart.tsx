@@ -39,8 +39,6 @@ import SuperChartCore, { Props as SuperChartCoreProps } from './SuperChartCore';
 import DefaultFallbackComponent from './FallbackComponent';
 import ChartProps, { ChartPropsConfig } from '../models/ChartProps';
 import NoResultsComponent from './NoResultsComponent';
-import { isMatrixifyEnabled } from '../types/matrixify';
-import MatrixifyGridRenderer from './Matrixify/MatrixifyGridRenderer';
 
 const defaultProps = {
   FallbackComponent: DefaultFallbackComponent,
@@ -188,47 +186,8 @@ class SuperChart extends PureComponent<Props, {}> {
       theme,
     });
 
-    // Check if Matrixify is enabled - use rawFormData (snake_case)
-    const matrixifyEnabled = isMatrixifyEnabled(chartProps.rawFormData);
-
-    if (matrixifyEnabled) {
-      // When matrixify is enabled, queriesData is expected to be empty
-      // since each cell fetches its own data via StatefulChart
-      const matrixifyChart = (
-        <MatrixifyGridRenderer
-          formData={chartProps.rawFormData}
-          datasource={chartProps.datasource}
-          width={width}
-          height={height}
-          hooks={chartProps.hooks}
-        />
-      );
-
-      // Apply wrapper if provided
-      const wrappedChart = Wrapper ? (
-        <Wrapper width={width} height={height}>
-          {matrixifyChart}
-        </Wrapper>
-      ) : (
-        matrixifyChart
-      );
-
-      // Include error boundary unless disabled
-      return disableErrorBoundary === true ? (
-        wrappedChart
-      ) : (
-        <ErrorBoundary
-          FallbackComponent={props => (
-            <FallbackComponent width={width} height={height} {...props} />
-          )}
-          onError={onErrorBoundary}
-        >
-          {wrappedChart}
-        </ErrorBoundary>
-      );
-    }
-
-    // Check for no results only for non-matrixified charts
+    let chart;
+    // Render the no results component if the query data is null or empty
     const noResultQueries =
       enableNoResults &&
       (!queriesData ||
@@ -237,8 +196,6 @@ class SuperChart extends PureComponent<Props, {}> {
           .every(
             ({ data }) => !data || (Array.isArray(data) && data.length === 0),
           ));
-
-    let chart;
     if (noResultQueries) {
       chart = noResults || (
         <NoResultsComponent

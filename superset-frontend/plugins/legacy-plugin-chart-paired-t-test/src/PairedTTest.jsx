@@ -19,7 +19,7 @@
 /* eslint-disable react/no-array-index-key */
 import PropTypes from 'prop-types';
 import { PureComponent } from 'react';
-import { styled } from '@apache-superset/core/ui';
+import { styled } from '@superset-ui/core';
 import TTestTable, { dataPropType } from './TTestTable';
 
 const propTypes = {

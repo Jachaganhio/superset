@@ -42,7 +42,6 @@ const ERROR_MESSAGE_COMPONENT = (props: ErrorMessageComponentProps) => (
   </>
 );
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('ChartErrorMessage', () => {
   const defaultProps = {
     chartId: 1,
@@ -50,7 +49,7 @@ describe('ChartErrorMessage', () => {
     source: 'test_source' as ChartSource,
   };
 
-  test('renders the default error message when error is null', () => {
+  it('renders the default error message when error is null', () => {
     mockUseChartOwnerNames.mockReturnValue({
       result: null,
       status: ResourceStatus.Loading,
@@ -62,7 +61,7 @@ describe('ChartErrorMessage', () => {
     expect(screen.getByText('Test subtitle')).toBeInTheDocument();
   });
 
-  test('renders the error message that is passed in from the error', () => {
+  it('renders the error message that is passed in from the error', () => {
     getErrorMessageComponentRegistry().registerValue(
       'VALID_KEY',
       ERROR_MESSAGE_COMPONENT,

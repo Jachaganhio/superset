@@ -27,5 +27,5 @@ export interface ViewState {
     };
     currencies: string[];
   };
-  messageToast: Array<object>;
+  messageToast: Array<Object>;
 }

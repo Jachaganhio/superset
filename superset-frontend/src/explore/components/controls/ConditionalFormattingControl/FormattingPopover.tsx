@@ -28,7 +28,6 @@ export const FormattingPopover = ({
   config,
   children,
   extraColorChoices,
-  conditionalFormattingFlag,
   ...props
 }: FormattingPopoverProps) => {
   const [visible, setVisible] = useState(false);
@@ -50,7 +49,6 @@ export const FormattingPopover = ({
           config={config}
           columns={columns}
           extraColorChoices={extraColorChoices}
-          conditionalFormattingFlag={conditionalFormattingFlag}
         />
       }
       open={visible}

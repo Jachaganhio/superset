@@ -19,7 +19,6 @@
 import { render, act } from 'spec/helpers/testing-library';
 import AnchorLink from 'src/dashboard/components/AnchorLink';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('AnchorLink', () => {
   const props = {
     id: 'CHART-123',
@@ -31,7 +30,7 @@ describe('AnchorLink', () => {
     window.location = globalLocation;
   });
 
-  test('should scroll the AnchorLink into view upon mount if id matches hash', async () => {
+  it('should scroll the AnchorLink into view upon mount if id matches hash', async () => {
     const callback = jest.fn();
     jest.spyOn(document, 'getElementById').mockReturnValue({
       scrollIntoView: callback,
@@ -50,7 +49,7 @@ describe('AnchorLink', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  test('should render anchor link without short link button', () => {
+  it('should render anchor link without short link button', () => {
     const { container, queryByRole } = render(
       <AnchorLink showShortLinkButton={false} {...props} />,
       { useRedux: true },
@@ -59,7 +58,7 @@ describe('AnchorLink', () => {
     expect(queryByRole('button')).not.toBeInTheDocument();
   });
 
-  test('should render short link button', () => {
+  it('should render short link button', () => {
     const { getByRole } = render(
       <AnchorLink {...props} showShortLinkButton />,
       { useRedux: true },

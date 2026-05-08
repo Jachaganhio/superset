@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { css, styled, SupersetTheme } from '@apache-superset/core/ui';
+import { css, styled, SupersetTheme } from '@superset-ui/core';
 import { Button, JsonEditor } from '@superset-ui/core/components';
 
 const CTAS_CVAS_SCHEMA_FORM_HEIGHT = 108;
@@ -106,7 +106,6 @@ export const infoTooltip = (theme: SupersetTheme) => css`
     margin-bottom: ${theme.sizeUnit * 0.25}px;
   }
   display: flex;
-  align-items: center;
 `;
 
 export const toggleStyle = (theme: SupersetTheme) => css`
@@ -325,7 +324,6 @@ export const StyledAlignment = styled.div`
 
 export const buttonLinkStyles = (theme: SupersetTheme) => css`
   text-transform: initial;
-  padding: 0 ${theme.sizeUnit * 4}px;
   padding-right: ${theme.sizeUnit * 2}px;
 `;
 
@@ -337,8 +335,8 @@ export const importDbButtonLinkStyles = (theme: SupersetTheme) => css`
 
 export const alchemyButtonLinkStyles = (theme: SupersetTheme) => css`
   text-transform: initial;
+  padding: ${theme.sizeUnit * 8}px 0 0;
   margin-left: 0px;
-  padding: 0 ${theme.sizeUnit * 2}px 0 0;
 `;
 
 export const TabHeader = styled.div`

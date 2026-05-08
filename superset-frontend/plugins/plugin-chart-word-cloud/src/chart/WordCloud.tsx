@@ -24,8 +24,12 @@ import {
   DeriveEncoding,
   Encoder,
 } from 'encodable';
-import { seed, CategoricalColorNamespace } from '@superset-ui/core';
-import { SupersetTheme, withTheme } from '@apache-superset/core/ui';
+import {
+  SupersetTheme,
+  withTheme,
+  seed,
+  CategoricalColorNamespace,
+} from '@superset-ui/core';
 import { isEqual } from 'lodash';
 
 const seedRandom = seed('superset-ui');

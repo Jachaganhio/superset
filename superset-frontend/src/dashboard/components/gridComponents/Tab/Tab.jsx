@@ -20,8 +20,7 @@ import { Fragment, useCallback, memo, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { useDispatch, useSelector } from 'react-redux';
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 
 import { EditableTitle, EmptyState } from '@superset-ui/core/components';
 import { setEditMode, onRefresh } from 'src/dashboard/actions/dashboardState';
@@ -56,7 +55,6 @@ const propTypes = {
   onHoverTab: PropTypes.func,
   editMode: PropTypes.bool.isRequired,
   embeddedMode: PropTypes.bool,
-  onTabTitleEditingChange: PropTypes.func,
 
   // grid related
   availableColumnCount: PropTypes.number,
@@ -82,7 +80,6 @@ const defaultProps = {
   onResizeStart() {},
   onResize() {},
   onResizeStop() {},
-  onTabTitleEditingChange() {},
 };
 
 const TabTitleContainer = styled.div`
@@ -359,7 +356,6 @@ const Tab = props => {
         isHighlighted,
         dashboardId,
         embeddedMode,
-        onTabTitleEditingChange,
       } = props;
       return (
         <TabTitleContainer
@@ -375,7 +371,6 @@ const Tab = props => {
             onSaveTitle={handleChangeText}
             showTooltip={false}
             editing={editMode && isFocused}
-            onEditingChange={onTabTitleEditingChange}
           />
           {!editMode && !embeddedMode && (
             <AnchorLink
@@ -401,7 +396,6 @@ const Tab = props => {
       props.isFocused,
       props.isHighlighted,
       props.dashboardId,
-      props.onTabTitleEditingChange,
       handleChangeText,
     ],
   );

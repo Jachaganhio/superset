@@ -51,7 +51,7 @@ class SetSystemDefaultThemeCommand(BaseCommand):
         self._theme.is_system_default = True
         db.session.add(self._theme)
 
-        logger.info("Set theme %s as system default", self._theme_id)
+        logger.info(f"Set theme {self._theme_id} as system default")
 
         return self._theme
 
@@ -82,7 +82,7 @@ class SetSystemDarkThemeCommand(BaseCommand):
         self._theme.is_system_dark = True
         db.session.add(self._theme)
 
-        logger.info("Set theme %s as system dark", self._theme_id)
+        logger.info(f"Set theme {self._theme_id} as system dark")
 
         return self._theme
 

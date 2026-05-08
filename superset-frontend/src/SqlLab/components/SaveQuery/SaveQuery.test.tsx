@@ -64,9 +64,8 @@ const splitSaveBtnProps = {
 const middlewares = [thunk];
 const mockStore = configureStore(middlewares);
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('SavedQuery', () => {
-  test('doesnt render save button when allows_virtual_table_explore is undefined', async () => {
+  it('doesnt render save button when allows_virtual_table_explore is undefined', async () => {
     const noRenderProps = {
       ...mockedProps,
       database: {
@@ -85,7 +84,7 @@ describe('SavedQuery', () => {
     );
   });
 
-  test('renders a non-split save button when allows_virtual_table_explore is not enabled', () => {
+  it('renders a non-split save button when allows_virtual_table_explore is not enabled', () => {
     render(<SaveQuery {...mockedProps} />, {
       useRedux: true,
       store: mockStore(mockState),
@@ -96,7 +95,7 @@ describe('SavedQuery', () => {
     expect(saveBtn).toBeVisible();
   });
 
-  test('renders a save query modal when user clicks save button', () => {
+  it('renders a save query modal when user clicks save button', () => {
     render(<SaveQuery {...mockedProps} />, {
       useRedux: true,
       store: mockStore(mockState),
@@ -112,7 +111,7 @@ describe('SavedQuery', () => {
     expect(saveQueryModalHeader).toBeInTheDocument();
   });
 
-  test('renders the save query modal UI', () => {
+  it('renders the save query modal UI', () => {
     render(<SaveQuery {...mockedProps} />, {
       useRedux: true,
       store: mockStore(mockState),
@@ -147,7 +146,7 @@ describe('SavedQuery', () => {
     expect(cancelBtn).toBeInTheDocument();
   });
 
-  test('renders a "save as new" and "update" button if query already exists', () => {
+  it('renders a "save as new" and "update" button if query already exists', () => {
     render(<SaveQuery {...mockedProps} />, {
       useRedux: true,
       store: mockStore({
@@ -172,7 +171,7 @@ describe('SavedQuery', () => {
     expect(updateBtn).toBeInTheDocument();
   });
 
-  test('renders a split save button when allows_virtual_table_explore is enabled', async () => {
+  it('renders a split save button when allows_virtual_table_explore is enabled', async () => {
     render(<SaveQuery {...splitSaveBtnProps} />, {
       useRedux: true,
       store: mockStore(mockState),
@@ -187,7 +186,7 @@ describe('SavedQuery', () => {
     });
   });
 
-  test('renders a save dataset modal when user clicks "save dataset" menu item', async () => {
+  it('renders a save dataset modal when user clicks "save dataset" menu item', async () => {
     render(<SaveQuery {...splitSaveBtnProps} />, {
       useRedux: true,
       store: mockStore(mockState),
@@ -206,7 +205,7 @@ describe('SavedQuery', () => {
     expect(saveDatasetHeader).toBeInTheDocument();
   });
 
-  test('renders the save dataset modal UI', async () => {
+  it('renders the save dataset modal UI', async () => {
     render(<SaveQuery {...splitSaveBtnProps} />, {
       useRedux: true,
       store: mockStore(mockState),
@@ -247,7 +246,7 @@ describe('SavedQuery', () => {
     expect(overwritePlaceholderText).toBeInTheDocument();
   });
 
-  test('modal stays open while save is in progress and closes after completion', async () => {
+  it('modal stays open while save is in progress and closes after completion', async () => {
     let resolveSave: () => void;
     const savePromise = new Promise<void>(resolve => {
       resolveSave = resolve;
@@ -291,7 +290,7 @@ describe('SavedQuery', () => {
     expect(mockOnSave).toHaveBeenCalledTimes(1);
   });
 
-  test('handles save with a new tab that has no changes', async () => {
+  it('handles save with a new tab that has no changes', async () => {
     const mockOnSave = jest.fn().mockResolvedValue(undefined);
 
     // Mock state for a new tab with default SQL

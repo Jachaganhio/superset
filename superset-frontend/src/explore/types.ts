@@ -98,6 +98,7 @@ export interface ExploreResponsePayload {
 export interface ExplorePageState {
   user: UserWithPermissionsAndRoles;
   common: {
+    flash_messages: string[];
     conf: JsonObject;
     locale: string;
   };

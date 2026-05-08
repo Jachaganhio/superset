@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { SMART_DATE_ID, t } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
+import { GenericDataType, SMART_DATE_ID, t } from '@superset-ui/core';
 import {
   ControlPanelConfig,
   D3_FORMAT_DOCS,
@@ -111,8 +110,6 @@ export default {
                             (Array.isArray(verboseMap)
                               ? verboseMap[colname as number]
                               : verboseMap[colname as string]) ?? colname,
-                          dataType:
-                            colnames && coltypes[colnames?.indexOf(colname)],
                         }))
                     : [];
                 return {

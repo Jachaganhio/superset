@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { reactify, addAlpha } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, reactify, addAlpha } from '@superset-ui/core';
 import PropTypes from 'prop-types';
 import Component from './ParallelCoordinates';
 

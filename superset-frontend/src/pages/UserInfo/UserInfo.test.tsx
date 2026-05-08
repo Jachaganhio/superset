@@ -58,7 +58,6 @@ const mockUser: UserWithPermissionsAndRoles = {
   },
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('UserInfo', () => {
   const renderPage = async () =>
     act(async () => {
@@ -87,7 +86,7 @@ describe('UserInfo', () => {
     fetchMock.restore();
   });
 
-  test('renders the user info page', async () => {
+  it('renders the user info page', async () => {
     await renderPage();
 
     expect(
@@ -102,14 +101,14 @@ describe('UserInfo', () => {
     expect(screen.getByText('john@example.com')).toBeInTheDocument();
   });
 
-  test('calls the /me endpoint on mount', async () => {
+  it('calls the /me endpoint on mount', async () => {
     await renderPage();
     await waitFor(() => {
       expect(fetchMock.called(meEndpoint)).toBe(true);
     });
   });
 
-  test('opens the reset password modal on button click', async () => {
+  it('opens the reset password modal on button click', async () => {
     await renderPage();
 
     const button = await screen.findByTestId('reset-password-button');
@@ -120,7 +119,7 @@ describe('UserInfo', () => {
     expect(await screen.findByText(/Reset password/i)).toBeInTheDocument();
   });
 
-  test('opens the edit user modal on button click', async () => {
+  it('opens the edit user modal on button click', async () => {
     await renderPage();
 
     const button = await screen.findByTestId('edit-user-button');

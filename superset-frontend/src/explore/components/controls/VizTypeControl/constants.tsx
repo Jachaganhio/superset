@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { VizType } from '@superset-ui/core';
-import { css } from '@apache-superset/core/ui';
+import { VizType, css } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { VizMeta } from './types';
 

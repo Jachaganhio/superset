@@ -21,8 +21,7 @@ import Echart from '../components/Echart';
 import { allEventHandlers } from '../utils/eventHandlers';
 
 export default function EchartsGauge(props: GaugeChartTransformedProps) {
-  const { height, width, echartOptions, selectedValues, refs, formData } =
-    props;
+  const { height, width, echartOptions, selectedValues, refs } = props;
 
   const eventHandlers = allEventHandlers(props);
 
@@ -34,7 +33,6 @@ export default function EchartsGauge(props: GaugeChartTransformedProps) {
       echartOptions={echartOptions}
       eventHandlers={eventHandlers}
       selectedValues={selectedValues}
-      vizType={formData.vizType}
     />
   );
 }

@@ -22,7 +22,10 @@ from typing import Any, ClassVar, TYPE_CHECKING
 import pandas as pd
 
 from superset.common.chart_data import ChartDataResultFormat, ChartDataResultType
-from superset.common.query_context_processor import QueryContextProcessor
+from superset.common.query_context_processor import (
+    CachedTimeOffset,
+    QueryContextProcessor,
+)
 from superset.common.query_object import QueryObject
 from superset.models.slice import Slice
 from superset.utils.core import GenericDataType
@@ -124,6 +127,13 @@ class QueryContext:
 
     def get_query_result(self, query_object: QueryObject) -> QueryResult:
         return self._processor.get_query_result(query_object)
+
+    def processing_time_offsets(
+        self,
+        df: pd.DataFrame,
+        query_object: QueryObject,
+    ) -> CachedTimeOffset:
+        return self._processor.processing_time_offsets(df, query_object)
 
     def raise_for_access(self) -> None:
         self._processor.raise_for_access()

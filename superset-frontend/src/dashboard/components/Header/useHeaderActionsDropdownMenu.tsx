@@ -17,8 +17,7 @@
  * under the License.
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
 import { t } from '@superset-ui/core';
 import { isEmpty } from 'lodash';
@@ -26,6 +25,8 @@ import { URL_PARAMS } from 'src/constants';
 import { useShareMenuItems } from 'src/dashboard/components/menu/ShareMenuItems';
 import { useDownloadMenuItems } from 'src/dashboard/components/menu/DownloadMenuItems';
 import { useHeaderReportMenuItems } from 'src/features/reports/ReportModal/HeaderReportDropdown';
+import CssEditor from 'src/dashboard/components/CssEditor';
+import RefreshIntervalModal from 'src/dashboard/components/RefreshIntervalModal';
 import SaveModal from 'src/dashboard/components/SaveModal';
 import injectCustomCss from 'src/dashboard/util/injectCustomCss';
 import { SAVE_TYPE_NEWDASHBOARD } from 'src/dashboard/util/constants';
@@ -35,6 +36,7 @@ import { getActiveFilters } from 'src/dashboard/util/activeDashboardFilters';
 import { getUrlParam } from 'src/utils/urlUtils';
 import { MenuKeys, RootState } from 'src/dashboard/types';
 import { HeaderDropdownProps } from 'src/dashboard/components/Header/types';
+import { updateDashboardTheme } from 'src/dashboard/actions/dashboardInfo';
 
 export const useHeaderActionsMenu = ({
   customCss,
@@ -53,29 +55,45 @@ export const useHeaderActionsMenu = ({
   userCanSave,
   userCanCurate,
   isLoading,
+  refreshLimit,
+  refreshWarning,
   lastModifiedTime,
   addSuccessToast,
   addDangerToast,
   forceRefreshAllCharts,
   showPropertiesModal,
-  showRefreshModal,
   showReportModal,
   manageEmbedded,
+  onChange,
+  updateCss,
+  startPeriodicRender,
+  setRefreshFrequency,
   dashboardTitle,
   logEvent,
   setCurrentReportDeleting,
 }: HeaderDropdownProps) => {
+  const dispatch = useDispatch();
+  const [css, setCss] = useState(customCss || '');
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const history = useHistory();
   const directPathToChild = useSelector(
     (state: RootState) => state.dashboardState.directPathToChild,
   );
 
   useEffect(() => {
-    if (customCss) {
+    if (customCss !== css) {
+      setCss(customCss || '');
       injectCustomCss(customCss);
     }
-  }, [customCss]);
+  }, [css, customCss]);
+
+  const handleThemeChange = useCallback(
+    async (themeId: number | null) => {
+      // Save the theme to the dashboard
+      // The CrudThemeProvider will handle applying the theme to dashboard content only
+      dispatch(updateDashboardTheme(themeId));
+    },
+    [dispatch],
+  );
 
   const handleMenuClick = useCallback(
     ({ key }: { key: string }) => {
@@ -87,9 +105,6 @@ export const useHeaderActionsMenu = ({
         case MenuKeys.EditProperties:
           showPropertiesModal();
           break;
-        case MenuKeys.AutorefreshModal:
-          showRefreshModal();
-          break;
         case MenuKeys.ToggleFullscreen: {
           const isCurrentlyStandalone =
             Number(getUrlParam(URL_PARAMS.standalone)) === 1;
@@ -99,7 +114,7 @@ export const useHeaderActionsMenu = ({
             hash: window.location.hash,
             standalone: isCurrentlyStandalone ? null : 1,
           });
-          history.replace(url);
+          window.location.replace(url);
           break;
         }
         case MenuKeys.ManageEmbedded:
@@ -114,9 +129,24 @@ export const useHeaderActionsMenu = ({
       forceRefreshAllCharts,
       addSuccessToast,
       showPropertiesModal,
-      showRefreshModal,
       manageEmbedded,
     ],
+  );
+
+  const changeCss = useCallback(
+    (newCss: string) => {
+      onChange();
+      updateCss(newCss);
+    },
+    [onChange, updateCss],
+  );
+
+  const changeRefreshInterval = useCallback(
+    (refreshInterval: number, isPersistent: boolean) => {
+      setRefreshFrequency(refreshInterval, isPersistent);
+      startPeriodicRender(refreshInterval * 1000);
+    },
+    [setRefreshFrequency, startPeriodicRender],
   );
 
   const emailSubject = useMemo(
@@ -180,6 +210,8 @@ export const useHeaderActionsMenu = ({
 
   const menu = useMemo(() => {
     const isEmbedded = !dashboardInfo?.userId;
+    const refreshIntervalOptions =
+      dashboardInfo?.common?.conf?.DASHBOARD_AUTO_REFRESH_INTERVALS;
 
     const menuItems: MenuItem[] = [];
 
@@ -188,13 +220,6 @@ export const useHeaderActionsMenu = ({
       menuItems.push({
         key: MenuKeys.RefreshDashboard,
         label: t('Refresh dashboard'),
-        disabled: isLoading,
-      });
-
-      // Auto-refresh settings (session-only in view mode)
-      menuItems.push({
-        key: MenuKeys.AutorefreshModal,
-        label: t('Set auto-refresh'),
         disabled: isLoading,
       });
     }
@@ -215,6 +240,23 @@ export const useHeaderActionsMenu = ({
         key: MenuKeys.EditProperties,
         label: t('Edit properties'),
       });
+    }
+
+    // Edit CSS
+    if (editMode) {
+      menuItems.push(
+        createModalMenuItem(
+          MenuKeys.EditCss,
+          <CssEditor
+            triggerNode={<div>{t('Theme & CSS')}</div>}
+            initialCss={css}
+            onChange={changeCss}
+            addDangerToast={addDangerToast}
+            currentThemeId={dashboardInfo.theme?.id || null}
+            onThemeChange={handleThemeChange}
+          />,
+        ),
+      );
     }
 
     // Divider
@@ -266,14 +308,8 @@ export const useHeaderActionsMenu = ({
       });
     }
 
-    // Only add divider if there are items after it
-    const hasItemsAfterDivider =
-      (!editMode && reportMenuItem) ||
-      (editMode && !isEmpty(dashboardInfo?.metadata?.filter_scopes));
-
-    if (hasItemsAfterDivider) {
-      menuItems.push({ type: 'divider' });
-    }
+    // Divider
+    menuItems.push({ type: 'divider' });
 
     // Report dropdown
     if (!editMode && reportMenuItem) {
@@ -292,6 +328,23 @@ export const useHeaderActionsMenu = ({
       );
     }
 
+    // Auto-refresh interval
+    menuItems.push(
+      createModalMenuItem(
+        MenuKeys.AutorefreshModal,
+        <RefreshIntervalModal
+          addSuccessToast={addSuccessToast}
+          refreshFrequency={refreshFrequency}
+          refreshLimit={refreshLimit}
+          refreshWarning={refreshWarning}
+          onChange={changeRefreshInterval}
+          editMode={editMode}
+          refreshIntervalOptions={refreshIntervalOptions}
+          triggerNode={<div>{t('Set auto-refresh interval')}</div>}
+        />,
+      ),
+    );
+
     return (
       <Menu
         selectable={false}
@@ -303,8 +356,11 @@ export const useHeaderActionsMenu = ({
   }, [
     addDangerToast,
     addSuccessToast,
+    changeRefreshInterval,
+    changeCss,
     colorNamespace,
     colorScheme,
+    css,
     customCss,
     dashboardId,
     dashboardInfo,
@@ -318,6 +374,8 @@ export const useHeaderActionsMenu = ({
     layout,
     onSave,
     refreshFrequency,
+    refreshLimit,
+    refreshWarning,
     reportMenuItem,
     shareMenuItems,
     shouldPersistRefreshFrequency,

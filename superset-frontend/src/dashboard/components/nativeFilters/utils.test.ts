@@ -21,23 +21,22 @@ import { DashboardLayout } from 'src/dashboard/types';
 import { CHART_TYPE } from 'src/dashboard/util/componentTypes';
 import { nativeFilterGate, findTabsWithChartsInScope } from './utils';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('nativeFilterGate', () => {
-  test('should return true for regular chart', () => {
+  it('should return true for regular chart', () => {
     expect(nativeFilterGate([])).toEqual(true);
   });
 
-  test('should return true for cross filter chart', () => {
+  it('should return true for cross filter chart', () => {
     expect(nativeFilterGate([Behavior.InteractiveChart])).toEqual(true);
   });
 
-  test('should return true for native filter chart with cross filter support', () => {
+  it('should return true for native filter chart with cross filter support', () => {
     expect(
       nativeFilterGate([Behavior.NativeFilter, Behavior.InteractiveChart]),
     ).toEqual(true);
   });
 
-  test('should return false for native filter behavior', () => {
+  it('should return false for native filter behavior', () => {
     expect(nativeFilterGate([Behavior.NativeFilter])).toEqual(false);
   });
 });

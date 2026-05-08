@@ -22,7 +22,6 @@ import getFormDataWithExtraFilters, {
 } from 'src/dashboard/util/charts/getFormDataWithExtraFilters';
 import { sliceId as chartId } from 'spec/fixtures/mockChartQueries';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('getFormDataWithExtraFilters', () => {
   const filterId = 'native-filter-1';
   const mockChart = {
@@ -73,7 +72,7 @@ describe('getFormDataWithExtraFilters', () => {
     allSliceIds: [chartId],
   };
 
-  test('should include filters from the passed filters', () => {
+  it('should include filters from the passed filters', () => {
     const result = getFormDataWithExtraFilters(mockArgs);
     expect(result.extra_filters).toHaveLength(2);
     expect(result.extra_filters[0]).toEqual({
@@ -88,7 +87,7 @@ describe('getFormDataWithExtraFilters', () => {
     });
   });
 
-  test('should compose extra control', () => {
+  it('should compose extra control', () => {
     const result: CachedFormDataWithExtraControls =
       getFormDataWithExtraFilters(mockArgs);
     expect(result.stack).toEqual('Stacked');

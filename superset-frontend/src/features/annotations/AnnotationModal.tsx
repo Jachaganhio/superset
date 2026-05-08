@@ -18,8 +18,7 @@
  */
 import { FunctionComponent, useState, useEffect, ChangeEvent } from 'react';
 
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 import { useSingleViewResource } from 'src/views/CRUD/hooks';
 import { extendedDayjs } from '@superset-ui/core/utils/dates';
 import withToasts from 'src/components/MessageToasts/withToasts';
@@ -279,7 +278,7 @@ const AnnotationModal: FunctionComponent<AnnotationModalProps> = ({
       }
     >
       <StyledAnnotationTitle>
-        <h4>{t('General information')}</h4>
+        <h4>{t('Basic information')}</h4>
       </StyledAnnotationTitle>
       <AnnotationContainer>
         <div className="control-label">

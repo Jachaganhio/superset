@@ -20,8 +20,14 @@
 
 import { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { DatasourceType, SupersetClient, t } from '@superset-ui/core';
-import { css, styled, withTheme } from '@apache-superset/core/ui';
+import {
+  css,
+  DatasourceType,
+  SupersetClient,
+  styled,
+  t,
+  withTheme,
+} from '@superset-ui/core';
 import { getTemporalColumns } from '@superset-ui/chart-controls';
 import { getUrlParam } from 'src/utils/urlUtils';
 import {
@@ -326,7 +332,7 @@ class DatasourceControl extends PureComponent {
           editText
         ),
         disabled: !allowEdit,
-        'data-test': 'edit-dataset',
+        ...{ 'data-test': 'edit-dataset' },
       });
     }
 

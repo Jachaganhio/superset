@@ -24,8 +24,6 @@ import {
   UNSET_FOCUSED_NATIVE_FILTER,
   SET_HOVERED_NATIVE_FILTER,
   UNSET_HOVERED_NATIVE_FILTER,
-  SET_HOVERED_CHART_CUSTOMIZATION,
-  UNSET_HOVERED_CHART_CUSTOMIZATION,
   UPDATE_CASCADE_PARENT_IDS,
 } from 'src/dashboard/actions/nativeFilters';
 import {
@@ -36,18 +34,14 @@ import {
 } from '@superset-ui/core';
 import { HYDRATE_DASHBOARD } from '../actions/hydrate';
 
-interface ExtendedNativeFiltersState extends NativeFiltersState {
-  hoveredChartCustomizationId?: string;
-}
-
 export function getInitialState({
   filterConfig,
   state: prevState,
 }: {
   filterConfig?: FilterConfiguration;
-  state?: ExtendedNativeFiltersState;
-}): ExtendedNativeFiltersState {
-  const state: Partial<ExtendedNativeFiltersState> = {};
+  state?: NativeFiltersState;
+}): NativeFiltersState {
+  const state: Partial<NativeFiltersState> = {};
   const filters: Record<string, Filter | Divider> = {};
   if (filterConfig) {
     filterConfig.forEach(filter => {
@@ -59,12 +53,11 @@ export function getInitialState({
     state.filters = prevState?.filters ?? {};
   }
   state.focusedFilterId = undefined;
-  state.hoveredChartCustomizationId = undefined;
-  return state as ExtendedNativeFiltersState;
+  return state as NativeFiltersState;
 }
 
 function handleFilterChangesComplete(
-  state: ExtendedNativeFiltersState,
+  state: NativeFiltersState,
   filters: Filter[],
 ) {
   const modifiedFilters = { ...state.filters };
@@ -84,11 +77,11 @@ function handleFilterChangesComplete(
   return {
     ...state,
     filters: modifiedFilters,
-  } as ExtendedNativeFiltersState;
+  } as NativeFiltersState;
 }
 
 export default function nativeFilterReducer(
-  state: ExtendedNativeFiltersState = {
+  state: NativeFiltersState = {
     filters: {},
   },
   action: AnyFilterAction,
@@ -127,18 +120,6 @@ export default function nativeFilterReducer(
       return {
         ...state,
         hoveredFilterId: undefined,
-      };
-
-    case SET_HOVERED_CHART_CUSTOMIZATION:
-      return {
-        ...state,
-        hoveredChartCustomizationId: action.id,
-      };
-
-    case UNSET_HOVERED_CHART_CUSTOMIZATION:
-      return {
-        ...state,
-        hoveredChartCustomizationId: undefined,
       };
 
     case UPDATE_CASCADE_PARENT_IDS:

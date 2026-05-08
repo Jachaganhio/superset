@@ -17,8 +17,8 @@
  * under the License.
  */
 import { ReactNode, MouseEvent as ReactMouseEvent } from 'react';
-import { TableInstance, Row, UseRowSelectRowProps } from 'react-table';
-import { styled } from '@apache-superset/core/ui';
+import { TableInstance, Row } from 'react-table';
+import { styled } from '@superset-ui/core';
 import cx from 'classnames';
 
 interface CardCollectionProps {
@@ -65,7 +65,7 @@ export default function CardCollection({
 }: CardCollectionProps) {
   function handleClick(
     event: ReactMouseEvent<HTMLDivElement, MouseEvent>,
-    toggleRowSelected: (value?: boolean) => void,
+    toggleRowSelected: Row['toggleRowSelected'],
   ) {
     if (bulkSelectEnabled) {
       event.preventDefault();
@@ -79,9 +79,9 @@ export default function CardCollection({
     <CardContainer showThumbnails={showThumbnails}>
       {loading &&
         rows.length === 0 &&
-        new Array(25)
-          .fill(undefined)
-          .map((e, i) => <div key={i}>{renderCard({ loading })}</div>)}
+        [...new Array(25)].map((e, i) => (
+          <div key={i}>{renderCard({ loading })}</div>
+        ))}
       {rows.length > 0 &&
         rows.map(row => {
           if (!renderCard) return null;
@@ -89,18 +89,11 @@ export default function CardCollection({
           return (
             <CardWrapper
               className={cx({
-                'card-selected':
-                  bulkSelectEnabled &&
-                  (row as Row & UseRowSelectRowProps<any>).isSelected,
+                'card-selected': bulkSelectEnabled && row.isSelected,
                 'bulk-select': bulkSelectEnabled,
               })}
               key={row.id}
-              onClick={e =>
-                handleClick(
-                  e,
-                  (row as Row & UseRowSelectRowProps<any>).toggleRowSelected,
-                )
-              }
+              onClick={e => handleClick(e, row.toggleRowSelected)}
               role="none"
             >
               {renderCard({ ...row.original, loading })}

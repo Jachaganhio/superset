@@ -17,16 +17,17 @@
  * under the License.
  */
 
-import { useCallback, useMemo, useState, useEffect } from 'react';
-import { t, SupersetClient } from '@superset-ui/core';
-import { styled, Alert } from '@apache-superset/core/ui';
+import { useMemo, useState } from 'react';
+import { t, SupersetClient, styled } from '@superset-ui/core';
 import {
   Tag,
   DeleteModal,
   ConfirmStatusChange,
   Loading,
+  Alert,
   Tooltip,
   Space,
+  Modal,
 } from '@superset-ui/core/components';
 
 import rison from 'rison';
@@ -52,7 +53,6 @@ import ThemeModal from 'src/features/themes/ThemeModal';
 import { ThemeObject } from 'src/features/themes/types';
 import { QueryObjectColumns } from 'src/views/CRUD/types';
 import { Icons } from '@superset-ui/core/components/Icons';
-import { useConfirmModal } from 'src/hooks/useConfirmModal';
 import {
   setSystemDefaultTheme,
   setSystemDarkTheme,
@@ -70,11 +70,6 @@ const FlexRowContainer = styled.div`
   .ant-tag {
     margin-left: ${({ theme }) => theme.sizeUnit * 2}px;
   }
-`;
-
-const IconTag = styled(Tag)`
-  display: inline-flex;
-  align-items: center;
 `;
 
 const CONFIRM_OVERWRITE_MESSAGE = t(
@@ -110,26 +105,12 @@ function ThemesList({
     refreshData,
     toggleBulkSelect,
   } = useListViewResource<ThemeObject>('theme', t('Themes'), addDangerToast);
-  const { setTemporaryTheme, hasDevOverride, getAppliedThemeId } =
-    useThemeContext();
+  const { setTemporaryTheme, getCurrentCrudThemeId } = useThemeContext();
   const [themeModalOpen, setThemeModalOpen] = useState<boolean>(false);
   const [currentTheme, setCurrentTheme] = useState<ThemeObject | null>(null);
   const [preparingExport, setPreparingExport] = useState<boolean>(false);
   const [importingTheme, showImportModal] = useState<boolean>(false);
-  const [appliedThemeId, setLocalAppliedThemeId] = useState<number | null>(
-    null,
-  );
-
-  const { showConfirm, ConfirmModal } = useConfirmModal();
-
-  useEffect(() => {
-    if (hasDevOverride()) {
-      const storedThemeId = getAppliedThemeId();
-      setLocalAppliedThemeId(storedThemeId);
-    } else {
-      setLocalAppliedThemeId(null);
-    }
-  }, [hasDevOverride, getAppliedThemeId]);
+  const [appliedThemeId, setAppliedThemeId] = useState<number | null>(null);
 
   const canCreate = hasPerm('can_write');
   const canEdit = hasPerm('can_write');
@@ -208,50 +189,36 @@ function ThemesList({
     setThemeModalOpen(true);
   }
 
-  const handleThemeApply = useCallback(
-    (themeObj: ThemeObject) => {
-      if (themeObj.json_data) {
-        try {
-          const themeConfig = JSON.parse(themeObj.json_data);
-          const themeId = themeObj.id || null;
-
-          setTemporaryTheme(themeConfig, themeId);
-          setLocalAppliedThemeId(themeId);
-
-          addSuccessToast(t('Local theme set to "%s"', themeObj.theme_name));
-        } catch (error) {
-          addDangerToast(
-            t('Failed to set local theme: Invalid JSON configuration'),
-          );
-        }
+  function handleThemeApply(themeObj: ThemeObject) {
+    if (themeObj.json_data) {
+      try {
+        const themeConfig = JSON.parse(themeObj.json_data);
+        setTemporaryTheme(themeConfig);
+        setAppliedThemeId(themeObj.id || null);
+        addSuccessToast(t('Local theme set to "%s"', themeObj.theme_name));
+      } catch (error) {
+        addDangerToast(
+          t('Failed to set local theme: Invalid JSON configuration'),
+        );
       }
-    },
-    [setTemporaryTheme, addSuccessToast, addDangerToast],
-  );
+    }
+  }
 
   function handleThemeModalApply() {
     // Clear any previously applied theme ID when applying from modal
     // since the modal theme might not have an ID yet (unsaved theme)
-    setLocalAppliedThemeId(null);
+    setAppliedThemeId(null);
   }
 
-  const handleBulkThemeExport = useCallback(
-    async (themesToExport: ThemeObject[]) => {
-      const ids = themesToExport
-        .map(({ id }) => id)
-        .filter((id): id is number => id !== undefined);
-      setPreparingExport(true);
-      try {
-        await handleResourceExport('theme', ids, () => {
-          setPreparingExport(false);
-        });
-      } catch (error) {
-        setPreparingExport(false);
-        addDangerToast(t('There was an issue exporting the selected themes'));
-      }
-    },
-    [addDangerToast],
-  );
+  const handleBulkThemeExport = (themesToExport: ThemeObject[]) => {
+    const ids = themesToExport
+      .map(({ id }) => id)
+      .filter((id): id is number => id !== undefined);
+    handleResourceExport('theme', ids, () => {
+      setPreparingExport(false);
+    });
+    setPreparingExport(true);
+  };
 
   const openThemeImportModal = () => {
     showImportModal(true);
@@ -267,107 +234,94 @@ function ThemesList({
     addSuccessToast(t('Theme imported'));
   };
 
-  const handleSetSystemDefault = useCallback(
-    (theme: ThemeObject) => {
-      showConfirm({
-        title: t('Set System Default Theme'),
-        body: t(
-          'Are you sure you want to set "%s" as the system default theme? This will apply to all users who haven\'t set a personal preference.',
-          theme.theme_name,
-        ),
-        onConfirm: async () => {
-          try {
-            await setSystemDefaultTheme(theme.id!);
+  // Generic confirmation modal utility to reduce code duplication
+  const showThemeConfirmation = (config: {
+    title: string;
+    content: string;
+    onConfirm: () => Promise<any>;
+    successMessage: string;
+    errorMessage: string;
+  }) => {
+    Modal.confirm({
+      title: config.title,
+      content: config.content,
+      onOk: () => {
+        config
+          .onConfirm()
+          .then(() => {
             refreshData();
-            addSuccessToast(
-              t('"%s" is now the system default theme', theme.theme_name),
-            );
-          } catch (err: any) {
-            addDangerToast(
-              t('Failed to set system default theme: %s', err.message),
-            );
-          }
-        },
-      });
-    },
-    [showConfirm, refreshData, addSuccessToast, addDangerToast],
-  );
+            addSuccessToast(config.successMessage);
+          })
+          .catch(err => {
+            addDangerToast(t(config.errorMessage, err.message));
+          });
+      },
+    });
+  };
 
-  const handleSetSystemDark = useCallback(
-    (theme: ThemeObject) => {
-      showConfirm({
-        title: t('Set System Dark Theme'),
-        body: t(
-          'Are you sure you want to set "%s" as the system dark theme? This will apply to all users who haven\'t set a personal preference.',
-          theme.theme_name,
-        ),
-        onConfirm: async () => {
-          try {
-            await setSystemDarkTheme(theme.id!);
-            refreshData();
-            addSuccessToast(
-              t('"%s" is now the system dark theme', theme.theme_name),
-            );
-          } catch (err: any) {
-            addDangerToast(
-              t('Failed to set system dark theme: %s', err.message),
-            );
-          }
-        },
-      });
-    },
-    [showConfirm, refreshData, addSuccessToast, addDangerToast],
-  );
+  const handleSetSystemDefault = (theme: ThemeObject) => {
+    showThemeConfirmation({
+      title: t('Set System Default Theme'),
+      content: t(
+        'Are you sure you want to set "%s" as the system default theme? This will apply to all users who haven\'t set a personal preference.',
+        theme.theme_name,
+      ),
+      onConfirm: () => setSystemDefaultTheme(theme.id!),
+      successMessage: t(
+        '"%s" is now the system default theme',
+        theme.theme_name,
+      ),
+      errorMessage: 'Failed to set system default theme: %s',
+    });
+  };
 
-  const handleUnsetSystemDefault = useCallback(() => {
-    showConfirm({
+  const handleSetSystemDark = (theme: ThemeObject) => {
+    showThemeConfirmation({
+      title: t('Set System Dark Theme'),
+      content: t(
+        'Are you sure you want to set "%s" as the system dark theme? This will apply to all users who haven\'t set a personal preference.',
+        theme.theme_name,
+      ),
+      onConfirm: () => setSystemDarkTheme(theme.id!),
+      successMessage: t('"%s" is now the system dark theme', theme.theme_name),
+      errorMessage: 'Failed to set system dark theme: %s',
+    });
+  };
+
+  const handleUnsetSystemDefault = () => {
+    showThemeConfirmation({
       title: t('Remove System Default Theme'),
-      body: t(
+      content: t(
         'Are you sure you want to remove the system default theme? The application will fall back to the configuration file default.',
       ),
-      onConfirm: async () => {
-        try {
-          await unsetSystemDefaultTheme();
-          refreshData();
-          addSuccessToast(t('System default theme removed'));
-        } catch (err: any) {
-          addDangerToast(
-            t('Failed to remove system default theme: %s', err.message),
-          );
-        }
-      },
+      onConfirm: () => unsetSystemDefaultTheme(),
+      successMessage: t('System default theme removed'),
+      errorMessage: 'Failed to remove system default theme: %s',
     });
-  }, [showConfirm, refreshData, addSuccessToast, addDangerToast]);
+  };
 
-  const handleUnsetSystemDark = useCallback(() => {
-    showConfirm({
+  const handleUnsetSystemDark = () => {
+    showThemeConfirmation({
       title: t('Remove System Dark Theme'),
-      body: t(
+      content: t(
         'Are you sure you want to remove the system dark theme? The application will fall back to the configuration file dark theme.',
       ),
-      onConfirm: async () => {
-        try {
-          await unsetSystemDarkTheme();
-          refreshData();
-          addSuccessToast(t('System dark theme removed'));
-        } catch (err: any) {
-          addDangerToast(
-            t('Failed to remove system dark theme: %s', err.message),
-          );
-        }
-      },
+      onConfirm: () => unsetSystemDarkTheme(),
+      successMessage: t('System dark theme removed'),
+      errorMessage: 'Failed to remove system dark theme: %s',
     });
-  }, [showConfirm, refreshData, addSuccessToast, addDangerToast]);
+  };
 
   const initialSort = [{ id: 'theme_name', desc: true }];
   const columns = useMemo(
     () => [
       {
         Cell: ({ row: { original } }: any) => {
+          const currentCrudThemeId = getCurrentCrudThemeId();
           const isCurrentTheme =
-            hasDevOverride() &&
-            appliedThemeId &&
-            original.id === appliedThemeId;
+            (currentCrudThemeId &&
+              original.id?.toString() === currentCrudThemeId) ||
+            (appliedThemeId && original.id === appliedThemeId);
 
           return (
             <FlexRowContainer>
@@ -386,16 +340,16 @@ function ThemesList({
               )}
               {original.is_system_default && (
                 <Tooltip title={t('This is the system default theme')}>
-                  <IconTag color="warning" icon={<Icons.SunOutlined />}>
-                    {t('Default')}
-                  </IconTag>
+                  <Tag color="warning">
+                    <Icons.SunOutlined /> {t('Default')}
+                  </Tag>
                 </Tooltip>
               )}
               {original.is_system_dark && (
                 <Tooltip title={t('This is the system dark theme')}>
-                  <IconTag color="default" icon={<Icons.MoonOutlined />}>
-                    {t('Dark')}
-                  </IconTag>
+                  <Tag color="default">
+                    <Icons.MoonOutlined /> {t('Dark')}
+                  </Tag>
                 </Tooltip>
               )}
             </FlexRowContainer>
@@ -533,20 +487,12 @@ function ThemesList({
       },
     ],
     [
-      canEdit,
       canDelete,
+      canCreate,
       canApply,
       canExport,
-      hasDevOverride,
-      appliedThemeId,
       canSetSystemThemes,
-      addDangerToast,
-      handleThemeApply,
-      handleBulkThemeExport,
-      handleSetSystemDefault,
-      handleUnsetSystemDefault,
-      handleSetSystemDark,
-      handleUnsetSystemDark,
+      appliedThemeId,
     ],
   );
 
@@ -624,7 +570,7 @@ function ThemesList({
         paginate: true,
       },
     ],
-    [user],
+    [],
   );
 
   return (
@@ -735,7 +681,6 @@ function ThemesList({
         }}
       </ConfirmStatusChange>
       {preparingExport && <Loading />}
-      {ConfirmModal}
     </>
   );
 }

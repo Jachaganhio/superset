@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ensureIsArray, t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { ensureIsArray, styled, t } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { ContentType, MetadataType } from '.';
 

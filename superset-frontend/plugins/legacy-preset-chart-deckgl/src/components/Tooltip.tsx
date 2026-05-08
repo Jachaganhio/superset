@@ -17,8 +17,7 @@
  * under the License.
  */
 
-import { safeHtmlSpan } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, safeHtmlSpan } from '@superset-ui/core';
 import { ReactNode } from 'react';
 
 export type TooltipProps = {
@@ -30,42 +29,26 @@ export type TooltipProps = {
       }
     | null
     | undefined;
-  variant?: 'default' | 'custom';
 };
 
-const StyledDiv = styled.div<{
-  top: number;
-  left: number;
-  variant: 'default' | 'custom';
-}>`
-  ${({ theme, top, left, variant }) => `
+const StyledDiv = styled.div<{ top: number; left: number }>`
+  ${({ theme, top, left }) => `
     position: absolute;
     top: ${top}px;
     left: ${left}px;
+    padding: ${theme.sizeUnit * 2}px;
+    margin: ${theme.sizeUnit * 2}px;
+    background: ${theme.colorBgElevated};
+    color: ${theme.colorText};
+    maxWidth: 300px;
+    fontSize: ${theme.fontSizeSM}px;
     zIndex: 9;
     pointerEvents: none;
-    ${
-      variant === 'default'
-        ? `
-      padding: ${theme.sizeUnit * 2}px;
-      margin: ${theme.sizeUnit * 2}px;
-      background: ${theme.colorBgElevated};
-      color: ${theme.colorText};
-      maxWidth: 300px;
-      fontSize: ${theme.fontSizeSM}px;
-      border: 1px solid ${theme.colorBorder};
-      border-radius: ${theme.borderRadius}px;
-      box-shadow: ${theme.boxShadowSecondary};
-    `
-        : `
-      margin: ${theme.sizeUnit * 3}px;
-    `
-    }
   `}
 `;
 
 export default function Tooltip(props: TooltipProps) {
-  const { tooltip, variant = 'default' } = props;
+  const { tooltip } = props;
   if (typeof tooltip === 'undefined' || tooltip === null) {
     return null;
   }
@@ -75,7 +58,7 @@ export default function Tooltip(props: TooltipProps) {
     typeof content === 'string' ? safeHtmlSpan(content) : content;
 
   return (
-    <StyledDiv top={y} left={x} variant={variant}>
+    <StyledDiv top={y} left={x}>
       {safeContent}
     </StyledDiv>
   );

@@ -58,121 +58,41 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-      ],
-    },
-    {
-      label: t('Series settings'),
-      expanded: true,
-      controlSetRows: [
         [
           <ControlSubSectionHeader>
-            {t('Series increase setting')}
+            {t('Series colors')}
           </ControlSubSectionHeader>,
         ],
         [
           {
             name: 'increase_color',
             config: {
-              label: t('Increase color'),
+              label: t('Increase'),
               type: 'ColorPickerControl',
               default: { r: 90, g: 193, b: 137, a: 1 },
               renderTrigger: true,
-              description: t(
-                'Select the color used for values that indicate an increase in the chart',
-              ),
             },
           },
-          {
-            name: 'increase_label',
-            config: {
-              label: t('Increase label'),
-              type: 'TextControl',
-              renderTrigger: true,
-              description: t(
-                'Customize the label displayed for increasing values in the chart tooltips and legend.',
-              ),
-            },
-          },
-        ],
-        [
-          <ControlSubSectionHeader>
-            {t('Series decrease setting')}
-          </ControlSubSectionHeader>,
-        ],
-        [
           {
             name: 'decrease_color',
             config: {
-              label: t('Decrease color'),
+              label: t('Decrease'),
               type: 'ColorPickerControl',
               default: { r: 224, g: 67, b: 85, a: 1 },
               renderTrigger: true,
-              description: t(
-                'Select the color used for values ​​that indicate a decrease in the chart.',
-              ),
             },
           },
-          {
-            name: 'decrease_label',
-            config: {
-              label: t('Decrease label'),
-              type: 'TextControl',
-              renderTrigger: true,
-              description: t(
-                'Customize the label displayed for decreasing values in the chart tooltips and legend.',
-              ),
-            },
-          },
-        ],
-        [
-          <ControlSubSectionHeader>
-            {t('Series total setting')}
-          </ControlSubSectionHeader>,
-        ],
-        [
-          {
-            name: 'show_total',
-            config: {
-              type: 'CheckboxControl',
-              label: t('Show total'),
-              renderTrigger: true,
-              default: true,
-              description: t('Display cumulative total at end'),
-            },
-          },
-        ],
-        [
           {
             name: 'total_color',
             config: {
-              label: t('Total color'),
+              label: t('Total'),
               type: 'ColorPickerControl',
               default: { r: 102, g: 102, b: 102, a: 1 },
               renderTrigger: true,
-              description: t(
-                'Select the color used for values that represent total bars in the chart',
-              ),
-            },
-          },
-
-          {
-            name: 'total_label',
-            config: {
-              label: t('Total label'),
-              type: 'TextControl',
-              renderTrigger: true,
-              description: t(
-                'Customize the label displayed for total values in the chart tooltips, legend, and chart axis.',
-              ),
             },
           },
         ],
-      ],
-    },
-    {
-      label: t('X Axis'),
-      expanded: true,
-      controlSetRows: [
+        [<ControlSubSectionHeader>{t('X Axis')}</ControlSubSectionHeader>],
         [
           {
             name: 'x_axis_label',
@@ -214,12 +134,7 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-      ],
-    },
-    {
-      label: t('Y Axis'),
-      expanded: true,
-      controlSetRows: [
+        [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],
         [
           {
             name: 'y_axis_label',

@@ -17,8 +17,7 @@
  * under the License.
  */
 import { forwardRef, RefObject } from 'react';
-import { QueryData } from '@superset-ui/core';
-import { css, SupersetTheme } from '@apache-superset/core/ui';
+import { css, QueryData, SupersetTheme } from '@superset-ui/core';
 import {
   CachedLabel,
   type LabelType,
@@ -42,7 +41,6 @@ export type ChartPillsProps = {
   chartUpdateEndTime?: number;
   refreshCachedQuery: () => void;
   rowLimit?: string | number;
-  hideRowCount?: boolean;
 };
 
 export const ChartPills = forwardRef(
@@ -54,7 +52,6 @@ export const ChartPills = forwardRef(
       chartUpdateEndTime,
       refreshCachedQuery,
       rowLimit,
-      hideRowCount = false,
     }: ChartPillsProps,
     ref: RefObject<HTMLDivElement>,
   ) => {
@@ -70,7 +67,7 @@ export const ChartPills = forwardRef(
             padding-bottom: ${theme.sizeUnit * 4}px;
           `}
         >
-          {!isLoading && !hideRowCount && firstQueryResponse && (
+          {!isLoading && firstQueryResponse && (
             <RowCountLabel
               rowcount={Number(firstQueryResponse.sql_rowcount) || 0}
               limit={Number(rowLimit ?? 0)}

@@ -46,7 +46,6 @@ module.exports = {
   plugins: [
     'lodash',
     '@babel/plugin-syntax-dynamic-import',
-    '@babel/plugin-transform-export-namespace-from',
     ['@babel/plugin-transform-class-properties', { loose: true }],
     ['@babel/plugin-transform-optional-chaining', { loose: true }],
     ['@babel/plugin-transform-private-methods', { loose: true }],
@@ -90,7 +89,6 @@ module.exports = {
       plugins: [
         'babel-plugin-dynamic-import-node',
         '@babel/plugin-transform-modules-commonjs',
-        '@babel/plugin-transform-export-namespace-from',
       ],
     },
     // build instrumented code for testing code coverage with Cypress

@@ -25,7 +25,6 @@ import DraggableNewComponent from 'src/dashboard/components/gridComponents/new/D
 import { CHART_TYPE } from 'src/dashboard/util/componentTypes';
 
 // TODO: rewrite to rtl
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('DraggableNewComponent', () => {
   const props = {
     id: 'id',
@@ -46,27 +45,27 @@ describe('DraggableNewComponent', () => {
     setup();
   });
 
-  test('should render a DragDroppable', () => {
+  it('should render a DragDroppable', () => {
     expect(screen.getByTestId('dragdroppable-object')).toBeInTheDocument();
   });
 
-  test('should pass component={ type, id } to DragDroppable', () => {
+  it('should pass component={ type, id } to DragDroppable', () => {
     const dragComponent = screen.getByTestId('dragdroppable-object');
     expect(dragComponent).toHaveClass(
       'dragdroppable dragdroppable--edit-mode dragdroppable-row',
     );
   });
 
-  test('should pass appropriate parent source and id to DragDroppable', () => {
+  it('should pass appropriate parent source and id to DragDroppable', () => {
     const dragComponent = screen.getByTestId('new-component');
     expect(dragComponent).toHaveAttribute('draggable', 'true');
   });
 
-  test('should render the passed label', () => {
+  it('should render the passed label', () => {
     expect(screen.getByText(props.label)).toBeInTheDocument();
   });
 
-  test('should add the passed className', () => {
+  it('should add the passed className', () => {
     const component = screen
       .getByTestId('new-component')
       .querySelector('.new-component-placeholder');

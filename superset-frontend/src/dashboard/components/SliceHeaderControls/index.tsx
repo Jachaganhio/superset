@@ -29,15 +29,17 @@ import { RouteComponentProps, useHistory } from 'react-router-dom';
 import { extendedDayjs } from '@superset-ui/core/utils/dates';
 import {
   Behavior,
+  css,
   isFeatureEnabled,
   FeatureFlag,
+  useTheme,
   getChartMetadataRegistry,
+  styled,
   t,
   VizType,
   BinaryQueryObjectFilterClause,
   QueryFormData,
 } from '@superset-ui/core';
-import { css, useTheme, styled } from '@apache-superset/core/ui';
 import { useSelector } from 'react-redux';
 import { Menu, MenuItem } from '@superset-ui/core/components/Menu';
 import {
@@ -318,10 +320,10 @@ const SliceHeaderControls = (
   const isTable = slice.viz_type === VizType.Table;
   const isPivotTable = slice.viz_type === VizType.PivotTable;
   const cachedWhen = (cachedDttm || []).map(itemCachedDttm =>
-    (extendedDayjs.utc(itemCachedDttm) as any).fromNow(),
+    extendedDayjs.utc(itemCachedDttm).fromNow(),
   );
   const updatedWhen = updatedDttm
-    ? (extendedDayjs.utc(updatedDttm) as any).fromNow()
+    ? extendedDayjs.utc(updatedDttm).fromNow()
     : '';
   const getCachedTitle = (itemCached: boolean) => {
     if (itemCached) {
@@ -364,8 +366,8 @@ const SliceHeaderControls = (
       ),
       disabled: props.chartStatus === 'loading',
       style: { height: 'auto', lineHeight: 'initial' },
-      'data-test': 'refresh-chart-menu-item', // Typescript hack to get around MenuItem type
-    } as any,
+      ...{ 'data-test': 'refresh-chart-menu-item' }, // Typescript hack to get around MenuItem type
+    },
     {
       key: MenuKeys.Fullscreen,
       label: fullscreenLabel,
@@ -392,8 +394,8 @@ const SliceHeaderControls = (
           {t('Edit chart')}
         </Tooltip>
       ),
-      'data-test-edit-chart-name': slice.slice_name,
-    } as any);
+      ...{ 'data-test-edit-chart-name': slice.slice_name },
+    });
   }
 
   if (canEditCrossFilters) {
@@ -471,8 +473,6 @@ const SliceHeaderControls = (
     addSuccessToast,
     addDangerToast,
     title: t('Share'),
-    latestQueryFormData: props.formData,
-    maxWidth: `${theme.sizeUnit * 100}px`,
   });
 
   if (isFeatureEnabled(FeatureFlag.DrillToDetail) && canDrillToDetail) {

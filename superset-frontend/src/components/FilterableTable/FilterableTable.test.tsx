@@ -26,7 +26,6 @@ import {
 import { setupAGGridModules } from '@superset-ui/core/components/ThemedAgGridReact';
 import { FilterableTable } from '.';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('FilterableTable', () => {
   beforeAll(() => {
     setupAGGridModules();
@@ -41,10 +40,10 @@ describe('FilterableTable', () => {
     ],
     height: 500,
   };
-  test('is valid element', () => {
+  it('is valid element', () => {
     expect(isValidElement(<FilterableTable {...mockedProps} />)).toBe(true);
   });
-  test('renders a grid with 3 Table rows', () => {
+  it('renders a grid with 3 Table rows', () => {
     const { getByRole, getByText } = render(
       <FilterableTable {...mockedProps} />,
     );
@@ -53,7 +52,7 @@ describe('FilterableTable', () => {
       expect(getByText(columnBContent)).toBeInTheDocument();
     });
   });
-  test('filters on a string', () => {
+  it('filters on a string', () => {
     const props = {
       ...mockedProps,
       filterText: 'b1',
@@ -63,7 +62,7 @@ describe('FilterableTable', () => {
     expect(queryByText('b2')).not.toBeInTheDocument();
     expect(queryByText('b3')).not.toBeInTheDocument();
   });
-  test('filters on a number', () => {
+  it('filters on a number', () => {
     const props = {
       ...mockedProps,
       filterText: '100',
@@ -75,13 +74,12 @@ describe('FilterableTable', () => {
   });
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('FilterableTable sorting - RTL', () => {
   beforeAll(() => {
     setupAGGridModules();
   });
 
-  test('sorts strings correctly', () => {
+  it('sorts strings correctly', () => {
     const stringProps = {
       orderedColumnKeys: ['columnA'],
       data: [
@@ -130,7 +128,7 @@ describe('FilterableTable sorting - RTL', () => {
     );
   });
 
-  test('sorts integers correctly', () => {
+  it('sorts integers correctly', () => {
     const integerProps = {
       orderedColumnKeys: ['columnB'],
       data: [{ columnB: 21 }, { columnB: 0 }, { columnB: 623 }],
@@ -165,7 +163,7 @@ describe('FilterableTable sorting - RTL', () => {
     expect(gridCells?.textContent).toEqual(['21', '0', '623'].join(''));
   });
 
-  test('sorts floating numbers correctly', () => {
+  it('sorts floating numbers correctly', () => {
     const floatProps = {
       orderedColumnKeys: ['columnC'],
       data: [{ columnC: 45.67 }, { columnC: 1.23 }, { columnC: 89.0000001 }],
@@ -208,7 +206,7 @@ describe('FilterableTable sorting - RTL', () => {
     );
   });
 
-  test('sorts rows properly when floating numbers have mixed types', () => {
+  it('sorts rows properly when floating numbers have mixed types', () => {
     const mixedFloatProps = {
       orderedColumnKeys: ['columnD'],
       data: [
@@ -310,7 +308,7 @@ describe('FilterableTable sorting - RTL', () => {
     );
   });
 
-  test('sorts YYYY-MM-DD properly', () => {
+  it('sorts YYYY-MM-DD properly', () => {
     const dsProps = {
       orderedColumnKeys: ['columnDS'],
       data: [

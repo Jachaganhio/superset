@@ -24,9 +24,7 @@ import {
   checkIsMissingRequiredValue,
 } from './utils';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('FilterBar Utils - Validation and Apply Logic', () => {
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('checkIsValidateError', () => {
     test('should return true when no filters have validation errors', () => {
       const dataMask: DataMaskStateWithId = {
@@ -91,7 +89,6 @@ describe('FilterBar Utils - Validation and Apply Logic', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('checkIsMissingRequiredValue', () => {
     test('should return true for required filter with undefined value', () => {
       const filter = {
@@ -168,7 +165,6 @@ describe('FilterBar Utils - Validation and Apply Logic', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('checkIsApplyDisabled', () => {
     test('should return true when filters have validation errors', () => {
       const dataMaskSelected: DataMaskStateWithId = {

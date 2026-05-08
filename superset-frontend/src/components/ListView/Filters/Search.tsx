@@ -24,8 +24,7 @@ import {
   ChangeEvent,
 } from 'react';
 
-import { t } from '@superset-ui/core';
-import { useTheme } from '@apache-superset/core/ui';
+import { t, useTheme } from '@superset-ui/core';
 import {
   Input,
   InfoTooltip,

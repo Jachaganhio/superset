@@ -30,8 +30,7 @@ import {
 } from 'src/explore/components/controls/DndColumnSelectControl/types';
 import { Tooltip } from '@superset-ui/core/components';
 import { StyledColumnOption } from 'src/explore/components/optionRenderers';
-import { isAdhocColumn } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, isAdhocColumn } from '@superset-ui/core';
 import { ColumnMeta } from '@superset-ui/chart-controls';
 import Option from './Option';
 
@@ -61,7 +60,6 @@ export default function OptionWrapper(
     datasourceWarningMessage,
     canDelete = true,
     tooltipOverlay,
-    multiValueWarningMessage,
     ...rest
   } = props;
   const ref = useRef<HTMLDivElement>(null);
@@ -190,7 +188,6 @@ export default function OptionWrapper(
         isExtra={isExtra}
         datasourceWarningMessage={datasourceWarningMessage}
         canDelete={canDelete}
-        multiValueWarningMessage={multiValueWarningMessage}
       >
         <Label />
       </Option>

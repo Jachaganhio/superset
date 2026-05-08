@@ -34,8 +34,6 @@ import {
   mapboxStyle,
   spatial,
   viewport,
-  tooltipContents,
-  tooltipTemplate,
 } from '../../utilities/Shared_DeckGL';
 import { COLOR_SCHEME_TYPES } from '../../utilities/utils';
 
@@ -50,8 +48,6 @@ const config: ControlPanelConfig = {
         ['row_limit'],
         [filterNulls],
         ['adhoc_filters'],
-        [tooltipContents],
-        [tooltipTemplate],
       ],
     },
     {

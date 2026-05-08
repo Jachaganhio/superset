@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { css } from '@apache-superset/core/ui';
+import { css } from '@superset-ui/core';
 import { FilterBarOrientation } from 'src/dashboard/types';
 import FilterDivider from './FilterDivider';
 import { FilterDividerProps } from './types';

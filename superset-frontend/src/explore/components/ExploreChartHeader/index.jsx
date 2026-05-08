@@ -27,8 +27,7 @@ import {
   UnsavedChangesModal,
 } from '@superset-ui/core/components';
 import { AlteredSliceTag } from 'src/components';
-import { logging, SupersetClient, t } from '@superset-ui/core';
-import { css } from '@apache-superset/core/ui';
+import { css, logging, SupersetClient, t } from '@superset-ui/core';
 import { chartPropShape } from 'src/dashboard/util/propShapes';
 import { Icons } from '@superset-ui/core/components/Icons';
 import PropertiesModal from 'src/explore/components/PropertiesModal';
@@ -40,7 +39,6 @@ import ReportModal from 'src/features/reports/ReportModal';
 import { deleteActiveReport } from 'src/features/reports/ReportModal/actions';
 import { useUnsavedChangesPrompt } from 'src/hooks/useUnsavedChangesPrompt';
 import { getChartFormDiffs } from 'src/utils/getChartFormDiffs';
-import { StreamingExportModal } from 'src/components/StreamingExportModal';
 import { useExploreAdditionalActionsMenu } from '../useExploreAdditionalActionsMenu';
 import { useExploreMetadataBar } from './useExploreMetadataBar';
 
@@ -174,7 +172,7 @@ export const ExploreChartHeader = ({
     [redirectSQLLab, history],
   );
 
-  const [menu, isDropdownVisible, setIsDropdownVisible, streamingExportState] =
+  const [menu, isDropdownVisible, setIsDropdownVisible] =
     useExploreAdditionalActionsMenu(
       latestQueryFormData,
       canDownload,
@@ -346,14 +344,6 @@ export const ExploreChartHeader = ({
         onHide={() => setShowUnsavedChangesModal(false)}
         onConfirmNavigation={handleConfirmNavigation}
         handleSave={handleSaveAndCloseModal}
-      />
-
-      <StreamingExportModal
-        visible={streamingExportState.isVisible}
-        onCancel={streamingExportState.onCancel}
-        onRetry={streamingExportState.onRetry}
-        onDownload={streamingExportState.onDownload}
-        progress={streamingExportState.progress}
       />
     </>
   );

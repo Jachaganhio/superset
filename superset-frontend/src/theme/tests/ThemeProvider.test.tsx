@@ -17,11 +17,7 @@
  * under the License.
  */
 import { ReactNode } from 'react';
-import {
-  type ThemeContextType,
-  Theme,
-  ThemeMode,
-} from '@apache-superset/core/ui';
+import { type ThemeContextType, Theme, ThemeMode } from '@superset-ui/core';
 import { act, render, screen } from '@superset-ui/core/spec';
 import { renderHook } from '@testing-library/react-hooks';
 import { SupersetThemeProvider, useThemeContext } from '../ThemeProvider';
@@ -65,7 +61,6 @@ const createWrapper =
     </SupersetThemeProvider>
   );
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('SupersetThemeProvider', () => {
   let mockThemeController: jest.Mocked<ThemeController>;
   let mockOnChangeCallback: jest.Mock;
@@ -96,9 +91,8 @@ describe('SupersetThemeProvider', () => {
     jest.clearAllMocks();
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('Provider Initialization', () => {
-    test('should render children within theme provider wrapper', () => {
+    it('should render children within theme provider wrapper', () => {
       render(
         <SupersetThemeProvider themeController={mockThemeController}>
           <div data-test="test-child">Hello Superset</div>
@@ -109,7 +103,7 @@ describe('SupersetThemeProvider', () => {
       expect(screen.getByTestId('test-child')).toBeInTheDocument();
     });
 
-    test('should initialize theme state from controller', () => {
+    it('should initialize theme state from controller', () => {
       const wrapper = createWrapper(mockThemeController);
 
       const { result } = renderHook((): ThemeContextType => useThemeContext(), {
@@ -122,7 +116,7 @@ describe('SupersetThemeProvider', () => {
       expect(result.current.themeMode).toBe(ThemeMode.DEFAULT);
     });
 
-    test('should register onChange listener on mount', () => {
+    it('should register onChange listener on mount', () => {
       const wrapper = createWrapper(mockThemeController);
 
       renderHook((): ThemeContextType => useThemeContext(), { wrapper });
@@ -132,7 +126,7 @@ describe('SupersetThemeProvider', () => {
       );
     });
 
-    test('should unregister onChange listener on unmount', () => {
+    it('should unregister onChange listener on unmount', () => {
       const unsubscribeMock = jest.fn();
       mockThemeController.onChange.mockReturnValue(unsubscribeMock);
 
@@ -149,9 +143,8 @@ describe('SupersetThemeProvider', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('Theme State Updates', () => {
-    test('should update theme state when controller notifies change', () => {
+    it('should update theme state when controller notifies change', () => {
       const wrapper = createWrapper(mockThemeController);
 
       const { result } = renderHook((): ThemeContextType => useThemeContext(), {
@@ -173,7 +166,7 @@ describe('SupersetThemeProvider', () => {
       expect(result.current.theme).toBe(mockDarkTheme);
     });
 
-    test('should update both theme and mode when controller changes', () => {
+    it('should update both theme and mode when controller changes', () => {
       const wrapper = createWrapper(mockThemeController);
 
       const { result } = renderHook((): ThemeContextType => useThemeContext(), {
@@ -190,9 +183,8 @@ describe('SupersetThemeProvider', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('Theme Actions', () => {
-    test('should call setTheme when invoked', () => {
+    it('should call setTheme when invoked', () => {
       const wrapper = createWrapper(mockThemeController);
 
       const { result } = renderHook((): ThemeContextType => useThemeContext(), {
@@ -213,7 +205,7 @@ describe('SupersetThemeProvider', () => {
       expect(mockThemeController.setTheme).toHaveBeenCalledWith(customTheme);
     });
 
-    test('should call setThemeMode when invoked', () => {
+    it('should call setThemeMode when invoked', () => {
       const wrapper = createWrapper(mockThemeController);
 
       const { result } = renderHook((): ThemeContextType => useThemeContext(), {
@@ -229,7 +221,7 @@ describe('SupersetThemeProvider', () => {
       );
     });
 
-    test('should call resetTheme when invoked', () => {
+    it('should call resetTheme when invoked', () => {
       const wrapper = createWrapper(mockThemeController);
 
       const { result } = renderHook((): ThemeContextType => useThemeContext(), {

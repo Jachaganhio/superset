@@ -18,8 +18,7 @@
  */
 import { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import { isEqualArray, t } from '@superset-ui/core';
-import { css } from '@apache-superset/core/ui';
+import { css, isEqualArray, t } from '@superset-ui/core';
 import { Select } from '@superset-ui/core/components';
 import ControlHeader from 'src/explore/components/ControlHeader';
 
@@ -168,12 +167,12 @@ export default class SelectControl extends PureComponent {
     this.handleFilterOptions = this.handleFilterOptions.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (
-      !isEqualArray(this.props.choices, prevProps.choices) ||
-      !isEqualArray(this.props.options, prevProps.options)
+      !isEqualArray(nextProps.choices, this.props.choices) ||
+      !isEqualArray(nextProps.options, this.props.options)
     ) {
-      const options = this.getOptions(this.props);
+      const options = this.getOptions(nextProps);
       this.setState({ options });
     }
   }

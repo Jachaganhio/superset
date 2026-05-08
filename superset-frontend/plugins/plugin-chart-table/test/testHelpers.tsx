@@ -17,11 +17,11 @@
  * under the License.
  */
 import {
-  supersetTheme,
-  ThemeProvider,
   EmotionCacheProvider,
   createEmotionCache,
-} from '@apache-superset/core/ui';
+  supersetTheme,
+  ThemeProvider,
+} from '@superset-ui/core';
 
 const emotionCache = createEmotionCache({
   key: 'test',

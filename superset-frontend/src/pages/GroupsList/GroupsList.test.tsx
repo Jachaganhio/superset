@@ -70,7 +70,6 @@ jest.mock('src/dashboard/util/permissionUtils', () => ({
   isUserAdmin: jest.fn(() => true),
 }));
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('GroupsList', () => {
   const renderComponent = async () => {
     await act(async () => {
@@ -89,31 +88,31 @@ describe('GroupsList', () => {
     fetchMock.resetHistory();
   });
 
-  test('renders the page', async () => {
+  it('renders the page', async () => {
     await renderComponent();
     expect(await screen.findByText('List Groups')).toBeInTheDocument();
   });
 
-  test('fetches roles on load', async () => {
+  it('fetches roles on load', async () => {
     await renderComponent();
     await waitFor(() => {
       expect(fetchMock.calls(rolesEndpoint).length).toBeGreaterThan(0);
     });
   });
 
-  test('renders add group button and triggers modal', async () => {
+  it('renders add group button and triggers modal', async () => {
     await renderComponent();
     const addButton = screen.getByTestId('add-group-button');
     fireEvent.click(addButton);
     expect(await screen.findByTestId('Add Group-modal')).toBeInTheDocument();
   });
 
-  test('renders actions column for admin', async () => {
+  it('renders actions column for admin', async () => {
     await renderComponent();
-    expect(screen.getAllByText('Actions')[0]).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
   });
 
-  test('renders the filters correctly', async () => {
+  it('renders the filters correctly', async () => {
     await renderComponent();
     const filtersSelect = screen.getAllByTestId('filters-select')[0];
 
@@ -124,16 +123,16 @@ describe('GroupsList', () => {
     expect(within(filtersSelect).getByText(/users/i)).toBeInTheDocument();
   });
 
-  test('renders correct columns in the table', async () => {
+  it('renders correct columns in the table', async () => {
     await renderComponent();
     const table = screen.getByRole('table');
 
-    expect(await within(table).findByTitle('Name')).toBeInTheDocument();
-    expect(await within(table).findByTitle('Label')).toBeInTheDocument();
-    expect(await within(table).findByTitle('Roles')).toBeInTheDocument();
+    expect(await within(table).findByText('Name')).toBeInTheDocument();
+    expect(await within(table).findByText('Label')).toBeInTheDocument();
+    expect(await within(table).findByText('Roles')).toBeInTheDocument();
   });
 
-  test('opens add group modal on button click', async () => {
+  it('opens add group modal on button click', async () => {
     await renderComponent();
     const addButton = screen.getByTestId('add-group-button');
     fireEvent.click(addButton);
@@ -141,7 +140,7 @@ describe('GroupsList', () => {
     expect(await screen.findByTestId('Add Group-modal')).toBeInTheDocument();
   });
 
-  test('opens edit modal on edit button click', async () => {
+  it('opens edit modal on edit button click', async () => {
     fetchMock.get('glob:*/security/groups/?*', {
       result: [
         {

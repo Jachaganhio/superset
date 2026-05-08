@@ -20,6 +20,7 @@
 export interface QueryExecutePayload {
   client_id: string;
   database_id: number;
+  json: boolean;
   runAsync: boolean;
   catalog: string | null;
   schema: string;

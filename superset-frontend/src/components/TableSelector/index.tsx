@@ -26,11 +26,11 @@ import {
 import type { SelectValue } from '@superset-ui/core/components';
 
 import {
+  styled,
   t,
   getClientErrorMessage,
   getClientErrorObject,
 } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
 import { CertifiedBadge, Select } from '@superset-ui/core/components';
 import { DatabaseSelector } from 'src/components';
 import { Icons } from '@superset-ui/core/components/Icons';
@@ -122,11 +122,9 @@ export const TableOption = ({ table }: { table: Table }) => {
   return (
     <TableLabel title={value}>
       {type === 'view' ? (
-        <Icons.FunctionOutlined iconSize="m" />
-      ) : type === 'materialized_view' ? (
-        <Icons.ProfileOutlined iconSize="m" />
+        <Icons.EyeOutlined iconSize="m" />
       ) : (
-        <Icons.TableOutlined iconSize="m" />
+        <Icons.InsertRowAboveOutlined iconSize="m" />
       )}
       {extra?.certification && (
         <CertifiedBadge

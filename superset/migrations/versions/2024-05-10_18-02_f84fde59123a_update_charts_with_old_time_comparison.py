@@ -113,9 +113,8 @@ def upgrade():
         except Exception as ex:
             session.rollback()
             logger.exception(
-                "An error occurred: Upgrading params for slice %s failed."
-                "You need to fix it before upgrading your DB.",
-                slc.id,
+                f"An error occurred: Upgrading params for slice {slc.id} failed."
+                f"You need to fix it before upgrading your DB."
             )
             raise Exception(f"An error occurred while upgrading slice: {ex}") from ex
 
@@ -214,9 +213,8 @@ def downgrade():
         except Exception as ex:
             session.rollback()
             logger.exception(
-                "An error occurred: Downgrading params for slice %s failed."
-                "You need to fix it before downgrading your DB.",
-                slc.id,
+                f"An error occurred: Downgrading params for slice {slc.id} failed."
+                f"You need to fix it before downgrading your DB."
             )
             raise Exception(f"An error occurred while downgrading slice: {ex}") from ex
 

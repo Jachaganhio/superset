@@ -42,7 +42,6 @@ class SqliteEngineSpec(BaseEngineSpec):
     engine_name = "SQLite"
 
     disable_ssh_tunneling = True
-    supports_multivalues_insert = True
 
     _time_grain_expressions = {
         None: "{col}",

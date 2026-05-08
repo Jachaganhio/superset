@@ -45,7 +45,6 @@ import { GRID_BASE_UNIT, GRID_GUTTER_SIZE } from '../../../util/constants';
 
 const DEFAULT_HEADER_HEIGHT = 22;
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('ChartHolder', () => {
   let scrollViewBase: any;
 
@@ -111,7 +110,7 @@ describe('ChartHolder', () => {
       store,
     });
 
-  test('should render empty state', async () => {
+  it('should render empty state', async () => {
     renderWrapper();
 
     expect(
@@ -125,7 +124,7 @@ describe('ChartHolder', () => {
     expect(screen.getByRole('img', { name: 'empty' })).toBeVisible();
   });
 
-  test('should render anchor link when not editing', async () => {
+  it('should render anchor link when not editing', async () => {
     const store = createMockStore();
     const { rerender } = renderWrapper(store, { editMode: false });
 
@@ -156,7 +155,7 @@ describe('ChartHolder', () => {
     ).toEqual(0);
   });
 
-  test('should highlight when path matches', async () => {
+  it('should highlight when path matches', async () => {
     const store = createMockStore({
       dashboardState: {
         ...mockState.dashboardState,
@@ -203,7 +202,7 @@ describe('ChartHolder', () => {
     );
   });
 
-  test('should calculate the default widthMultiple', async () => {
+  it('should calculate the default widthMultiple', async () => {
     const widthMultiple = 5;
     renderWrapper(createMockStore(), {
       editMode: true,
@@ -232,7 +231,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual(`${expectedWidth}px`);
   });
 
-  test('should set the resizable width to auto when parent component type is column', async () => {
+  it('should set the resizable width to auto when parent component type is column', async () => {
     renderWrapper(createMockStore(), {
       editMode: true,
       parentComponent: {
@@ -256,7 +255,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual('auto');
   });
 
-  test("should override the widthMultiple if there's a column in the parent chain whose width is less than the chart", async () => {
+  it("should override the widthMultiple if there's a column in the parent chain whose width is less than the chart", async () => {
     const widthMultiple = 10;
     const parentColumnWidth = 6;
     renderWrapper(createMockStore(), {
@@ -289,7 +288,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual(`${expectedWidth}px`);
   });
 
-  test('should calculate the chartWidth', async () => {
+  it('should calculate the chartWidth', async () => {
     const widthMultiple = 7;
     const columnWidth = 250;
     renderWrapper(createMockStore(), {
@@ -320,7 +319,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual(expectedWidth);
   });
 
-  test('should calculate the chartWidth on full screen mode', async () => {
+  it('should calculate the chartWidth on full screen mode', async () => {
     const widthMultiple = 7;
     const columnWidth = 250;
     renderWrapper(createMockStore(), {
@@ -346,7 +345,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual(expectedWidth);
   });
 
-  test('should calculate the chartHeight', async () => {
+  it('should calculate the chartHeight', async () => {
     const heightMultiple = 12;
     renderWrapper(createMockStore(), {
       fullSizeChartId: null,
@@ -373,7 +372,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual(expectedWidth);
   });
 
-  test('should calculate the chartHeight on full screen mode', async () => {
+  it('should calculate the chartHeight on full screen mode', async () => {
     const heightMultiple = 12;
     renderWrapper(createMockStore(), {
       component: {
@@ -398,7 +397,7 @@ describe('ChartHolder', () => {
     expect(computedWidth).toEqual(expectedWidth);
   });
 
-  test('should call deleteComponent when deleted', async () => {
+  it('should call deleteComponent when deleted', async () => {
     const deleteComponent = sinon.spy();
     const store = createMockStore();
     const { rerender } = renderWrapper(store, {

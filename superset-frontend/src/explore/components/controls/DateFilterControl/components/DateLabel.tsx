@@ -19,8 +19,7 @@
 
 import { forwardRef, MouseEvent, ReactNode, RefObject } from 'react';
 
-import { t } from '@superset-ui/core';
-import { css, styled } from '@apache-superset/core/ui';
+import { css, styled, t } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 
 export type DateLabelProps = {

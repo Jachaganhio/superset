@@ -20,7 +20,6 @@ import getDashboardUrl from 'src/dashboard/util/getDashboardUrl';
 import { DASHBOARD_FILTER_SCOPE_GLOBAL } from 'src/dashboard/reducers/dashboardFilters';
 import { DashboardStandaloneMode } from 'src/dashboard/util/constants';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('getChartIdsFromLayout', () => {
   const filters = {
     '35_key': {
@@ -34,14 +33,14 @@ describe('getChartIdsFromLayout', () => {
     window.location = globalLocation;
   });
 
-  test('should encode filters', () => {
+  it('should encode filters', () => {
     const url = getDashboardUrl({ pathname: 'path', filters });
     expect(url).toBe(
       'path?preselect_filters=%7B%2235%22%3A%7B%22key%22%3A%5B%22value%22%5D%7D%7D',
     );
   });
 
-  test('should encode filters with hash', () => {
+  it('should encode filters with hash', () => {
     const urlWithHash = getDashboardUrl({
       pathname: 'path',
       filters,
@@ -52,7 +51,7 @@ describe('getChartIdsFromLayout', () => {
     );
   });
 
-  test('should encode filters with standalone', () => {
+  it('should encode filters with standalone', () => {
     const urlWithStandalone = getDashboardUrl({
       pathname: 'path',
       filters,
@@ -63,7 +62,7 @@ describe('getChartIdsFromLayout', () => {
     );
   });
 
-  test('should encode filters with missing standalone', () => {
+  it('should encode filters with missing standalone', () => {
     const urlWithStandalone = getDashboardUrl({
       pathname: 'path',
       filters,
@@ -74,7 +73,7 @@ describe('getChartIdsFromLayout', () => {
     );
   });
 
-  test('should encode filters with missing filters', () => {
+  it('should encode filters with missing filters', () => {
     const urlWithStandalone = getDashboardUrl({
       pathname: 'path',
       filters: undefined,
@@ -85,7 +84,7 @@ describe('getChartIdsFromLayout', () => {
     );
   });
 
-  test('should preserve unknown filters', () => {
+  it('should preserve unknown filters', () => {
     const windowSpy = jest.spyOn(window, 'window', 'get');
     windowSpy.mockImplementation(() => ({
       location: {
@@ -103,7 +102,7 @@ describe('getChartIdsFromLayout', () => {
     windowSpy.mockRestore();
   });
 
-  test('should process native filters key', () => {
+  it('should process native filters key', () => {
     const windowSpy = jest.spyOn(window, 'window', 'get');
     windowSpy.mockImplementation(() => ({
       location: {

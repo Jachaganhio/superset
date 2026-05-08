@@ -86,7 +86,6 @@ const getTestId = testWithId<string>(VIZ_TYPE_CONTROL_TEST_ID, true);
  * on and prevents those warnings.
  */
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('VizTypeControl', () => {
   new MainPreset().register();
   const defaultProps = {
@@ -117,7 +116,7 @@ describe('VizTypeControl', () => {
     jest.clearAllMocks();
   });
 
-  test('Fast viz switcher tiles render', async () => {
+  it('Fast viz switcher tiles render', async () => {
     const props = {
       ...defaultProps,
       value: VizType.Line,
@@ -152,7 +151,7 @@ describe('VizTypeControl', () => {
     ).toBeInTheDocument();
   });
 
-  test('Render viz tiles when non-featured chart is selected', async () => {
+  it('Render viz tiles when non-featured chart is selected', async () => {
     const props = {
       ...defaultProps,
       value: 'line',
@@ -166,7 +165,7 @@ describe('VizTypeControl', () => {
     ).toBeVisible();
   });
 
-  test('Render viz tiles when non-featured is rendered', async () => {
+  it('Render viz tiles when non-featured is rendered', async () => {
     const props = {
       ...defaultProps,
       value: VizType.Sankey,
@@ -193,7 +192,7 @@ describe('VizTypeControl', () => {
     ).toBeVisible();
   });
 
-  test('Change viz type on click', async () => {
+  it('Change viz type on click', async () => {
     const props = {
       ...defaultProps,
       value: VizType.Line,
@@ -210,7 +209,7 @@ describe('VizTypeControl', () => {
     expect(props.onChange).toHaveBeenCalledWith('table');
   });
 
-  test('Open viz gallery modal on "View all charts" click', async () => {
+  it('Open viz gallery modal on "View all charts" click', async () => {
     await waitForRenderWrapper({ ...defaultProps, isModalOpenInit: false });
     expect(
       screen.queryByText('Select a visualization type'),
@@ -221,7 +220,7 @@ describe('VizTypeControl', () => {
     ).toBeInTheDocument();
   });
 
-  test('Search visualization type', async () => {
+  it('Search visualization type', async () => {
     await waitForRenderWrapper();
 
     const visualizations = screen.getByTestId(getTestId('viz-row'));
@@ -249,7 +248,7 @@ describe('VizTypeControl', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('Submit on viz type double-click', async () => {
+  it('Submit on viz type double-click', async () => {
     await waitForRenderWrapper();
     userEvent.click(screen.getByRole('tab', { name: 'All charts' }));
     const visualizations = screen.getByTestId(getTestId('viz-row'));
@@ -261,7 +260,7 @@ describe('VizTypeControl', () => {
     expect(defaultProps.onChange).toHaveBeenCalledWith(VizType.Line);
   });
 
-  test('Search input is focused when modal opens', async () => {
+  it('Search input is focused when modal opens', async () => {
     // Mock the focus method to track if it was called
     const focusSpy = jest.fn();
     const originalFocus = HTMLInputElement.prototype.focus;
@@ -277,73 +276,5 @@ describe('VizTypeControl', () => {
 
     // Restore the original focus method
     HTMLInputElement.prototype.focus = originalFocus;
-  });
-
-  test('Navigate categories and select visualization type', async () => {
-    await waitForRenderWrapper();
-
-    const visualizations = screen.getByTestId(getTestId('viz-row'));
-
-    // Click on the "KPI" category button as per the original Cypress test
-    const kpiTab = screen.getByRole('tab', { name: 'KPI' });
-    expect(kpiTab).toBeInTheDocument();
-    userEvent.click(kpiTab);
-
-    // Verify KPI category charts are shown
-    await waitFor(() => {
-      expect(
-        within(visualizations).getByText('Big Number'),
-      ).toBeInTheDocument();
-    });
-
-    // Select Big Number chart type as per original Cypress test
-    const bigNumberChart = within(visualizations).getByText('Big Number');
-    userEvent.click(bigNumberChart);
-
-    // Click the Select button to confirm selection
-    const selectButton = screen.getByText('Select');
-    expect(selectButton).toBeInTheDocument();
-    userEvent.click(selectButton);
-
-    // Verify onChange was called with Big Number viz type
-    expect(defaultProps.onChange).toHaveBeenCalledWith(VizType.BigNumberTotal);
-  });
-
-  test('Handle category switching between different chart types', async () => {
-    await waitForRenderWrapper();
-
-    const visualizations = screen.getByTestId(getTestId('viz-row'));
-
-    // Start with All charts
-    userEvent.click(screen.getByRole('tab', { name: 'All charts' }));
-    await waitFor(() => {
-      expect(
-        within(visualizations).getByText('Line Chart'),
-      ).toBeInTheDocument();
-    });
-
-    // Switch to KPI category
-    userEvent.click(screen.getByRole('tab', { name: 'KPI' }));
-    await waitFor(() => {
-      expect(
-        within(visualizations).getByText('Big Number'),
-      ).toBeInTheDocument();
-      // Line Chart should not be visible in KPI category
-      expect(
-        within(visualizations).queryByText('Line Chart'),
-      ).not.toBeInTheDocument();
-    });
-
-    // Switch back to All charts
-    userEvent.click(screen.getByRole('tab', { name: 'All charts' }));
-    await waitFor(() => {
-      expect(
-        within(visualizations).getByText('Line Chart'),
-      ).toBeInTheDocument();
-      // Should still see Big Number since it's part of all charts
-      expect(
-        within(visualizations).getByText('Big Number'),
-      ).toBeInTheDocument();
-    });
   });
 });

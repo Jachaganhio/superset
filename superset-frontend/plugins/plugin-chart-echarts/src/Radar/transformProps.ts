@@ -116,7 +116,6 @@ export default function transformProps(
     dateFormat,
     showLabels,
     showLegend,
-    legendSort,
     isCircle,
     columnConfig,
     sliceId,
@@ -355,10 +354,7 @@ export default function transformProps(
     },
     legend: {
       ...getLegendProps(legendType, legendOrientation, showLegend, theme),
-      data: Array.from(columnsLabelMap.keys()).sort((a: string, b: string) => {
-        if (!legendSort) return 0;
-        return legendSort === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
-      }),
+      data: Array.from(columnsLabelMap.keys()),
     },
     series,
     radar: {

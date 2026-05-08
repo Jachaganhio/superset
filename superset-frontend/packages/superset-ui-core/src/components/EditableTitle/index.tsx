@@ -17,8 +17,7 @@
  * under the License.
  */
 
-import { t } from '@superset-ui/core';
-import { css, styled } from '@apache-superset/core/ui';
+import { css, styled, t } from '@superset-ui/core';
 import { useEffect, useState, useRef } from 'react';
 import cx from 'classnames';
 import { Tooltip } from '../Tooltip';
@@ -86,7 +85,6 @@ export function EditableTitle({
   renderLink,
   maxWidth,
   autoSize = true,
-  onEditingChange,
   ...rest
 }: EditableTitleProps) {
   const [isEditing, setIsEditing] = useState(editing);
@@ -132,8 +130,7 @@ export function EditableTitle({
         textArea.scrollTop = textArea.scrollHeight;
       }
     }
-    onEditingChange?.(isEditing);
-  }, [isEditing, onEditingChange]);
+  }, [isEditing]);
 
   function handleClick() {
     if (!canEdit || isEditing) return;

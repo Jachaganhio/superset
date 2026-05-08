@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useTheme } from '@apache-superset/core/ui';
+import { useTheme } from '@superset-ui/core';
 import { Icons, type IconType, SafeMarkdown, Tooltip } from '..';
 
 export interface WarningIconWithTooltipProps {

@@ -16,12 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import * as sectionsModule from './sections';
 
 export * from './utils';
 export * from './constants';
 export * from './operators';
 
-export * as sections from './sections';
+// can't do `export * as sections from './sections'`, babel-transformer will fail
+export const sections = sectionsModule;
 
 export * from './components/ColumnOption';
 export * from './components/ColumnTypeLabel/ColumnTypeLabel';

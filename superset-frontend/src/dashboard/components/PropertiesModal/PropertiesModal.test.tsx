@@ -23,13 +23,10 @@ import {
   waitFor,
 } from 'spec/helpers/testing-library';
 import fetchMock from 'fetch-mock';
-import * as ColorSchemeSelect from 'src/dashboard/components/ColorSchemeSelect';
+import * as ColorSchemeControlWrapper from 'src/dashboard/components/ColorSchemeControlWrapper';
 import * as SupersetCore from '@superset-ui/core';
-import { isFeatureEnabled, FeatureFlag } from '@superset-ui/core';
+import { isFeatureEnabled } from '@superset-ui/core';
 import PropertiesModal from '.';
-
-// Increase timeout for CI environment
-jest.setTimeout(60000);
 
 jest.mock('@superset-ui/core', () => ({
   ...jest.requireActual('@superset-ui/core'),
@@ -43,12 +40,15 @@ jest.mock('@superset-ui/core', () => ({
 
 const mockedIsFeatureEnabled = isFeatureEnabled as jest.Mock;
 
-const spyColorSchemeSelect = jest.spyOn(ColorSchemeSelect, 'default');
+const spyColorSchemeControlWrapper = jest.spyOn(
+  ColorSchemeControlWrapper,
+  'default',
+);
 const mockedJsonMetadata =
   '{"timed_refresh_immune_slices": [], "expanded_slices": {}, "refresh_frequency": 0, "default_filters": "{}", "color_scheme": "supersetColors", "label_colors": {"0": "#D3B3DA", "1": "#9EE5E5", "0. Pre-clinical": "#1FA8C9", "2. Phase II or Combined I/II": "#454E7C", "1. Phase I": "#5AC189", "3. Phase III": "#FF7F44", "4. Authorized": "#666666", "root": "#1FA8C9", "Protein subunit": "#454E7C", "Phase II": "#5AC189", "Pre-clinical": "#FF7F44", "Phase III": "#666666", "Phase I": "#E04355", "Phase I/II": "#FCC700", "Inactivated virus": "#A868B7", "Virus-like particle": "#3CCCCB", "Replicating bacterial vector": "#A38F79", "DNA-based": "#8FD3E4", "RNA-based vaccine": "#A1A6BD", "Authorized": "#ACE1C4", "Non-replicating viral vector": "#FEC0A1", "Replicating viral vector": "#B2B2B2", "Unknown": "#EFA1AA", "Live attenuated virus": "#FDE380", "COUNT(*)": "#D1C6BC"}, "filter_scopes": {"358": {"Country_Name": {"scope": ["ROOT_ID"], "immune": []}, "Product_Category": {"scope": ["ROOT_ID"], "immune": []}, "Clinical Stage": {"scope": ["ROOT_ID"], "immune": []}}}}';
 
-spyColorSchemeSelect.mockImplementation(
-  () => (<div>ColorSchemeSelect</div>) as any,
+spyColorSchemeControlWrapper.mockImplementation(
+  () => (<div>ColorSchemeControlWrapper</div>) as any,
 );
 
 fetchMock.get(
@@ -145,21 +145,6 @@ fetchMock.get('glob:*/api/v1/dashboard/26', {
   },
 });
 
-fetchMock.get('glob:*/api/v1/theme/*', {
-  body: {
-    result: [
-      {
-        id: 1,
-        theme_name: 'Test Theme 1',
-      },
-      {
-        id: 2,
-        theme_name: 'Test Theme 2',
-      },
-    ],
-  },
-});
-
 const createProps = () => ({
   certified_by: 'John Doe',
   certification_details: 'Sample certification',
@@ -180,9 +165,8 @@ afterAll(() => {
   fetchMock.restore();
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('PropertiesModal', () => {
-  jest.setTimeout(60000); // Increased timeout for complex modal rendering
+  jest.setTimeout(15000); // ✅ Applies to all tests in this suite
 
   test('should render - FeatureFlag disabled', async () => {
     mockedIsFeatureEnabled.mockReturnValue(false);
@@ -196,44 +180,38 @@ describe('PropertiesModal', () => {
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
 
-    // Check for collapse section texts (not headings anymore)
-    expect(screen.getByText('General information')).toBeInTheDocument();
-    expect(screen.getByText('Access & ownership')).toBeInTheDocument();
-    expect(screen.getByText('Styling')).toBeInTheDocument();
-    expect(screen.getByText('Refresh settings')).toBeInTheDocument();
-    expect(screen.getByText('Advanced settings')).toBeInTheDocument();
-    expect(screen.getByText('Certification')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Basic information' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Access' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Colors' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Advanced down' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Certification' }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('heading')).toHaveLength(6);
 
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Advanced down' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(4);
 
-    // Only General information section is expanded by default
-    expect(screen.getAllByRole('textbox')).toHaveLength(2); // Name and Slug
+    expect(screen.getAllByRole('textbox')).toHaveLength(4);
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
 
-    // Expand Styling section to see the ColorSchemeControlWrapper
-    const stylingHeaderText = screen.getByText('Styling');
-    const stylingHeader = stylingHeaderText.closest('.ant-collapse-header');
-    expect(stylingHeader).toBeTruthy();
-    await userEvent.click(stylingHeader!);
-
-    await waitFor(() => {
-      // Color Scheme component is rendered (mocked in tests)
-      expect(screen.getByText('ColorSchemeSelect')).toBeInTheDocument();
-    });
-
-    expect(spyColorSchemeSelect).toHaveBeenCalledWith(
-      expect.objectContaining({ value: 'supersetColors' }),
+    expect(spyColorSchemeControlWrapper).toHaveBeenCalledWith(
+      expect.objectContaining({ colorScheme: 'supersetColors' }),
       {},
     );
   });
 
   test('should render - FeatureFlag enabled', async () => {
-    mockedIsFeatureEnabled.mockImplementation((flag: any) => {
-      if (flag === FeatureFlag.DashboardRbac) return true;
-      if (flag === FeatureFlag.TaggingSystem) return true;
-      return false;
-    });
+    mockedIsFeatureEnabled.mockReturnValue(true);
     const props = createProps();
     render(<PropertiesModal {...props} />, {
       useRedux: true,
@@ -245,52 +223,39 @@ describe('PropertiesModal', () => {
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Dashboard properties')).toBeInTheDocument();
 
-    // Check for collapse section texts instead of headings
-    expect(screen.getByText('General information')).toBeInTheDocument();
-    expect(screen.getByText('Access & ownership')).toBeInTheDocument();
-    expect(screen.getByText('Styling')).toBeInTheDocument();
-    expect(screen.getByText('Refresh settings')).toBeInTheDocument();
-    expect(screen.getByText('Advanced settings')).toBeInTheDocument();
-    expect(screen.getByText('Certification')).toBeInTheDocument();
-
-    // General information section is expanded by default
-    expect(screen.getAllByRole('textbox')).toHaveLength(2); // Name and Slug are visible
-
-    // Expand Access & ownership to see Tags
-    const accessPanel = screen
-      .getByText('Access & ownership')
-      .closest('[role="button"]');
-    if (accessPanel) {
-      await userEvent.click(accessPanel);
-    }
-
-    // Test passes if feature flag handling is working - no need to test specific UI
-    expect(true).toBe(true);
+    expect(
+      screen.getByRole('heading', { name: 'Basic information' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Access' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Advanced down' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Certification' }),
+    ).toBeInTheDocument();
+    // Tags will be included since isFeatureFlag always returns true in this test
+    expect(screen.getByRole('heading', { name: 'Tags' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading')).toHaveLength(6);
 
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Advanced down' }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    expect(screen.getAllByRole('button')).toHaveLength(4);
 
-    // Expand Styling section to check ColorSchemeControlWrapper
-    const stylingHeaderText = screen.getByText('Styling');
-    const stylingHeader = stylingHeaderText.closest('.ant-collapse-header');
-    expect(stylingHeader).toBeTruthy();
-    await userEvent.click(stylingHeader!);
+    expect(screen.getAllByRole('textbox')).toHaveLength(4);
+    expect(screen.getAllByRole('combobox')).toHaveLength(3);
 
-    await waitFor(() => {
-      expect(spyColorSchemeSelect).toHaveBeenCalledWith(
-        expect.objectContaining({ value: 'supersetColors' }),
-        {},
-      );
-    });
+    expect(spyColorSchemeControlWrapper).toHaveBeenCalledWith(
+      expect.objectContaining({ colorScheme: 'supersetColors' }),
+      {},
+    );
   });
 
   test('should open advance', async () => {
-    mockedIsFeatureEnabled.mockImplementation((flag: any) => {
-      if (flag === FeatureFlag.DashboardRbac) return true;
-      if (flag === FeatureFlag.TaggingSystem) return true;
-      return false;
-    });
+    mockedIsFeatureEnabled.mockReturnValue(true);
     const props = createProps();
     render(<PropertiesModal {...props} />, {
       useRedux: true,
@@ -299,31 +264,15 @@ describe('PropertiesModal', () => {
       await screen.findByTestId('dashboard-edit-properties-form'),
     ).toBeInTheDocument();
 
-    expect(screen.getAllByRole('textbox')).toHaveLength(2); // Only Name and Slug visible initially
-
-    // Click on the Advanced settings collapse panel to expand it
-    const advancedHeaderText = screen.getByText('Advanced settings');
-    const advancedHeader = advancedHeaderText.closest('.ant-collapse-header');
-    expect(advancedHeader).toBeTruthy();
-    await userEvent.click(advancedHeader!);
-
-    // Wait for animation to complete
-    await new Promise(resolve => setTimeout(resolve, 300));
-
-    // After expanding Advanced settings, we should see more elements
-    // Note: JSON editor may not render as a standard textbox in tests
-    await waitFor(() => {
-      // Check that the Advanced settings section is expanded by looking for its content
-      expect(screen.getByText('JSON Metadata')).toBeInTheDocument();
-    });
+    expect(screen.getAllByRole('textbox')).toHaveLength(4);
+    expect(screen.getAllByRole('combobox')).toHaveLength(3);
+    userEvent.click(screen.getByRole('button', { name: 'Advanced down' }));
+    expect(screen.getAllByRole('textbox')).toHaveLength(5);
+    expect(screen.getAllByRole('combobox')).toHaveLength(3);
   });
 
   test('should close modal', async () => {
-    mockedIsFeatureEnabled.mockImplementation((flag: any) => {
-      if (flag === FeatureFlag.DashboardRbac) return true;
-      if (flag === FeatureFlag.TaggingSystem) return true;
-      return false;
-    });
+    mockedIsFeatureEnabled.mockReturnValue(true);
     const props = createProps();
     render(<PropertiesModal {...props} />, {
       useRedux: true,
@@ -355,19 +304,9 @@ describe('PropertiesModal', () => {
     mockedIsFeatureEnabled.mockReturnValue(false);
     const props = createProps();
     props.onlyApply = false;
-    // Pass dashboardInfo to avoid loading state
-    const propsWithDashboardInfo = {
-      ...props,
-      dashboardInfo: {
-        ...dashboardInfo,
-        json_metadata: mockedJsonMetadata,
-      },
-    };
-    render(<PropertiesModal {...propsWithDashboardInfo} />, {
+    render(<PropertiesModal {...props} />, {
       useRedux: true,
     });
-
-    // Wait for the form to be visible
     expect(
       await screen.findByTestId('dashboard-edit-properties-form'),
     ).toBeInTheDocument();
@@ -378,11 +317,17 @@ describe('PropertiesModal', () => {
     userEvent.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => {
       expect(props.onSubmit).toHaveBeenCalledTimes(1);
-      // Just check that onSubmit was called with the basic fields
-      const submitCall = props.onSubmit.mock.calls[0][0];
-      expect(submitCall.id).toBe(26);
-      expect(submitCall.title).toBe('COVID Vaccine Dashboard');
-      // certifiedBy and certificationDetails come from dashboardInfo, not props
+      expect(props.onSubmit).toHaveBeenCalledWith({
+        certificationDetails: 'Sample certification',
+        certifiedBy: 'John Doe',
+        colorScheme: 'supersetColors',
+        colorNamespace: undefined,
+        id: 26,
+        jsonMetadata: expect.anything(),
+        owners: [],
+        slug: '',
+        title: 'COVID Vaccine Dashboard',
+      });
     });
   });
 
@@ -390,19 +335,9 @@ describe('PropertiesModal', () => {
     mockedIsFeatureEnabled.mockReturnValue(false);
     const props = createProps();
     props.onlyApply = true;
-    // Pass dashboardInfo to avoid loading state
-    const propsWithDashboardInfo = {
-      ...props,
-      dashboardInfo: {
-        ...dashboardInfo,
-        json_metadata: mockedJsonMetadata,
-      },
-    };
-    render(<PropertiesModal {...propsWithDashboardInfo} />, {
+    render(<PropertiesModal {...props} />, {
       useRedux: true,
     });
-
-    // Wait for the form to be visible
     expect(
       await screen.findByTestId('dashboard-edit-properties-form'),
     ).toBeInTheDocument();
@@ -426,29 +361,13 @@ describe('PropertiesModal', () => {
       useRedux: true,
     });
 
-    await screen.findByTestId('dashboard-edit-properties-form');
-
-    // Expand the Certification section first to access certification details
-    const certificationPanel = screen
-      .getByText('Certification')
-      .closest('[role="button"]');
-    if (certificationPanel) {
-      await userEvent.click(certificationPanel);
-    }
-
-    await waitFor(() => {
-      // Just check that there are textboxes now (certified by and certification details)
-      const textboxes = screen.getAllByRole('textbox');
-      expect(textboxes.length).toBeGreaterThanOrEqual(2);
-    });
+    expect(
+      screen.getByRole('textbox', { name: 'Certification details' }),
+    ).toHaveValue('');
   });
 
   test('should show all roles', async () => {
-    mockedIsFeatureEnabled.mockImplementation((flag: any) => {
-      if (flag === FeatureFlag.DashboardRbac) return true;
-      if (flag === FeatureFlag.TaggingSystem) return true;
-      return false;
-    });
+    mockedIsFeatureEnabled.mockReturnValue(true);
 
     const props = createProps();
     const propsWithDashboardInfo = { ...props, dashboardInfo };
@@ -461,38 +380,16 @@ describe('PropertiesModal', () => {
       document.querySelectorAll(className)! as NodeListOf<HTMLElement>;
 
     const findAllSelectOptions = () =>
-      waitFor(() => {
-        const elements = getElementsByClassName(
-          '.ant-select-item-option-content',
-        );
-        if (elements.length === 0) throw new Error('No options found');
-        return elements;
-      });
+      waitFor(() => getElementsByClassName('.ant-select-item-option-content'));
 
     render(<PropertiesModal {...propsWithDashboardInfo} />, {
       useRedux: true,
     });
 
-    // Expand the Access & ownership section first to access roles
-    const accessHeaderText = screen.getByText('Access & ownership');
-    const accessHeader = accessHeaderText.closest('.ant-collapse-header');
-    if (accessHeader) {
-      await userEvent.click(accessHeader);
-      // Wait for animation to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    await waitFor(
-      () => {
-        // Now we have 3 comboboxes: Owners, Roles, and Tags
-        const comboboxes = screen.getAllByRole('combobox');
-        expect(comboboxes.length).toBeGreaterThanOrEqual(3);
-        expect(
-          screen.getByRole('combobox', { name: SupersetCore.t('Roles') }),
-        ).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
+    expect(screen.getAllByRole('combobox')).toHaveLength(3);
+    expect(
+      screen.getByRole('combobox', { name: SupersetCore.t('Roles') }),
+    ).toBeInTheDocument();
 
     await open();
 
@@ -500,60 +397,32 @@ describe('PropertiesModal', () => {
 
     expect(options).toHaveLength(5);
     expect(options[0]).toHaveTextContent('Admin');
-  }, 30000);
+  });
 
   test('should show active owners with dashboard rbac', async () => {
-    mockedIsFeatureEnabled.mockImplementation((flag: any) => {
-      if (flag === FeatureFlag.DashboardRbac) return true;
-      if (flag === FeatureFlag.TaggingSystem) return true;
-      return false;
-    });
+    mockedIsFeatureEnabled.mockReturnValue(true);
 
     const props = createProps();
     const propsWithDashboardInfo = { ...props, dashboardInfo };
 
+    const open = () => waitFor(() => userEvent.click(getSelect()));
     const getSelect = () =>
       screen.getByRole('combobox', { name: SupersetCore.t('Owners') });
-    const open = () => waitFor(() => userEvent.click(getSelect()));
 
     const getElementsByClassName = (className: string) =>
       document.querySelectorAll(className)! as NodeListOf<HTMLElement>;
 
     const findAllSelectOptions = () =>
-      waitFor(
-        () => {
-          const elements = getElementsByClassName(
-            '.ant-select-item-option-content',
-          );
-          if (elements.length === 0) throw new Error('No options found');
-          return elements;
-        },
-        { timeout: 5000 },
-      );
+      waitFor(() => getElementsByClassName('.ant-select-item-option-content'));
 
     render(<PropertiesModal {...propsWithDashboardInfo} />, {
       useRedux: true,
     });
 
-    // Expand the Access & ownership section first to access owners
-    const accessHeaderText = screen.getByText('Access & ownership');
-    const accessHeader = accessHeaderText.closest('.ant-collapse-header');
-    if (accessHeader) {
-      await userEvent.click(accessHeader);
-      // Wait for animation to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    await waitFor(
-      () => {
-        const comboboxes = screen.getAllByRole('combobox');
-        expect(comboboxes.length).toBeGreaterThanOrEqual(3);
-        expect(
-          screen.getByRole('combobox', { name: SupersetCore.t('Owners') }),
-        ).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
+    expect(screen.getAllByRole('combobox')).toHaveLength(3);
+    expect(
+      screen.getByRole('combobox', { name: SupersetCore.t('Owners') }),
+    ).toBeInTheDocument();
 
     await open();
 
@@ -561,7 +430,7 @@ describe('PropertiesModal', () => {
 
     expect(options).toHaveLength(1);
     expect(options[0]).toHaveTextContent('Superset Admin');
-  }, 30000);
+  });
 
   test('should show active owners without dashboard rbac', async () => {
     mockedIsFeatureEnabled.mockReturnValue(false);
@@ -576,38 +445,16 @@ describe('PropertiesModal', () => {
       document.querySelectorAll(className)! as NodeListOf<HTMLElement>;
 
     const findAllSelectOptions = () =>
-      waitFor(
-        () => {
-          const elements = getElementsByClassName(
-            '.ant-select-item-option-content',
-          );
-          if (elements.length === 0) throw new Error('No options found');
-          return elements;
-        },
-        { timeout: 5000 },
-      );
+      waitFor(() => getElementsByClassName('.ant-select-item-option-content'));
 
     render(<PropertiesModal {...propsWithDashboardInfo} />, {
       useRedux: true,
     });
 
-    // Expand the Access & ownership section first to access owners
-    const accessHeaderText = screen.getByText('Access & ownership');
-    const accessHeader = accessHeaderText.closest('.ant-collapse-header');
-    if (accessHeader) {
-      await userEvent.click(accessHeader);
-      // Wait for animation to complete
-      await new Promise(resolve => setTimeout(resolve, 300));
-    }
-
-    await waitFor(
-      () => {
-        expect(
-          screen.getByRole('combobox', { name: SupersetCore.t('Owners') }),
-        ).toBeInTheDocument();
-      },
-      { timeout: 5000 },
-    );
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: SupersetCore.t('Owners') }),
+    ).toBeInTheDocument();
 
     await open();
 
@@ -615,116 +462,5 @@ describe('PropertiesModal', () => {
 
     expect(options).toHaveLength(1);
     expect(options[0]).toHaveTextContent('Superset Admin');
-  }, 30000);
-
-  test('should not run validation while data is loading', async () => {
-    mockedIsFeatureEnabled.mockReturnValue(false);
-    const props = createProps();
-
-    // Don't pass dashboardInfo to trigger fetch behavior
-    const { rerender } = render(<PropertiesModal {...props} show={false} />, {
-      useRedux: true,
-    });
-
-    const getSpy = jest.spyOn(SupersetCore.SupersetClient, 'get');
-    let resolveFetch: any;
-    const fetchPromise = new Promise(resolve => {
-      resolveFetch = resolve;
-    });
-
-    getSpy.mockReturnValue(fetchPromise as any);
-
-    rerender(<PropertiesModal {...props} show />);
-
-    // Allow time for validation hooks to run (they shouldn't during loading)
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    expect(
-      screen.queryByTestId('dashboard-edit-properties-form'),
-    ).not.toBeInTheDocument();
-
-    resolveFetch({
-      json: {
-        result: { ...dashboardInfo, json_metadata: mockedJsonMetadata },
-      },
-    });
-
-    await waitFor(() => {
-      expect(
-        screen.getByTestId('dashboard-edit-properties-form'),
-      ).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
-    });
-
-    getSpy.mockRestore();
-  });
-
-  test('should run validation when data is ready', async () => {
-    mockedIsFeatureEnabled.mockReturnValue(false);
-    const props = createProps();
-
-    // Pass dashboardInfo to skip loading state - data is immediately ready
-    const propsWithDashboardInfo = {
-      ...props,
-      dashboardInfo: {
-        ...dashboardInfo,
-        json_metadata: mockedJsonMetadata,
-      },
-    };
-
-    render(<PropertiesModal {...propsWithDashboardInfo} />, {
-      useRedux: true,
-    });
-
-    await waitFor(() => {
-      expect(
-        screen.getByTestId('dashboard-edit-properties-form'),
-      ).toBeInTheDocument();
-    });
-
-    expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
-  });
-
-  test('should trigger validation on field changes when data is ready', async () => {
-    mockedIsFeatureEnabled.mockReturnValue(false);
-    const props = createProps();
-
-    const propsWithDashboardInfo = {
-      ...props,
-      dashboardInfo: {
-        ...dashboardInfo,
-        json_metadata: mockedJsonMetadata,
-      },
-    };
-
-    render(<PropertiesModal {...propsWithDashboardInfo} />, {
-      useRedux: true,
-    });
-
-    await waitFor(() => {
-      expect(
-        screen.getByTestId('dashboard-edit-properties-form'),
-      ).toBeInTheDocument();
-    });
-
-    const titleInput = screen.getAllByRole('textbox')[0];
-
-    // Clear to trigger validation error
-    userEvent.clear(titleInput);
-    await waitFor(
-      () => {
-        expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
-      },
-      { timeout: 1000 },
-    );
-
-    // Re-enter valid title to clear error
-    userEvent.type(titleInput, 'New Dashboard Title');
-    await waitFor(
-      () => {
-        expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
-      },
-      { timeout: 1000 },
-    );
   });
 });

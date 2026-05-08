@@ -17,14 +17,14 @@
  * under the License.
  */
 import { ReactNode, useEffect, useState } from 'react';
-import { styled } from '@apache-superset/core/ui';
+import { styled } from '@superset-ui/core';
 import { Checkbox, InfoTooltip } from '@superset-ui/core/components';
 
 interface CollapsibleControlProps {
   initialValue?: boolean;
   disabled?: boolean;
   checked?: boolean;
-  title: ReactNode;
+  title: string;
   tooltip?: string;
   children: ReactNode;
   onChange?: (checked: boolean) => void;

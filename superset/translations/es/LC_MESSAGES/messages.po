@@ -20,8 +20,8 @@ msgstr ""
 "POT-Creation-Date: 2025-04-29 12:34+0330\n"
 "PO-Revision-Date: 2016-05-02 08:49-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: es\n"
-"Language-Team: Español; Castellano <>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -90,10 +90,6 @@ msgstr " uno nuevo"
 #, python-format
 msgid " at line %(line)d"
 msgstr " en la línea %(line)d"
-
-#, python-format
-msgid " at line %(line)d"
-msgstr ""
 
 msgid " expression which needs to adhere to the "
 msgstr " expresión que debe adherirse al "
@@ -188,14 +184,7 @@ msgstr "la frecuencia de %(report_type)s programación excede el límite. Config
 
 #, python-format
 msgid "%(rows)d rows returned"
-msgstr "líneas obtenidas"
-
-#, python-format
-msgid ""
-"%(subtitle)s\n"
-"This may be triggered by:\n"
-" %(issue)s"
-msgstr ""
+msgstr "%(rows)d filas devueltas"
 
 #, fuzzy, python-format
 msgid "%(suggestion)s instead of \"%(undefinedParameter)s?\""
@@ -266,7 +255,7 @@ msgstr "%s elementos no se han podido etiquetar porque no tienes permisos de edi
 msgid "%s operator(s)"
 msgstr "%s operador(es)"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%s option"
 msgid_plural "%s options"
 msgstr[0] "%s opción"
@@ -280,7 +269,7 @@ msgstr "%s opción(es)"
 msgid "%s recipients"
 msgstr "%s destinatarios"
 
-#, python-format
+#, fuzzy, python-format
 msgid "%s row"
 msgid_plural "%s rows"
 msgstr[0] "%s fila"
@@ -1076,14 +1065,14 @@ msgstr "La consulta de alerta ha devuelto más de una columna."
 
 #, python-format
 msgid "Alert query returned more than one column. %(num_cols)s columns returned"
-msgstr "La consulta de alerta devolvió más de una columna. %(num_cols)s columnas devueltas"
+msgstr "La consulta de alerta ha devuelto más de una columna. %(num_cols)s columnas devueltas"
 
 msgid "Alert query returned more than one row."
 msgstr "La consulta de alerta ha devuelto más de una fila."
 
 #, python-format
 msgid "Alert query returned more than one row. %(num_rows)s rows returned"
-msgstr "La consulta de alerta devolvió más de una fila. %(num_rows)s filas devueltas"
+msgstr "La consulta de alerta ha devuelto más de una fila. %(num_rows)s filas devueltas"
 
 msgid "Alert running"
 msgstr "Alerta en ejecución"
@@ -1253,7 +1242,7 @@ msgid "An error occurred while creating %ss: %s"
 msgstr "Se ha producido un error al crear %ss: %s"
 
 msgid "An error occurred while creating the copy link."
-msgstr "Se produjo un error en la creación %ss: %s"
+msgstr "Se ha producido un error al crear el enlace de copia."
 
 msgid "An error occurred while creating the data source"
 msgstr "Se ha producido un error al crear la fuente de datos"
@@ -1350,7 +1339,7 @@ msgstr "Se ha producido un error al recuperar los valores del usuario: %s"
 
 #, python-format
 msgid "An error occurred while importing %s: %s"
-msgstr "Se produjo un error importando %s: %s"
+msgstr "Se ha producido un error al importar %s: %s"
 
 msgid "An error occurred while loading dashboard information."
 msgstr "Se ha producido un error al cargar la información del panel de control."
@@ -1546,7 +1535,7 @@ msgstr "Filtros aplicados (%s)"
 
 #, python-format
 msgid "Applied filters: %s"
-msgstr "Filtros aplicados %s"
+msgstr "Filtros aplicados: %s"
 
 msgid ""
 "Applied rolling window did not return any data. Please make sure the "
@@ -1588,7 +1577,7 @@ msgstr "¿Seguro que quieres eliminar?"
 
 #, python-format
 msgid "Are you sure you want to delete %s?"
-msgstr "¿Está seguro de que desea eliminar %s?"
+msgstr "¿Seguro que quieres eliminar %s?"
 
 #, python-format
 msgid "Are you sure you want to delete the selected %s?"
@@ -2249,7 +2238,7 @@ msgstr "Opciones del gráfico"
 msgid "Chart Orientation"
 msgstr "Orientación del gráfico"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Chart Owner: %s"
 msgid_plural "Chart Owners: %s"
 msgstr[0] "Propietario del gráfico: %s"
@@ -2263,15 +2252,15 @@ msgstr "Título del gráfico"
 
 #, python-format
 msgid "Chart [%s] has been overwritten"
-msgstr "El gráfico [%s] ha sido sobreescrito"
+msgstr "El gráfico [%s] se ha sobrescrito"
 
 #, python-format
 msgid "Chart [%s] has been saved"
-msgstr "El gráfico [%s] ha sido guardado"
+msgstr "El gráfico [%s] se ha guardado"
 
 #, python-format
 msgid "Chart [%s] was added to dashboard [%s]"
-msgstr "El gráfico [%s] ha sido añadido al panel de control [%s]"
+msgstr "El gráfico [%s] se ha añadido al panel de control [%s]"
 
 msgid "Chart [{}] has been overwritten"
 msgstr "El gráfico [{}] se ha sobrescrito"
@@ -2807,7 +2796,7 @@ msgid "Configuration"
 msgstr "Configuración"
 
 msgid "Configure Advanced Time Range "
-msgstr "Configuración avanzada de rango de tiempo "
+msgstr "Configurar el intervalo de tiempo avanzado "
 
 msgid "Configure Time Range: Current..."
 msgstr "Configurar el intervalo de tiempo: actual..."
@@ -2816,7 +2805,7 @@ msgid "Configure Time Range: Last..."
 msgstr "Configurar el intervalo de tiempo: último..."
 
 msgid "Configure Time Range: Previous..."
-msgstr "Configurar Rango de Tiempo: Anteriores..."
+msgstr "Configurar el intervalo de tiempo: anterior..."
 
 msgid "Configure custom time range"
 msgstr "Configurar intervalo de tiempo personalizado"
@@ -3825,7 +3814,7 @@ msgid_plural "Deleted %(num)d report schedules"
 msgstr[0] "Se ha eliminado%(num)d programación de informe"
 msgstr[1] "Se han eliminado%(num)d programaciones de informe"
 
-#, python-format
+#, fuzzy, python-format
 msgid "Deleted %(num)d rules"
 msgid_plural "Deleted %(num)d rules"
 msgstr[0] "Se han eliminado%(num)d reglas"
@@ -4123,11 +4112,13 @@ msgstr "El desglose en detalle está deshabilitado para esta base de datos. Camb
 msgid "Drill to detail: %s"
 msgstr "Desglosar en detalle: %s"
 
+#, fuzzy
 msgid "Drop a column here or click"
 msgid_plural "Drop columns here or click"
 msgstr[0] "Suelta una columna aquí o haz clic"
 msgstr[1] "Suelta las columnas aquí o haz clic"
 
+#, fuzzy
 msgid "Drop a column/metric here or click"
 msgid_plural "Drop columns/metrics here or click"
 msgstr[0] "Suelta una columna/métrica aquí o haz clic"
@@ -4194,10 +4185,10 @@ msgid "Duration in ms (1.40008 => 1ms 400µs 80ns)"
 msgstr "Duración en ms (1,40008 => 1 ms 400 µs 80 ns)"
 
 msgid "Duration in ms (100.40008 => 100ms 400µs 80ns)"
-msgstr "Duración en ms (100.40008 => 100 ms 400 µs 80 ns)"
+msgstr "Duración en ms (100,40008 => 100 ms 400 µs 80 ns)"
 
 msgid "Duration in ms (10500 => 0:10.5)"
-msgstr "Duración en ms (10500 => 0:10.5)"
+msgstr "Duración en ms (10 500 => 0:10,5)"
 
 msgid "Duration in ms (66000 => 1m 6s)"
 msgstr "Duración en ms (66 000 => 1 m 6 s)"
@@ -4243,9 +4234,6 @@ msgstr "Editar CSS"
 
 msgid "Edit CSS template properties"
 msgstr "Editar propiedades de la plantilla CSS"
-
-msgid "Edit Chart"
-msgstr "Editar Gráfico"
 
 msgid "Edit Chart Properties"
 msgstr "Editar propiedades del gráfico"
@@ -4381,7 +4369,7 @@ msgid "Embed dashboard"
 msgstr "Incrustar panel de control"
 
 msgid "Embedded dashboard could not be deleted."
-msgstr "El panel de control no pudo ser eliminado."
+msgstr "No se ha podido eliminar el panel de control incrustado."
 
 msgid "Embedding deactivated."
 msgstr "Incrustación desactivada."
@@ -4465,7 +4453,7 @@ msgid "End date"
 msgstr "Fecha final"
 
 msgid "End date excluded from time range"
-msgstr "Fecha final excluida del rango de tiempo"
+msgstr "Fecha final excluida del intervalo de tiempo"
 
 msgid "End date must be after start date"
 msgstr "La fecha final debe ser posterior a la fecha inicial"
@@ -4584,6 +4572,9 @@ msgstr "Error al leer el archivo de Excel"
 msgid "Error saving dataset"
 msgstr "Error al guardar el conjunto de datos"
 
+msgid "Error unfaving chart"
+msgstr "Error al quitar el gráfico de favoritos"
+
 msgid "Error while adding role!"
 msgstr "Error al añadir el rol"
 
@@ -4592,9 +4583,6 @@ msgstr "Error al añadir el usuario"
 
 msgid "Error while duplicating role!"
 msgstr "Error al duplicar el rol"
-
-msgid "Error unfaving chart"
-msgstr "Error al quitar el gráfico de favoritos"
 
 msgid "Error while fetching charts"
 msgstr "Error al recuperar los gráficos"
@@ -5230,10 +5218,10 @@ msgid "Geometry Column"
 msgstr "Columna de geometría"
 
 msgid "Get the last date by the date unit."
-msgstr "Obtiene la última fecha para la unidad de fecha especificada."
+msgstr "Obtener la última fecha por la unidad de fecha."
 
 msgid "Get the specify date for the holiday"
-msgstr "Obtiene la fecha del día feriado especificado"
+msgstr "Obtener la fecha especificada para el día festivo"
 
 msgid "Give access to multiple catalogs in a single database connection."
 msgstr "Da acceso a múltiples catálogos en una sola conexión de base de datos."
@@ -5508,7 +5496,7 @@ msgstr "Incluye una descripción que se enviará con tu informe"
 
 #, python-format
 msgid "Include description to be sent with %s"
-msgstr "Incluye una descripción para ser enviada con %s"
+msgstr "Incluye una descripción para enviarse con %s"
 
 msgid "Include series name as an axis"
 msgstr "Incluir el nombre de la serie como eje"
@@ -5596,7 +5584,7 @@ msgstr "JSON no válido"
 
 #, python-format
 msgid "Invalid advanced data type: %(advanced_data_type)s"
-msgstr "Tipo de información avanzada inválida: %(advanced_data_type)s"
+msgstr "Tipo de datos avanzados no válido: %(advanced_data_type)s"
 
 msgid "Invalid certificate"
 msgstr "Certificado no válido"
@@ -5669,7 +5657,7 @@ msgstr "Referencia no válida a la columna: «%(column)s»"
 
 #, python-format
 msgid "Invalid result type: %(result_type)s"
-msgstr "Tipo de resultado inválido: %(result_type)s"
+msgstr "Tipo de resultado no válido: %(result_type)s"
 
 #, python-format
 msgid "Invalid rolling_type: %(type)s"
@@ -5677,7 +5665,7 @@ msgstr "Tipo móvil no válido: %(type)s "
 
 #, python-format
 msgid "Invalid spatial point encountered: %(latlong)s"
-msgstr "Se encontró un punto espacial inválido: %(latlong)s"
+msgstr "Se ha encontrado un punto espacial no válido: %(latlong)s"
 
 msgid "Invalid state."
 msgstr "Estado no válido."
@@ -6463,7 +6451,7 @@ msgid "Middle"
 msgstr "Medio"
 
 msgid "Midnight"
-msgstr "Media noche"
+msgstr "Medianoche"
 
 msgid "Miles"
 msgstr "Millas"
@@ -6574,7 +6562,7 @@ msgstr "Mes"
 
 #, python-format
 msgid "Months %s"
-msgstr "Meses %s"
+msgstr "Meses %s "
 
 msgid "More"
 msgstr "Más"
@@ -6589,7 +6577,7 @@ msgid "Move only"
 msgstr "Solo mover"
 
 msgid "Moves the given set of dates by a specified interval."
-msgstr "Desplaza el conjunto de fechas dado en un intervalo especificado."
+msgstr "Mueve el conjunto de fechas en cuestión por un intervalo especificado."
 
 msgid "Multi-Dimensions"
 msgstr "Multidimensional"
@@ -6809,7 +6797,7 @@ msgid "No entities have this tag currently assigned"
 msgstr "Ninguna entidad tiene esta etiqueta asignada actualmente"
 
 msgid "No filter"
-msgstr "Sin filtro"
+msgstr "No hay ningún filtro"
 
 msgid "No filter is selected."
 msgstr "No se ha seleccionado ningún filtro."
@@ -6833,7 +6821,7 @@ msgid "No records found"
 msgstr "No se han encontrado registros"
 
 msgid "No results"
-msgstr "Sin resultados"
+msgstr "No hay resultados"
 
 msgid "No results found"
 msgstr "No se han encontrado resultados"
@@ -6842,7 +6830,7 @@ msgid "No results match your filter criteria"
 msgstr "No hay resultados que coincidan con tus criterios de filtro"
 
 msgid "No results were returned for this query"
-msgstr "No se obtuvieron resultados para esta consulta"
+msgstr "No se han devuelto resultados para esta consulta"
 
 msgid ""
 "No results were returned for this query. If you expected results to be "
@@ -7085,7 +7073,7 @@ msgid "One or many metrics to display"
 msgstr "Una o varias métricas a mostrar"
 
 msgid "One or more annotation layers failed loading."
-msgstr "Una o más capas de anotación fallaron al cargar."
+msgstr "No se han podido cargar una o más capas de anotación."
 
 msgid "One or more columns already exist"
 msgstr "Una o más columnas ya existen"
@@ -7501,7 +7489,7 @@ msgid "Pie Chart"
 msgstr "Gráfico tipo pastel"
 
 msgid "Pie charts on a map"
-msgstr "Mapa con gráficos tipo pastel"
+msgstr "Gráficos tipo pastel en un mapa"
 
 msgid "Pie shape"
 msgstr "Forma de pastel"
@@ -7602,6 +7590,7 @@ msgstr "Vuelve a introducir tu contraseña."
 msgid "Please re-export your file and try importing again"
 msgstr "Vuelve a exportar tu archivo e intenta importarlo de nuevo"
 
+#, fuzzy
 msgid "Please reach out to the Chart Owner for assistance."
 msgid_plural "Please reach out to the Chart Owners for assistance."
 msgstr[0] "Ponte en contacto con el propietario del gráfico para obtener ayuda."
@@ -8018,7 +8007,7 @@ msgid "Relationships between community channels"
 msgstr "Relaciones entre canales comunitarios"
 
 msgid "Relative Date/Time"
-msgstr "Fecha/Hora Relativa"
+msgstr "Fecha/hora relativa"
 
 msgid "Relative period"
 msgstr "Periodo relativo"
@@ -8763,9 +8752,6 @@ msgstr "Selecciona el método de entrega"
 msgid "Select Tags"
 msgstr "Seleccionar etiquetas"
 
-msgid "Select Viz Type"
-msgstr "Selecciona un tipo de visualización"
-
 msgid "Select chart type"
 msgstr "Seleccionar tipo de visualización"
 
@@ -9155,20 +9141,11 @@ msgstr "Mostrar burbujas"
 msgid "Show CREATE VIEW statement"
 msgstr "Mostrar instrucción CREAR VISTA"
 
-msgid "Show Cell bars"
-msgstr "Todos los gráficos"
-
-msgid "Show Chart"
-msgstr "Mostrar Gráfico"
-
-msgid "Show Column"
-msgstr "Mostrar Columna"
+msgid "Show cell bars"
+msgstr "Mostrar barras de celda"
 
 msgid "Show Dashboard"
 msgstr "Mostrar el panel de control"
-
-msgid "Show Database"
-msgstr "Mostrar Base de Datos"
 
 msgid "Show Labels"
 msgstr "Mostrar etiquetas"
@@ -9178,9 +9155,6 @@ msgstr "Mostrar registro"
 
 msgid "Show Markers"
 msgstr "Mostrar marcadores"
-
-msgid "Show Metric"
-msgstr "Mostrar Métrica"
 
 msgid "Show Metric Names"
 msgstr "Mostrar nombres de las métricas"
@@ -9449,7 +9423,7 @@ msgstr "Lo sentimos, se ha producido un error. Inténtalo de nuevo más tarde."
 
 #, python-format
 msgid "Sorry, there was an error saving this %s: %s"
-msgstr "Lo sentimos, se ha producido un error al guardar esto %s: %s"
+msgstr "Lo sentimos, se ha producido un error al guardar este %s: %s"
 
 #, python-format
 msgid "Sorry, there was an error saving this dashboard: %s"
@@ -9538,7 +9512,7 @@ msgid "Spatial"
 msgstr "Espacial"
 
 msgid "Specific Date/Time"
-msgstr "Fecha/Hora Específica"
+msgstr "Fecha/hora específica"
 
 msgid "Specify name to CREATE TABLE AS schema in: public"
 msgstr "Especifica el nombre para el esquema CREAR TABLA COMO en: público"
@@ -9603,7 +9577,7 @@ msgid "Start date"
 msgstr "Fecha de inicio"
 
 msgid "Start date included in time range"
-msgstr "Fecha inicial incluida en el rango de tiempo"
+msgstr "Fecha de inicio incluida en el intervalo de tiempo"
 
 msgid "Start y-axis at 0"
 msgstr "Iniciar eje Y en 0"
@@ -9759,9 +9733,6 @@ msgstr "Documentación del SDK integrado de Superset."
 msgid "Superset chart"
 msgstr "Gráfico Superset"
 
-msgid "Superset dashboard"
-msgstr "Dashboard Superset"
-
 msgid "Superset encountered an error while running a command."
 msgstr "Superset ha encontrado un error al ejecutar un comando."
 
@@ -9879,7 +9850,7 @@ msgstr "No se ha definido el nombre de la tabla"
 
 #, python-format
 msgid "Table or View \"%(table)s\" does not exist."
-msgstr "La tabla o vista \"%(table)s\" no existe"
+msgstr "La tabla o la vista «%(table)s» no existen."
 
 msgid ""
 "Table that visualizes paired t-tests, which are used to understand "
@@ -10746,9 +10717,7 @@ msgid "There was an error loading the tables"
 msgstr "Se ha producido un error al cargar las tablas"
 
 msgid "There was an error retrieving dashboard tabs."
-msgstr ""
-"Lo sentimos, hubo un error al obtener la información de la base de datos:"
-" %s"
+msgstr "Se ha producido un error al recuperar las pestañas del panel."
 
 #, python-format
 msgid "There was an error saving the favorite status: %s"
@@ -10767,7 +10736,7 @@ msgstr "Ha habido un problema al eliminar %s: %s"
 
 #, python-format
 msgid "There was an issue deleting rules: %s"
-msgstr "Hubo un problema eliminando las reglas: %s"
+msgstr "Ha habido un problema al eliminar las reglas: %s"
 
 #, python-format
 msgid "There was an issue deleting the selected %s: %s"
@@ -10826,11 +10795,11 @@ msgstr "Ha habido un problema al recuperar tu gráfico: %s "
 
 #, python-format
 msgid "There was an issue fetching your dashboards: %s"
-msgstr "Hubo un problema al obtener tus dashboards: %s"
+msgstr "Ha habido un problema al recuperar tus paneles de control: %s"
 
 #, python-format
 msgid "There was an issue fetching your recent activity: %s"
-msgstr "Hubo un error al obtener tu actividad reciente: %s"
+msgstr "Ha habido un problema al recuperar tu actividad reciente: %s"
 
 #, python-format
 msgid "There was an issue fetching your saved queries: %s"
@@ -10870,7 +10839,7 @@ msgid "This action will permanently delete the template."
 msgstr "Esta acción eliminará permanentemente la plantilla."
 
 msgid "This action will permanently delete the user."
-msgstr "Esta acción eliminará permanentemente el usuario."
+msgstr "Esta acción eliminará permanentemente el uduario."
 
 msgid ""
 "This can be either an IP address (e.g. 127.0.0.1) or a domain name (e.g. "
@@ -11079,6 +11048,7 @@ msgstr "Este tipo de visualización no admite el filtro cruzado."
 msgid "This visualization type is not supported."
 msgstr "Este tipo de visualización no se admite."
 
+#, fuzzy
 msgid "This was triggered by:"
 msgid_plural "This may be triggered by:"
 msgstr[0] "La causa de esto ha sido:"
@@ -11357,33 +11327,7 @@ msgid "Tree layout"
 msgstr "Diseño del árbol"
 
 msgid "Tree orientation"
-Findings (brief):
-
-- No git merge conflict markers found (no <<<<<<< / ======= / >>>>>>>).
-- PO header mismatch: "Language: en" — this is an Spanish file; set to "es".
-- Duplicate msgid entries with conflicting/empty translations:
-    - " at line %(line)d" — one entry has " en la línea %(line)d", another has an empty msgstr.
-    - "Dashboard cannot be copied due to invalid parameters." — appears multiple times with different/empty msgstr values.
-    - "%(subtitle)s\nThis may be triggered by:\n %(issue)s" — msgstr is empty in one occurrence.
-    - There are other repeated msgids with one occurrence left untranslated (examples: search for repeated msgid strings with one msgstr == "").
-- Empty translations (examples):
-    - msgid "%(subtitle)s\nThis may be triggered by:\n %(issue)s" → msgstr "".
-    - Several other msgid entries have msgstr "" (scan for msgstr "" occurrences).
-- Fuzzy entries present (e.g. entries annotated "#, fuzzy") — these need review and removal of the fuzzy flag after correction.
-- Typo in a translation: msgid "This action will permanently delete the user." → msgstr contains "uduario." (should be "usuario.").
-
-Recommended next steps:
-- Fix header Language to "es".
-- Remove/fix duplicate msgids: consolidate into a single entry and keep the correct translation.
-- Fill in missing msgstr values (or mark as untranslated intentionally).
-- Review and resolve fuzzy entries, then remove the "fuzzy" flag.
-- Fix obvious typos (e.g., "uduario" → "usuario").
-
-If you want, I can produce a patch that:
-- updates header Language to "es",
-- removes duplicate entries by keeping the first translated occurrence,
-- lists all msgids with empty msgstr for you to translate,
-or show exact locations (line ranges) for each problem. Which would you prefer?
+msgstr "Orientación del árbol"
 
 msgid "Treemap"
 msgstr "Diagrama de árbol"
@@ -12039,7 +11983,7 @@ msgstr "WMS"
 
 #, python-format
 msgid "Waiting on %s"
-msgstr "Esperando por %s"
+msgstr "Esperando a %s"
 
 msgid "Waiting on database..."
 msgstr "Esperando a la base de datos..."
@@ -12139,7 +12083,7 @@ msgstr "Semanas %s"
 msgid "Weight"
 msgstr "Peso"
 
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "We’re having trouble loading these results. Queries are set to timeout "
 "after %s second."
@@ -12149,7 +12093,7 @@ msgid_plural ""
 msgstr[0] "Estamos teniendo problemas para cargar estos resultados. Se considera que una consulta ha superado el tiempo de espera después de %s segundo."
 msgstr[1] "Estamos teniendo problemas para cargar estos resultados. Se considera que una consulta ha superado el tiempo de espera después de %s segundos."
 
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "We’re having trouble loading this visualization. Queries are set to "
 "timeout after %s second."
@@ -12632,7 +12576,7 @@ msgstr "No puedes utilizar el diseño de marca de 45° con el filtro de interval
 
 #, python-format
 msgid "You do not have permission to edit this %s"
-msgstr "No tienes permisos para editar esto %s"
+msgstr "No tienes permisos para editar este %s"
 
 msgid "You do not have permission to edit this chart"
 msgstr "No tienes permisos para editar este gráfico"
@@ -12897,7 +12841,7 @@ msgid "background"
 msgstr "fondo"
 
 msgid "Basic conditional formatting"
-msgstr "Formato condicional básico"
+msgstr "formato condicional básico"
 
 msgid "basis"
 msgstr "base"
@@ -13220,18 +13164,13 @@ msgid ""
 "is linked to %s charts that appear on %s dashboards and users have %s SQL"
 " Lab tabs using this database open. Are you sure you want to continue? "
 "Deleting the database will break those objects."
-msgstr ""
-"La base de datos %s está vinculada a %s gráficos que aparecen en %s "
-"dashboards. ¿Estás seguro de que quieres continuar? Eliminar la base de "
-"datos dejará inutilizables esos objetos."
+msgstr "está vinculado a %s gráficos que aparecen en %s paneles de control y los usuarios tienen %s pestañas de SQL Lab usando esta base de datos abierta. ¿Seguro que quieres continuar? Eliminar la base de datos descompondrá esos objetos."
 
 #, python-format
 msgid ""
 "is linked to %s charts that appear on %s dashboards. Are you sure you "
 "want to continue? Deleting the dataset will break those objects."
-msgstr ""
-"esta linkeado a %s gráficos que aparecen en %s tableros. ¿Está seguro"
-"de que desea continuar? Eliminar el conjunto de datos romperá esos objetos."
+msgstr "está vinculado a %s gráficos que aparecen en %s paneles de control. ¿Seguro que quieres continuar? Eliminar el conjunto de datos descompondrá esos objetos."
 
 msgid "is not"
 msgstr "no es"
@@ -13371,19 +13310,16 @@ msgid "pixels"
 msgstr "píxeles"
 
 msgid "previous calendar month"
-msgstr "mes anterior"
+msgstr "mes natural anterior"
 
 msgid "previous calendar quarter"
-msgstr "trimestre anterior"
+msgstr "trimestre natural anterior"
 
 msgid "previous calendar week"
-msgstr "semana anterior"
+msgstr "semana natural anterior"
 
 msgid "previous calendar year"
-msgstr "año anterior"
-
-msgid "published"
-msgstr "No publicado"
+msgstr "año natural anterior"
 
 msgid "quarter"
 msgstr "trimestre"
@@ -13402,9 +13338,6 @@ msgstr "reiniciar"
 
 msgid "recent"
 msgstr "reciente"
-
-msgid "recents"
-msgstr "Recientes"
 
 msgid "recipients"
 msgstr "destinatarios"
@@ -13426,9 +13359,6 @@ msgstr "rowlevelsecurity"
 
 msgid "running"
 msgstr "en ejecución"
-
-msgid "saved queries"
-msgstr "Consultas Guardadas"
 
 msgid "save"
 msgstr "guardar"

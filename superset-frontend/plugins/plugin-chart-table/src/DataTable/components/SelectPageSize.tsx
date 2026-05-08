@@ -17,8 +17,7 @@
  * under the License.
  */
 import { memo } from 'react';
-import { t } from '@superset-ui/core';
-import { css } from '@apache-superset/core/ui';
+import { css, t } from '@superset-ui/core';
 import { formatSelectOptions } from '@superset-ui/chart-controls';
 import { RawAntdSelect } from '@superset-ui/core/components';
 

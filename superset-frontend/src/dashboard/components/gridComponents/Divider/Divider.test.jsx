@@ -26,7 +26,6 @@ import {
 import { screen, render, userEvent } from 'spec/helpers/testing-library';
 import Divider from './Divider';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Divider', () => {
   const props = {
     id: 'id',
@@ -47,19 +46,19 @@ describe('Divider', () => {
       useDnd: true,
     });
 
-  test('should render a Draggable', () => {
+  it('should render a Draggable', () => {
     setup();
     expect(screen.getByTestId('dragdroppable-object')).toBeInTheDocument();
   });
 
-  test('should render a div with class "dashboard-component-divider"', () => {
+  it('should render a div with class "dashboard-component-divider"', () => {
     const { container } = setup();
     expect(
       container.querySelector('.dashboard-component-divider'),
     ).toBeInTheDocument();
   });
 
-  test('should render a HoverMenu with DeleteComponentButton in editMode', () => {
+  it('should render a HoverMenu with DeleteComponentButton in editMode', () => {
     setup();
     expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -73,7 +72,7 @@ describe('Divider', () => {
     );
   });
 
-  test('should call deleteComponent when deleted', () => {
+  it('should call deleteComponent when deleted', () => {
     const deleteComponent = sinon.spy();
     setup({ editMode: true, deleteComponent });
     userEvent.click(screen.getByRole('button'));

@@ -21,8 +21,7 @@ import {
   CustomControlConfig,
   sharedControls,
 } from '@superset-ui/chart-controls';
-import { t, validateNonEmpty } from '@superset-ui/core';
-import { useTheme } from '@apache-superset/core/ui';
+import { t, validateNonEmpty, useTheme } from '@superset-ui/core';
 import { InfoTooltip, SafeMarkdown } from '@superset-ui/core/components';
 import { CodeEditor } from '../../components/CodeEditor/CodeEditor';
 import { ControlHeader } from '../../components/ControlHeader/controlHeader';

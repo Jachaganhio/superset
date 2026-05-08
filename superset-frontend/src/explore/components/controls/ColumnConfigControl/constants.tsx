@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, validateNumber } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
+import { GenericDataType, t, validateNumber } from '@superset-ui/core';
 import {
   ControlFormItemSpec,
   D3_FORMAT_DOCS,

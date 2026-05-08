@@ -18,8 +18,7 @@
  */
 
 import { FC, memo, useMemo } from 'react';
-import { DataMaskStateWithId, t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { DataMaskStateWithId, styled, t } from '@superset-ui/core';
 import { Loading } from '@superset-ui/core/components';
 import { RootState } from 'src/dashboard/types';
 import { useChartLayoutItems } from 'src/dashboard/util/useChartLayoutItems';
@@ -30,8 +29,6 @@ import { useChartsVerboseMaps, getFilterBarTestId } from './utils';
 import { HorizontalBarProps } from './types';
 import FilterBarSettings from './FilterBarSettings';
 import crossFiltersSelector from './CrossFilters/selectors';
-import { selectChartCustomizationItems } from '../ChartCustomization/selectors';
-import { ChartCustomizationItem } from '../ChartCustomization/types';
 
 const HorizontalBar = styled.div`
   ${({ theme }) => `
@@ -93,21 +90,13 @@ const HorizontalFilterBar: FC<HorizontalBarProps> = ({
     [chartIds, chartLayoutItems, dataMask, verboseMaps],
   );
 
-  const chartCustomizationItems = useSelector<
-    RootState,
-    ChartCustomizationItem[]
-  >(selectChartCustomizationItems);
-
-  const hasFilters =
-    filterValues.length > 0 ||
-    selectedCrossFilters.length > 0 ||
-    chartCustomizationItems.length > 0;
+  const hasFilters = filterValues.length > 0 || selectedCrossFilters.length > 0;
 
   return (
     <HorizontalBar {...getFilterBarTestId()}>
       <HorizontalBarContent>
         {!isInitialized ? (
-          <Loading position="inline-centered" size="s" muted />
+          <Loading position="inline-centered" />
         ) : (
           <>
             <FilterBarSettings />

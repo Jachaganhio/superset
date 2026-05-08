@@ -24,7 +24,6 @@ import {
   isFeatureEnabled,
   FeatureFlag,
   getLabelsColorMap,
-  logging,
   SupersetClient,
   t,
   getClientErrorObject,
@@ -185,6 +184,11 @@ export function toggleExpandSlice(sliceId) {
   return { type: TOGGLE_EXPAND_SLICE, sliceId };
 }
 
+export const UPDATE_CSS = 'UPDATE_CSS';
+export function updateCss(css) {
+  return { type: UPDATE_CSS, css };
+}
+
 export const SET_EDIT_MODE = 'SET_EDIT_MODE';
 export function setEditMode(editMode) {
   return { type: SET_EDIT_MODE, editMode };
@@ -262,7 +266,7 @@ export const setDashboardMetadata =
     dispatch(
       dashboardInfoChanged({
         metadata: {
-          ...dashboardInfo?.metadata,
+          ...(dashboardInfo?.metadata || {}),
           ...updatedMetadata,
         },
       }),
@@ -397,16 +401,12 @@ export function saveDashboardRequest(data, id, saveType) {
         SupersetClient.get({
           endpoint: `/api/v1/dashboard/${id}/datasets`,
           headers: { 'Content-Type': 'application/json' },
-        })
-          .then(({ json }) => {
-            const datasources = json?.result ?? [];
-            if (datasources.length) {
-              dispatch(setDatasources(datasources));
-            }
-          })
-          .catch(error => {
-            logging.error('Error fetching dashboard datasets:', error);
-          });
+        }).then(({ json }) => {
+          const datasources = json?.result ?? [];
+          if (datasources.length) {
+            dispatch(setDatasources(datasources));
+          }
+        });
       }
       if (lastModifiedTime) {
         dispatch(saveDashboardRequestSuccess(lastModifiedTime));
@@ -456,9 +456,8 @@ export function saveDashboardRequest(data, id, saveType) {
               owners: cleanedData.owners,
               roles: cleanedData.roles,
               tags: cleanedData.tags || [],
-              theme_id: cleanedData.theme_id,
               json_metadata: safeStringify({
-                ...cleanedData?.metadata,
+                ...(cleanedData?.metadata || {}),
                 default_filters: safeStringify(serializedFilters),
                 filter_scopes: serializedFilterScopes,
                 chart_configuration: chartConfiguration,
@@ -748,27 +747,6 @@ export function setFullSizeChartId(chartId) {
   return { type: SET_FULL_SIZE_CHART_ID, chartId };
 }
 
-export const UPDATE_CHART_STATE = 'UPDATE_CHART_STATE';
-export function updateChartState(chartId, vizType, chartState) {
-  return {
-    type: UPDATE_CHART_STATE,
-    chartId,
-    vizType,
-    chartState,
-    lastModified: Date.now(),
-  };
-}
-
-export const REMOVE_CHART_STATE = 'REMOVE_CHART_STATE';
-export function removeChartState(chartId) {
-  return { type: REMOVE_CHART_STATE, chartId };
-}
-
-export const RESTORE_CHART_STATES = 'RESTORE_CHART_STATES';
-export function restoreChartStates(chartStates) {
-  return { type: RESTORE_CHART_STATES, chartStates };
-}
-
 // Undo history ---------------------------------------------------------------
 export const SET_MAX_UNDO_HISTORY_EXCEEDED = 'SET_MAX_UNDO_HISTORY_EXCEEDED';
 export function setMaxUndoHistoryExceeded(maxUndoHistoryExceeded = true) {
@@ -915,7 +893,7 @@ export const applyDashboardLabelsColorOnLoad = metadata => async dispatch => {
       dispatch(setDashboardLabelsColorMapSync());
     }
   } catch (e) {
-    logging.error('Failed to update dashboard color on load:', e);
+    console.error('Failed to update dashboard color on load:', e);
   }
 };
 
@@ -1082,6 +1060,6 @@ export const updateDashboardLabelsColor = renderedChartIds => (_, getState) => {
     // re-apply the color map first to get fresh maps accordingly
     applyColors(metadata, shouldGoFresh, shouldMerge);
   } catch (e) {
-    logging.error('Failed to update colors for new charts and labels:', e);
+    console.error('Failed to update colors for new charts and labels:', e);
   }
 };

@@ -272,14 +272,10 @@ export function logFailedQuery(query, errors) {
   };
 }
 
-export function createQueryFailedAction(query, msg, link, errors) {
-  return { type: QUERY_FAILED, query, msg, link, errors };
-}
-
 export function queryFailed(query, msg, link, errors) {
   return function (dispatch) {
     dispatch(logFailedQuery(query, errors));
-    dispatch(createQueryFailedAction(query, msg, link, errors));
+    dispatch({ type: QUERY_FAILED, query, msg, link, errors });
   };
 }
 
@@ -338,6 +334,7 @@ export function runQuery(query, runPreviewOnly) {
     const postPayload = {
       client_id: query.id,
       database_id: query.dbId,
+      json: true,
       runAsync: query.runAsync,
       catalog: query.catalog,
       schema: query.schema,
@@ -394,7 +391,7 @@ export function runQueryFromSqlEditor(
       dbId: qe.dbId,
       sql: qe.selectedText || qe.sql,
       sqlEditorId: qe.tabViewId ?? qe.id,
-      sqlEditorImmutableId: qe.immutableId,
+      immutableId: qe.immutableId,
       tab: qe.name,
       catalog: qe.catalog,
       schema: qe.schema,

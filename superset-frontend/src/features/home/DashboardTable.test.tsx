@@ -28,18 +28,7 @@ import { Router } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
 import fetchMock from 'fetch-mock';
 import * as hooks from 'src/views/CRUD/hooks';
-import handleResourceExport from 'src/utils/export';
 import DashboardTable from './DashboardTable';
-
-// Mock the export module
-jest.mock('src/utils/export', () => ({
-  __esModule: true,
-  default: jest.fn(),
-}));
-
-const mockExport = handleResourceExport as jest.MockedFunction<
-  typeof handleResourceExport
->;
 
 jest.mock('src/views/CRUD/utils', () => ({
   ...jest.requireActual('src/views/CRUD/utils'),
@@ -105,7 +94,6 @@ const defaultProps = {
   otherTabTitle: 'Examples',
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('DashboardTable', () => {
   const history = createMemoryHistory();
   const store = configureStore({
@@ -154,7 +142,7 @@ describe('DashboardTable', () => {
     }));
   });
 
-  test('renders loading state initially', () => {
+  it('renders loading state initially', () => {
     render(
       <Router history={history}>
         <DashboardTable {...defaultProps} />
@@ -164,7 +152,7 @@ describe('DashboardTable', () => {
     expect(screen.getByRole('img', { name: 'empty' })).toBeInTheDocument();
   });
 
-  test('renders empty state when no dashboards', async () => {
+  it('renders empty state when no dashboards', async () => {
     render(
       <Router history={history}>
         <DashboardTable {...defaultProps} />
@@ -177,7 +165,7 @@ describe('DashboardTable', () => {
     });
   });
 
-  test('renders dashboard cards when data is loaded', async () => {
+  it('renders dashboard cards when data is loaded', async () => {
     jest.spyOn(hooks, 'useListViewResource').mockImplementation(() => ({
       state: {
         loading: false,
@@ -207,7 +195,7 @@ describe('DashboardTable', () => {
     });
   });
 
-  test('switches to Mine tab correctly', async () => {
+  it('switches to Mine tab correctly', async () => {
     const props = {
       ...defaultProps,
       mine: mockDashboards,
@@ -227,7 +215,7 @@ describe('DashboardTable', () => {
     });
   });
 
-  test('handles create dashboard button click', async () => {
+  it('handles create dashboard button click', async () => {
     const assignMock = jest.fn();
     Object.defineProperty(window, 'location', {
       value: { assign: assignMock },
@@ -246,7 +234,7 @@ describe('DashboardTable', () => {
     expect(assignMock).toHaveBeenCalledWith('/dashboard/new');
   });
 
-  test('switches to Other tab when available', async () => {
+  it('switches to Other tab when available', async () => {
     const props = {
       ...defaultProps,
       otherTabData: mockDashboards,
@@ -265,37 +253,11 @@ describe('DashboardTable', () => {
     expect(otherTab).toHaveClass('active');
   });
 
-  test('handles bulk dashboard export with correct ID and shows spinner', async () => {
-    // Mock export to take some time before calling the done callback
-    mockExport.mockImplementation(
-      (resource: string, ids: number[], done: () => void) =>
-        new Promise(resolve => {
-          setTimeout(() => {
-            done();
-            resolve();
-          }, 100);
-        }),
-    );
-
+  it('handles bulk dashboard export', async () => {
     const props = {
       ...defaultProps,
       mine: mockDashboards,
     };
-
-    jest.spyOn(hooks, 'useListViewResource').mockImplementation(() => ({
-      state: {
-        loading: false,
-        resourceCollection: mockDashboards,
-        resourceCount: mockDashboards.length,
-        bulkSelectEnabled: false,
-        lastFetched: new Date().toISOString(),
-      },
-      setResourceCollection: jest.fn(),
-      hasPerm: jest.fn().mockReturnValue(true),
-      refreshData: jest.fn(),
-      fetchData: jest.fn(),
-      toggleBulkSelect: jest.fn(),
-    }));
 
     render(
       <Router history={history}>
@@ -317,28 +279,10 @@ describe('DashboardTable', () => {
     const exportOption = screen.getByText('Export');
     await userEvent.click(exportOption);
 
-    // Verify spinner shows up during export
-    await waitFor(() => {
-      expect(screen.getByRole('status')).toBeInTheDocument();
-    });
-
-    // Verify the export was called with correct parameters
-    expect(mockExport).toHaveBeenCalledWith(
-      'dashboard',
-      [1],
-      expect.any(Function),
-    );
-
-    // Wait for export to complete and spinner to disappear
-    await waitFor(
-      () => {
-        expect(screen.queryByRole('status')).not.toBeInTheDocument();
-      },
-      { timeout: 3000 },
-    );
+    expect(screen.getByRole('status')).toBeInTheDocument();
   });
 
-  test('handles dashboard deletion confirmation', async () => {
+  it('handles dashboard deletion confirmation', async () => {
     const props = {
       ...defaultProps,
       mine: mockDashboards,

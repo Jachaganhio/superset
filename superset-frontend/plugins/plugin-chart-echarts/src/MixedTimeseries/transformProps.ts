@@ -25,6 +25,7 @@ import {
   CategoricalColorNamespace,
   CurrencyFormatter,
   ensureIsArray,
+  GenericDataType,
   getCustomFormatter,
   getNumberFormatter,
   getXAxisLabel,
@@ -41,7 +42,6 @@ import {
   tooltipHtml,
   ValueFormatter,
 } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import { getOriginalSeries } from '@superset-ui/chart-controls';
 import type { EChartsCoreOption } from 'echarts/core';
 import type { SeriesOption } from 'echarts';
@@ -160,7 +160,6 @@ export default function transformProps(
     legendOrientation,
     legendMargin,
     legendType,
-    legendSort,
     logAxis,
     logAxisSecondary,
     markerEnabled,
@@ -214,7 +213,6 @@ export default function transformProps(
     sortSeriesAscending,
     sortSeriesAscendingB,
     timeGrainSqla,
-    forceMaxInterval,
     percentageThreshold,
     showQueryIdentifiers = false,
     metrics = [],
@@ -586,17 +584,11 @@ export default function transformProps(
       },
       minorTick: { show: minorTicks },
       minInterval:
-        xAxisType === AxisType.Time && timeGrainSqla && !forceMaxInterval
+        xAxisType === AxisType.Time && timeGrainSqla
           ? TIMEGRAIN_TO_TIMESTAMP[
               timeGrainSqla as keyof typeof TIMEGRAIN_TO_TIMESTAMP
             ]
           : 0,
-      maxInterval:
-        xAxisType === AxisType.Time && timeGrainSqla && forceMaxInterval
-          ? TIMEGRAIN_TO_TIMESTAMP[
-              timeGrainSqla as keyof typeof TIMEGRAIN_TO_TIMESTAMP
-            ]
-          : undefined,
       ...getMinAndMaxFromBounds(
         xAxisType,
         truncateXAxis,
@@ -738,11 +730,7 @@ export default function transformProps(
             ForecastSeriesEnum.Observation,
         )
         .map(entry => entry.id || entry.name || '')
-        .concat(extractAnnotationLabels(annotationLayers))
-        .sort((a: string, b: string) => {
-          if (!legendSort) return 0;
-          return legendSort === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
-        }),
+        .concat(extractAnnotationLabels(annotationLayers)),
     },
     series: dedupSeries(reorderForecastSeries(series) as SeriesOption[]),
     toolbox: {

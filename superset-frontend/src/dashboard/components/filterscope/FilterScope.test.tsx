@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { supersetTheme } from '@apache-superset/core/ui';
+import { supersetTheme } from '@superset-ui/core';
 import {
   cleanup,
   render,

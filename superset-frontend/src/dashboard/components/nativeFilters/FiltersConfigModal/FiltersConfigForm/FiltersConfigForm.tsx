@@ -26,17 +26,19 @@ import {
   isFeatureEnabled,
   FeatureFlag,
   Filter,
+  GenericDataType,
   getChartMetadataRegistry,
   JsonResponse,
   NativeFilterType,
+  styled,
   SupersetApiError,
   t,
   ClientErrorObject,
   getClientErrorObject,
+  useTheme,
+  css,
   getExtensionsRegistry,
 } from '@superset-ui/core';
-import { styled, useTheme, css } from '@apache-superset/core/ui';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import { debounce, isEqual } from 'lodash';
 import {
   forwardRef,

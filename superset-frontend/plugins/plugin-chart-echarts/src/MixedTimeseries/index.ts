@@ -21,9 +21,7 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from './images/thumbnail.png';
-import thumbnailDark from './images/thumbnail-dark.png';
 import example from './images/example.jpg';
-import exampleDark from './images/example-dark.jpg';
 import {
   EchartsMixedTimeseriesFormData,
   EchartsMixedTimeseriesProps,
@@ -66,10 +64,9 @@ export default class EchartsTimeseriesChartPlugin extends EchartsChartPlugin<
           AnnotationType.Interval,
           AnnotationType.Timeseries,
         ],
-        exampleGallery: [{ url: example, urlDark: exampleDark }],
+        exampleGallery: [{ url: example }],
         name: t('Mixed Chart'),
         thumbnail,
-        thumbnailDark,
         tags: [
           t('Advanced-Analytics'),
           t('ECharts'),

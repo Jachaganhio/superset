@@ -33,10 +33,6 @@ export const crossFiltersSelector = (props: {
 }): CrossFilterIndicator[] => {
   const { dataMask, chartIds, chartLayoutItems, verboseMaps } = props;
 
-  if (!chartIds || !Array.isArray(chartIds)) {
-    return [];
-  }
-
   return chartIds
     .map(chartId => {
       const filterIndicator = getCrossFilterIndicator(

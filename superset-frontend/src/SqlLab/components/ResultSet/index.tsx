@@ -30,10 +30,12 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { pick } from 'lodash';
 import {
+  Alert,
   Button,
   ButtonGroup,
   Tooltip,
   Card,
+  Modal,
   Input,
   Label,
   Loading,
@@ -46,14 +48,16 @@ import {
 import { nanoid } from 'nanoid';
 import {
   QueryState,
+  styled,
   t,
   tn,
+  useTheme,
   usePrevious,
+  css,
   getNumberFormatter,
   getExtensionsRegistry,
   ErrorTypeEnum,
 } from '@superset-ui/core';
-import { styled, useTheme, css, Alert } from '@apache-superset/core/ui';
 import {
   ISaveableDatasource,
   ISimpleColumn,
@@ -83,10 +87,7 @@ import {
 } from 'src/logger/LogUtils';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { findPermission } from 'src/utils/findPermission';
-import { StreamingExportModal } from 'src/components/StreamingExportModal';
-import { useStreamingExport } from 'src/components/StreamingExportModal/useStreamingExport';
 import { ensureAppRoot } from 'src/utils/pathUtils';
-import { useConfirmModal } from 'src/hooks/useConfirmModal';
 import ExploreCtasResultsButton from '../ExploreCtasResultsButton';
 import ExploreResultsButton from '../ExploreResultsButton';
 import HighlightedSql from '../HighlightedSql';
@@ -104,6 +105,7 @@ export interface ResultSetProps {
   csv?: boolean;
   database?: Record<string, any>;
   displayLimit: number;
+  height: number;
   queryId: string;
   search?: boolean;
   showSql?: boolean;
@@ -157,14 +159,12 @@ const ResultSetButtons = styled.div`
   padding-right: ${({ theme }) => 2 * theme.sizeUnit}px;
 `;
 
-const CopyStyledButton = styled(Button)`
+const copyButtonStyles = css`
   &:hover {
-    color: ${({ theme }) => theme.colorPrimary};
     text-decoration: unset;
   }
-
   span > :first-of-type {
-    margin: 0;
+    margin: 0px;
   }
 `;
 
@@ -178,6 +178,7 @@ const ResultSet = ({
   csv = true,
   database = {},
   displayLimit,
+  height,
   queryId,
   search = true,
   showSql = false,
@@ -186,10 +187,6 @@ const ResultSet = ({
   defaultQueryLimit,
 }: ResultSetProps) => {
   const user = useSelector(({ user }: SqlLabRootState) => user, shallowEqual);
-  const streamingThreshold = useSelector(
-    (state: SqlLabRootState) =>
-      state.common?.conf?.CSV_STREAMING_ROW_THRESHOLD || 1000,
-  );
   const query = useSelector(
     ({ sqlLab: { queries } }: SqlLabRootState) =>
       pick(queries[queryId], [
@@ -203,7 +200,6 @@ const ResultSet = ({
         'sql',
         'executedSql',
         'sqlEditorId',
-        'sqlEditorImmutableId',
         'templateParams',
         'schema',
         'rows',
@@ -230,20 +226,10 @@ const ResultSet = ({
   const [searchText, setSearchText] = useState('');
   const [cachedData, setCachedData] = useState<Record<string, unknown>[]>([]);
   const [showSaveDatasetModal, setShowSaveDatasetModal] = useState(false);
-  const [showStreamingModal, setShowStreamingModal] = useState(false);
 
   const history = useHistory();
   const dispatch = useDispatch();
   const logAction = useLogAction({ queryId, sqlEditorId: query.sqlEditorId });
-  const { showConfirm, ConfirmModal } = useConfirmModal();
-
-  const { progress, startExport, resetExport, retryExport, cancelExport } =
-    useStreamingExport({
-      onComplete: () => {},
-      onError: error => {
-        addDangerToast(t('Export failed: %s', error));
-      },
-    });
 
   const reRunQueryIfSessionTimeoutErrorOnMount = useCallback(() => {
     if (
@@ -298,8 +284,9 @@ const ResultSet = ({
       const key = await postFormData(results.query_id, 'query', {
         ...EXPLORE_CHART_DEFAULT,
         datasource: `${results.query_id}__query`,
-
-        all_columns: results.columns.map(column => column.column_name),
+        ...{
+          all_columns: results.columns.map(column => column.column_name),
+        },
       });
       const url = mountExploreUrl(null, {
         [URL_PARAMS.formDataKey.name]: key,
@@ -317,31 +304,9 @@ const ResultSet = ({
   const getExportCsvUrl = (clientId: string) =>
     ensureAppRoot(`/api/v1/sqllab/export/${clientId}/`);
 
-  const handleCloseStreamingModal = () => {
-    cancelExport();
-    setShowStreamingModal(false);
-    resetExport();
-  };
-
-  const shouldUseStreamingExport = () => {
-    const { rows, queryLimit, limitingFactor } = query;
-    const limit = queryLimit || query.results?.query?.limit;
-    const rowsCount = Math.min(rows || 0, query.results?.data?.length || 0);
-
-    let actualRowCount = rowsCount;
-
-    if (limitingFactor === LimitingFactor.NotLimited && rows) {
-      actualRowCount = rows;
-    } else if (limit) {
-      actualRowCount = Math.max(actualRowCount, limit);
-    }
-
-    return actualRowCount >= streamingThreshold;
-  };
-
   const renderControls = () => {
     if (search || visualize || csv) {
-      const { limitingFactor, queryLimit, results, rows } = query;
+      const { results, queryLimit, limitingFactor, rows } = query;
       const limit = queryLimit || results.query.limit;
       const rowsCount = Math.min(rows || 0, results?.data?.length || 0);
       let { data } = query.results;
@@ -349,6 +314,7 @@ const ResultSet = ({
         data = cachedData;
       }
       const { columns } = query.results;
+      // Added compute logic to stop user from being able to Save & Explore
 
       const datasource: ISaveableDatasource = {
         columns: query.results.columns as ISimpleColumn[],
@@ -364,27 +330,6 @@ const ResultSet = ({
         'SQLLab',
         user?.roles,
       );
-
-      const handleDownloadCsv = (event: React.MouseEvent<HTMLElement>) => {
-        logAction(LOG_ACTIONS_SQLLAB_DOWNLOAD_CSV, {});
-
-        if (limitingFactor === LimitingFactor.Dropdown && limit === rowsCount) {
-          event.preventDefault();
-
-          showConfirm({
-            title: t('Download is on the way'),
-            body: t(
-              'Downloading %(rows)s rows based on the LIMIT configuration. If you want the entire result set, you need to adjust the LIMIT.',
-              { rows: rowsCount.toLocaleString() },
-            ),
-            onConfirm: () => {
-              window.location.href = getExportCsvUrl(query.id);
-            },
-            confirmText: t('OK'),
-            cancelText: t('Close'),
-          });
-        }
-      };
 
       return (
         <ResultSetControls>
@@ -406,46 +351,45 @@ const ResultSet = ({
               />
             )}
             {csv && canExportData && (
-              <CopyStyledButton
+              <Button
+                css={copyButtonStyles}
                 buttonSize="small"
                 buttonStyle="secondary"
-                {...(!shouldUseStreamingExport() && {
-                  href: getExportCsvUrl(query.id),
-                })}
+                href={getExportCsvUrl(query.id)}
                 data-test="export-csv-button"
-                onClick={e => {
-                  const useStreaming = shouldUseStreamingExport();
-
-                  if (useStreaming) {
-                    e.preventDefault();
-                    setShowStreamingModal(true);
-
-                    startExport({
-                      url: '/api/v1/sqllab/export_streaming/',
-                      payload: { client_id: query.id },
-                      exportType: 'csv',
-                      expectedRows: rows,
+                onClick={() => {
+                  logAction(LOG_ACTIONS_SQLLAB_DOWNLOAD_CSV, {});
+                  if (
+                    limitingFactor === LimitingFactor.Dropdown &&
+                    limit === rowsCount
+                  ) {
+                    Modal.warning({
+                      title: t('Download is on the way'),
+                      content: t(
+                        'Downloading %(rows)s rows based on the LIMIT configuration. If you want the entire result set, you need to adjust the LIMIT.',
+                        { rows: rowsCount.toLocaleString() },
+                      ),
                     });
-                  } else {
-                    handleDownloadCsv(e);
                   }
                 }}
               >
                 <Icons.DownloadOutlined iconSize="m" /> {t('Download to CSV')}
-              </CopyStyledButton>
+              </Button>
             )}
+
             {canExportData && (
               <CopyToClipboard
                 text={prepareCopyToClipboardTabularData(data, columns)}
                 wrapped={false}
                 copyNode={
-                  <CopyStyledButton
+                  <Button
+                    css={copyButtonStyles}
                     buttonSize="small"
                     buttonStyle="secondary"
                     data-test="copy-to-clipboard-button"
                   >
                     <Icons.CopyOutlined iconSize="s" /> {t('Copy to Clipboard')}
-                  </CopyStyledButton>
+                  </Button>
                 }
                 hideTooltip
                 onCopyEnd={() =>
@@ -713,140 +657,105 @@ const ResultSet = ({
         true,
       );
       return (
-        <>
-          <ResultContainer>
-            {renderControls()}
-            {showSql && showSqlInline ? (
-              <>
-                <div
-                  css={css`
-                    display: flex;
-                    justify-content: space-between;
-                    padding-left: ${theme.sizeUnit * 4}px;
-                    align-items: center;
-                    gap: ${GAP}px;
-                  `}
+        <ResultContainer>
+          {renderControls()}
+          {showSql && showSqlInline ? (
+            <>
+              <div
+                css={css`
+                  display: flex;
+                  justify-content: space-between;
+                  padding-left: ${theme.sizeUnit * 4}px;
+                  align-items: center;
+                  gap: ${GAP}px;
+                `}
+              >
+                <Card
+                  css={[
+                    css`
+                      height: 28px;
+                      width: calc(100% - ${ROWS_CHIP_WIDTH + GAP}px);
+                      code {
+                        width: 100%;
+                        overflow: hidden;
+                        white-space: nowrap !important;
+                        text-overflow: ellipsis;
+                        display: block;
+                      }
+                    `,
+                  ]}
                 >
-                  <Card
-                    css={[
-                      css`
-                        height: 28px;
-                        width: calc(100% - ${ROWS_CHIP_WIDTH + GAP}px);
-                        code {
-                          width: 100%;
-                          overflow: hidden;
-                          white-space: nowrap !important;
-                          text-overflow: ellipsis;
-                          display: block;
-                        }
-                      `,
-                    ]}
-                  >
-                    {sql}
-                  </Card>
-                  {renderRowsReturned(false)}
-                </div>
-                {renderRowsReturned(true)}
-              </>
-            ) : (
-              <>
+                  {sql}
+                </Card>
                 {renderRowsReturned(false)}
-                {renderRowsReturned(true)}
-                {sql}
-              </>
-            )}
-            <div
-              css={css`
-                flex: 1 1 auto;
-                padding-left: ${theme.sizeUnit * 4}px;
-              `}
-            >
-              <AutoSizer disableWidth>
-                {({ height }) => (
-                  <ResultTable
-                    data={data}
-                    queryId={query.id}
-                    orderedColumnKeys={results.columns.map(
-                      col => col.column_name,
-                    )}
-                    height={height}
-                    filterText={searchText}
-                    expandedColumns={expandedColumns}
-                    allowHTML={allowHTML}
-                  />
-                )}
-              </AutoSizer>
-            </div>
-          </ResultContainer>
-          <StreamingExportModal
-            visible={showStreamingModal}
-            onCancel={handleCloseStreamingModal}
-            onRetry={retryExport}
-            progress={progress}
-          />
-          {ConfirmModal}
-        </>
+              </div>
+              {renderRowsReturned(true)}
+            </>
+          ) : (
+            <>
+              {renderRowsReturned(false)}
+              {renderRowsReturned(true)}
+              {sql}
+            </>
+          )}
+          <div
+            css={css`
+              flex: 1 1 auto;
+              padding-left: ${theme.sizeUnit * 4}px;
+            `}
+          >
+            <AutoSizer disableWidth>
+              {({ height }) => (
+                <ResultTable
+                  data={data}
+                  queryId={query.id}
+                  orderedColumnKeys={results.columns.map(
+                    col => col.column_name,
+                  )}
+                  height={height}
+                  filterText={searchText}
+                  expandedColumns={expandedColumns}
+                  allowHTML={allowHTML}
+                />
+              )}
+            </AutoSizer>
+          </div>
+        </ResultContainer>
       );
     }
     if (data && data.length === 0) {
-      return (
-        <>
-          <Alert type="warning" message={t('The query returned no data')} />
-          <StreamingExportModal
-            visible={showStreamingModal}
-            onCancel={handleCloseStreamingModal}
-            onRetry={retryExport}
-            progress={progress}
-          />
-        </>
-      );
+      return <Alert type="warning" message={t('The query returned no data')} />;
     }
   }
 
   if (query.cached || (query.state === QueryState.Success && !query.results)) {
     if (query.isDataPreview) {
       return (
-        <>
-          <Button
-            buttonSize="small"
-            buttonStyle="primary"
-            onClick={() =>
-              dispatch(
-                reFetchQueryResults({
-                  ...query,
-                  isDataPreview: true,
-                }),
-              )
-            }
-          >
-            {t('Fetch data preview')}
-          </Button>
-          <StreamingExportModal
-            visible={showStreamingModal}
-            onCancel={handleCloseStreamingModal}
-            onRetry={retryExport}
-            progress={progress}
-          />
-        </>
+        <Button
+          buttonSize="small"
+          buttonStyle="primary"
+          onClick={() =>
+            dispatch(
+              reFetchQueryResults({
+                ...query,
+                isDataPreview: true,
+              }),
+            )
+          }
+        >
+          {t('Fetch data preview')}
+        </Button>
       );
     }
     if (query.resultsKey) {
       return (
-        <>
-          <Button
-            buttonSize="small"
-            buttonStyle="primary"
-            onClick={() => fetchResults(query)}
-          >
-            {t('Refetch results')}
-          </Button>
-          <StreamingExportModal
-            visible={showStreamingModal}
-            onCancel={handleCloseStreamingModal}
-            onRetry={retryExport}
-            progress={progress}
-          />
-        </>
+        <Button
+          buttonSize="small"
+          buttonStyle="primary"
+          onClick={() => fetchResults(query)}
+        >
+          {t('Refetch results')}
+        </Button>
       );
     }
   }
@@ -861,24 +770,15 @@ const ResultSet = ({
   const progressMsg = query?.extra?.progress ?? null;
 
   return (
-    <>
-      <ResultlessStyles>
-        <div>{!progressBar && <Loading position="normal" />}</div>
-        {/* show loading bar whenever progress bar is completed but needs time to render */}
-        <div>{query.progress === 100 && <Loading position="normal" />}</div>
-        <QueryStateLabel query={query} />
-        <div>
-          {progressMsg && <Alert type="success" message={progressMsg} />}
-        </div>
-        <div>{query.progress !== 100 && progressBar}</div>
-        {trackingUrl && <div>{trackingUrl}</div>}
-      </ResultlessStyles>
-      <StreamingExportModal
-        visible={showStreamingModal}
-        onCancel={handleCloseStreamingModal}
-        progress={progress}
-      />
-    </>
+    <ResultlessStyles>
+      <div>{!progressBar && <Loading position="normal" />}</div>
+      {/* show loading bar whenever progress bar is completed but needs time to render */}
+      <div>{query.progress === 100 && <Loading position="normal" />}</div>
+      <QueryStateLabel query={query} />
+      <div>{progressMsg && <Alert type="success" message={progressMsg} />}</div>
+      <div>{query.progress !== 100 && progressBar}</div>
+      {trackingUrl && <div>{trackingUrl}</div>}
+    </ResultlessStyles>
   );
 };
 

@@ -21,13 +21,12 @@ import { getChartDataUri } from '.';
 
 jest.mock('src/utils/pathUtils');
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Get ChartUri', () => {
   (ensureAppRoot as jest.Mock).mockImplementation(
     (path: string) => `/prefix${path}`,
   );
 
-  test('Get ChartUri when allowDomainSharding:false', () => {
+  it('Get ChartUri when allowDomainSharding:false', () => {
     expect(
       getChartDataUri({
         path: '/path',
@@ -54,7 +53,7 @@ describe('Get ChartUri', () => {
     });
   });
 
-  test('Get ChartUri when allowDomainSharding:true', () => {
+  it('Get ChartUri when allowDomainSharding:true', () => {
     expect(
       getChartDataUri({
         path: '/path-allowDomainSharding-true',

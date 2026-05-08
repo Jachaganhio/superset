@@ -1,1 +1,1 @@
-../AGENTS.md
+../LLMS.md

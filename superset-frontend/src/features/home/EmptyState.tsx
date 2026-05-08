@@ -21,8 +21,7 @@ import {
   EmptyState as EmptyStateComponent,
 } from '@superset-ui/core/components';
 import { TableTab } from 'src/views/CRUD/types';
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 import { navigateTo } from 'src/utils/navigationUtils';
 import { WelcomeTable } from './types';
 

@@ -17,8 +17,12 @@
  * under the License.
  */
 import { useEffect, useState } from 'react';
-import { t, isFeatureEnabled, FeatureFlag } from '@superset-ui/core';
-import { SupersetTheme } from '@apache-superset/core/ui';
+import {
+  t,
+  SupersetTheme,
+  isFeatureEnabled,
+  FeatureFlag,
+} from '@superset-ui/core';
 import { Switch } from '@superset-ui/core/components/Switch';
 import { InfoTooltip } from '@superset-ui/core/components';
 import { isEmpty } from 'lodash';

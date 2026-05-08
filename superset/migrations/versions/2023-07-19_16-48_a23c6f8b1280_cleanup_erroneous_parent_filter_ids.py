@@ -70,7 +70,7 @@ def upgrade():
                     dashboard.json_metadata = json.dumps(json_metadata)
             except Exception:
                 logging.exception(
-                    "Unable to parse JSON metadata for dashboard %s", dashboard.id
+                    f"Unable to parse JSON metadata for dashboard {dashboard.id}"
                 )
 
     session.commit()

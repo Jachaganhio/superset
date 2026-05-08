@@ -67,8 +67,8 @@ export interface StyledModalProps {
 export type { ModalFuncProps };
 
 export interface FormModalProps extends ModalProps {
-  initialValues?: object;
-  formSubmitHandler: (values: object) => Promise<void>;
+  initialValues?: Object;
+  formSubmitHandler: (values: Object) => Promise<void>;
   onSave: () => void;
   requiredFields: string[];
 }

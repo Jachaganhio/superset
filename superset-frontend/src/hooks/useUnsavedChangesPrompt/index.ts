@@ -19,8 +19,6 @@
 import { getClientErrorObject, t } from '@superset-ui/core';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useBeforeUnload } from 'src/hooks/useBeforeUnload';
-import type { Location } from 'history';
 
 type UseUnsavedChangesPromptProps = {
   hasUnsavedChanges: boolean;
@@ -70,13 +68,7 @@ export const useUnsavedChangesPrompt = ({
   }, [onSave]);
 
   const blockCallback = useCallback(
-    ({
-      pathname,
-      state,
-    }: {
-      pathname: Location['pathname'];
-      state: Location['state'];
-    }) => {
+    ({ pathname, state }: { pathname: string; state?: any }) => {
       if (manualSaveRef.current) {
         manualSaveRef.current = false;
         return undefined;
@@ -103,13 +95,25 @@ export const useUnsavedChangesPrompt = ({
   }, [blockCallback, hasUnsavedChanges, history]);
 
   useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!hasUnsavedChanges) return;
+      event.preventDefault();
+
+      // Most browsers require a "returnValue" set to empty string
+      const evt = event as any;
+      evt.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
     if (!isSaveModalVisible && manualSaveRef.current) {
       setShowModal(false);
       manualSaveRef.current = false;
     }
   }, [isSaveModalVisible]);
-
-  useBeforeUnload(hasUnsavedChanges);
 
   return {
     showModal,

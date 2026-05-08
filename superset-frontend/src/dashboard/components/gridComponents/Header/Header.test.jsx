@@ -31,7 +31,6 @@ import {
 import { mockStoreWithTabs } from 'spec/fixtures/mockStore';
 import Header from './Header';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Header', () => {
   const props = {
     id: 'id',
@@ -58,17 +57,17 @@ describe('Header', () => {
     );
   }
 
-  test('should render a Draggable', () => {
+  it('should render a Draggable', () => {
     setup();
     expect(screen.getByTestId('dragdroppable-object')).toBeInTheDocument();
   });
 
-  test('should render a WithPopoverMenu', () => {
+  it('should render a WithPopoverMenu', () => {
     setup();
     expect(screen.getByRole('none')).toBeInTheDocument();
   });
 
-  test('should render a HoverMenu in editMode', () => {
+  it('should render a HoverMenu in editMode', () => {
     setup();
     expect(screen.queryByTestId('hover-menu')).not.toBeInTheDocument();
 
@@ -77,14 +76,14 @@ describe('Header', () => {
     expect(hoverMenus[0]).toBeInTheDocument();
   });
 
-  test('should render an EditableTitle with meta.text', () => {
+  it('should render an EditableTitle with meta.text', () => {
     setup();
     const titleElement = screen.getByTestId('editable-title');
     expect(titleElement).toBeInTheDocument();
     expect(titleElement).toHaveTextContent(props.component.meta.text);
   });
 
-  test('should call updateComponents when EditableTitle changes', () => {
+  it('should call updateComponents when EditableTitle changes', () => {
     const updateComponents = sinon.spy();
     setup({ editMode: true, updateComponents });
 
@@ -104,13 +103,13 @@ describe('Header', () => {
     );
   });
 
-  test('should render a DeleteComponentButton when focused in editMode', () => {
+  it('should render a DeleteComponentButton when focused in editMode', () => {
     setup({ editMode: true });
     const trashButton = screen.getByRole('img', { name: 'delete' });
     expect(trashButton).toBeInTheDocument();
   });
 
-  test('should call deleteComponent when deleted', () => {
+  it('should call deleteComponent when deleted', () => {
     const deleteComponent = sinon.spy();
     setup({ editMode: true, deleteComponent });
 
@@ -120,17 +119,17 @@ describe('Header', () => {
     expect(deleteComponent.callCount).toBe(1);
   });
 
-  test('should render the AnchorLink in view mode', () => {
+  it('should render the AnchorLink in view mode', () => {
     setup();
     expect(screen.getByTestId('anchor-link')).toBeInTheDocument();
   });
 
-  test('should not render the AnchorLink in edit mode', () => {
+  it('should not render the AnchorLink in edit mode', () => {
     setup({ editMode: true });
     expect(screen.queryByTestId('anchor-link')).not.toBeInTheDocument();
   });
 
-  test('should not render the AnchorLink in embedded mode', () => {
+  it('should not render the AnchorLink in embedded mode', () => {
     setup({ embeddedMode: true });
     expect(screen.queryByTestId('anchor-link')).not.toBeInTheDocument();
   });

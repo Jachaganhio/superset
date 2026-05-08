@@ -41,7 +41,6 @@ import {
   truncateXAxis,
   xAxisBounds,
   minorTicks,
-  forceMaxInterval,
 } from '../../controls';
 import { AreaChartStackControlOptions } from '../../constants';
 
@@ -186,7 +185,6 @@ const config: ControlPanelConfig = {
         ],
         [xAxisLabelRotation],
         [xAxisLabelInterval],
-        [forceMaxInterval],
         ...richTooltipSection,
         // eslint-disable-next-line react/jsx-key
         [<ControlSubSectionHeader>{t('Y Axis')}</ControlSubSectionHeader>],

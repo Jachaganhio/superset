@@ -44,7 +44,6 @@ const FormDataMock = () => {
   return <div data-test="mock-formdata">{Object.keys(formData).join(':')}</div>;
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('ControlPanelsContainer', () => {
   const defaultTableConfig = {
     controlPanelSections: [

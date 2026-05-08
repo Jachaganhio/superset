@@ -57,7 +57,6 @@ jest.mock('@superset-ui/core', () => ({
 }));
 
 const mockedIsFeatureEnabled = isFeatureEnabled as jest.Mock;
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Email Report Modal', () => {
   beforeEach(() => {
     mockedIsFeatureEnabled.mockImplementation(
@@ -66,7 +65,7 @@ describe('Email Report Modal', () => {
     render(<ReportModal {...defaultProps} />, { useRedux: true });
   });
 
-  test('inputs respond correctly', () => {
+  it('inputs respond correctly', () => {
     // ----- Report name textbox
     // Initial value
     const reportNameTextbox = screen.getByTestId('report-name-test');
@@ -93,7 +92,7 @@ describe('Email Report Modal', () => {
     expect(crontabInputs).toHaveLength(5);
   });
 
-  test('does not allow user to create a report without a name', () => {
+  it('does not allow user to create a report without a name', () => {
     // Grab name textbox and add button
     const reportNameTextbox = screen.getByTestId('report-name-test');
     const addButton = screen.getByRole('button', { name: /add/i });
@@ -110,7 +109,6 @@ describe('Email Report Modal', () => {
     expect(addButton).toBeDisabled();
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('Email Report Modal', () => {
     let dispatch: any;
 
@@ -118,7 +116,7 @@ describe('Email Report Modal', () => {
       dispatch = sinon.spy();
     });
 
-    test('creates a new email report', async () => {
+    it('creates a new email report', async () => {
       // ---------- Render/value setup ----------
       const reportValues = {
         id: 1,

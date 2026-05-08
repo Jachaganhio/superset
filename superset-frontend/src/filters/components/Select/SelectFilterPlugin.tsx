@@ -23,14 +23,14 @@ import {
   DataMask,
   ensureIsArray,
   ExtraFormData,
+  GenericDataType,
   getColumnLabel,
   JsonObject,
   finestTemporalGrainFormatter,
   t,
   tn,
+  styled,
 } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import { debounce, isUndefined } from 'lodash';
 import { useImmerReducer } from 'use-immer';
 import {
@@ -296,7 +296,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
   }, [filterState.validateMessage, filterState.validateStatus]);
 
   const uniqueOptions = useMemo(() => {
-    const allOptions = new Set(data.map(el => el[col]));
+    const allOptions = new Set([...data.map(el => el[col])]);
     return [...allOptions].map((value: string) => ({
       label: labelFormatter(value, datatype),
       value,
@@ -408,7 +408,8 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
   useEffect(() => {
     if (
       isChangedByUser.current &&
-      filterState.value?.every((value?: any) =>
+      filterState.value &&
+      filterState.value.every((value?: any) =>
         data.some(row => row[col] === value),
       )
     )
@@ -437,6 +438,7 @@ export default function PluginFilterSelect(props: PluginFilterSelectProps) {
     formData,
     data,
     JSON.stringify(filterState.value),
+    isChangedByUser.current,
     clearAllTrigger,
   ]);
 

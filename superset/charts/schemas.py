@@ -24,7 +24,6 @@ from flask import current_app
 from flask_babel import gettext as _
 from marshmallow import EXCLUDE, fields, post_load, Schema, validate
 from marshmallow.validate import Length, Range
-from marshmallow_union import Union
 
 from superset.common.chart_data import ChartDataResultFormat, ChartDataResultType
 from superset.db_engine_specs.base import builtin_time_grains
@@ -1018,17 +1017,6 @@ class ChartDataExtrasSchema(Schema):
         },
         allow_none=True,
     )
-    column_order = fields.List(
-        fields.String(),
-        metadata={
-            "description": (
-                "Ordered list of column names for result ordering. "
-                "Used to preserve user's column reordering (including mixed "
-                "dimension columns and metrics)"
-            )
-        },
-        allow_none=True,
-    )
 
 
 class AnnotationLayerSchema(Schema):
@@ -1144,9 +1132,8 @@ class AnnotationLayerSchema(Schema):
 
 class ChartDataDatasourceSchema(Schema):
     description = "Chart datasource"
-    id = Union(
-        [fields.Integer(), fields.UUID()],
-        metadata={"description": "Datasource id or uuid"},
+    id = fields.Integer(
+        metadata={"description": "Datasource id"},
         required=True,
     )
     type = fields.String(

@@ -143,9 +143,12 @@ test('moves autocomplete popup to parent container when triggered', async () => 
     editorInstance.container?.parentElement;
 
   // Manually trigger the afterExec event with insertstring command using _emit
+  // Note: Using _emit is necessary here to test internal event handling behavior
+  // since there's no public API to trigger the afterExec event directly
   type CommandManagerWithEmit = typeof editorInstance.commands & {
     _emit: (event: string, data: unknown) => void;
   };
+  // eslint-disable-next-line no-underscore-dangle
   (editorInstance.commands as CommandManagerWithEmit)._emit('afterExec', {
     command: { name: 'insertstring' },
     args: ['SELECT'],
@@ -182,9 +185,12 @@ test('moves autocomplete popup on startAutocomplete command event', async () => 
     editorInstance.container?.parentElement;
 
   // Manually trigger the afterExec event with startAutocomplete command
+  // Note: Using _emit is necessary here to test internal event handling behavior
+  // since there's no public API to trigger the afterExec event directly
   type CommandManagerWithEmit = typeof editorInstance.commands & {
     _emit: (event: string, data: unknown) => void;
   };
+  // eslint-disable-next-line no-underscore-dangle
   (editorInstance.commands as CommandManagerWithEmit)._emit('afterExec', {
     command: { name: 'startAutocomplete' },
   });

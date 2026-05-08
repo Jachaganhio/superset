@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled } from '@apache-superset/core/ui';
+import { styled } from '@superset-ui/core';
 
 export const ExplorePopoverContent = styled.div`
   .edit-popover-resize {

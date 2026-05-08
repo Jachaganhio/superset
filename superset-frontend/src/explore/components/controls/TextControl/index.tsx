@@ -35,7 +35,6 @@ export interface TextControlProps<T extends InputValueType = InputValueType> {
   value?: T | null;
   controlId?: string;
   renderTrigger?: boolean;
-  validationErrors?: string[];
 }
 
 export interface TextControlState {

@@ -28,6 +28,7 @@ import DashboardComponent from 'src/dashboard/containers/DashboardComponent';
 import { EditableTitle } from '@superset-ui/core/components';
 import { setEditMode, onRefresh } from 'src/dashboard/actions/dashboardState';
 
+import getChartIdsFromComponent from 'src/dashboard/util/getChartIdsFromComponent';
 import Tab from './Tab';
 import Markdown from '../Markdown';
 
@@ -455,8 +456,7 @@ test('AnchorLink does not render in embedded mode', () => {
 
 test('Should refresh charts when tab becomes active after dashboard refresh', async () => {
   jest.clearAllMocks();
-  const getChartIdsFromComponent = require('src/dashboard/util/getChartIdsFromComponent');
-  getChartIdsFromComponent.mockReturnValue([101, 102]);
+  jest.mocked(getChartIdsFromComponent).mockReturnValue([101, 102]);
 
   const props = createProps();
   props.renderType = 'RENDER_TAB_CONTENT';
@@ -505,8 +505,7 @@ test('Should refresh charts when tab becomes active after dashboard refresh', as
 
 test('Should not refresh charts when tab becomes active if no dashboard refresh occurred', async () => {
   jest.clearAllMocks();
-  const getChartIdsFromComponent = require('src/dashboard/util/getChartIdsFromComponent');
-  getChartIdsFromComponent.mockReturnValue([101]);
+  jest.mocked(getChartIdsFromComponent).mockReturnValue([101]);
 
   const props = createProps();
   props.renderType = 'RENDER_TAB_CONTENT';

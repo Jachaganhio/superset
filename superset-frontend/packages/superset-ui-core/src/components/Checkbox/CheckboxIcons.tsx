@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useTheme } from '@apache-superset/core/ui';
+import { useTheme } from '@superset-ui/core';
 
 export const CheckboxChecked = () => {
   const theme = useTheme();

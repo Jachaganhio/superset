@@ -84,9 +84,7 @@ export type EchartsTimeseriesFormData = QueryFormData & {
   yAxisFormat?: string;
   xAxisForceCategorical?: boolean;
   xAxisTimeFormat?: string;
-  xAxisNumberFormat?: string;
   timeGrainSqla?: TimeGranularity;
-  forceMaxInterval?: boolean;
   xAxisBounds: [number | undefined | null, number | undefined | null];
   yAxisBounds: [number | undefined | null, number | undefined | null];
   zoomable: boolean;

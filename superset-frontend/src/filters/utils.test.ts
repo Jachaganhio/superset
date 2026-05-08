@@ -18,12 +18,12 @@
  */
 
 import {
+  GenericDataType,
   getNumberFormatter,
   getTimeFormatter,
   NumberFormats,
   TimeFormats,
 } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import {
   getDataRecordFormatter,
   getRangeExtraFormData,
@@ -31,11 +31,9 @@ import {
 } from 'src/filters/utils';
 import { FALSE_STRING, NULL_STRING, TRUE_STRING } from 'src/utils/common';
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Filter utils', () => {
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('getRangeExtraFormData', () => {
-    test('getRangeExtraFormData - col: "testCol", lower: 1, upper: 2', () => {
+    it('getRangeExtraFormData - col: "testCol", lower: 1, upper: 2', () => {
       expect(getRangeExtraFormData('testCol', 1, 2)).toEqual({
         filters: [
           {
@@ -51,7 +49,7 @@ describe('Filter utils', () => {
         ],
       });
     });
-    test('getRangeExtraFormData - col: "testCol", lower: 0, upper: 0', () => {
+    it('getRangeExtraFormData - col: "testCol", lower: 0, upper: 0', () => {
       expect(getRangeExtraFormData('testCol', 0, 0)).toEqual({
         filters: [
           {
@@ -62,7 +60,7 @@ describe('Filter utils', () => {
         ],
       });
     });
-    test('getRangeExtraFormData - col: "testCol", lower: null, upper: 2', () => {
+    it('getRangeExtraFormData - col: "testCol", lower: null, upper: 2', () => {
       expect(getRangeExtraFormData('testCol', null, 2)).toEqual({
         filters: [
           {
@@ -73,7 +71,7 @@ describe('Filter utils', () => {
         ],
       });
     });
-    test('getRangeExtraFormData - col: "testCol", lower: 1, upper: undefined', () => {
+    it('getRangeExtraFormData - col: "testCol", lower: 1, upper: undefined', () => {
       expect(getRangeExtraFormData('testCol', 1, undefined)).toEqual({
         filters: [
           {
@@ -85,9 +83,8 @@ describe('Filter utils', () => {
       });
     });
   });
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('getSelectExtraFormData', () => {
-    test('getSelectExtraFormData - col: "testCol", value: ["value"], emptyFilter: false, inverseSelection: false', () => {
+    it('getSelectExtraFormData - col: "testCol", value: ["value"], emptyFilter: false, inverseSelection: false', () => {
       expect(
         getSelectExtraFormData('testCol', ['value'], false, false),
       ).toEqual({
@@ -100,7 +97,7 @@ describe('Filter utils', () => {
         ],
       });
     });
-    test('getSelectExtraFormData - col: "testCol", value: ["value"], emptyFilter: true, inverseSelection: false', () => {
+    it('getSelectExtraFormData - col: "testCol", value: ["value"], emptyFilter: true, inverseSelection: false', () => {
       expect(getSelectExtraFormData('testCol', ['value'], true, false)).toEqual(
         {
           adhoc_filters: [
@@ -113,7 +110,7 @@ describe('Filter utils', () => {
         },
       );
     });
-    test('getSelectExtraFormData - col: "testCol", value: ["value"], emptyFilter: false, inverseSelection: true', () => {
+    it('getSelectExtraFormData - col: "testCol", value: ["value"], emptyFilter: false, inverseSelection: true', () => {
       expect(getSelectExtraFormData('testCol', ['value'], false, true)).toEqual(
         {
           filters: [
@@ -126,22 +123,21 @@ describe('Filter utils', () => {
         },
       );
     });
-    test('getSelectExtraFormData - col: "testCol", value: [], emptyFilter: false, inverseSelection: false', () => {
+    it('getSelectExtraFormData - col: "testCol", value: [], emptyFilter: false, inverseSelection: false', () => {
       expect(getSelectExtraFormData('testCol', [], false, false)).toEqual({});
     });
-    test('getSelectExtraFormData - col: "testCol", value: undefined, emptyFilter: false, inverseSelection: false', () => {
+    it('getSelectExtraFormData - col: "testCol", value: undefined, emptyFilter: false, inverseSelection: false', () => {
       expect(
         getSelectExtraFormData('testCol', undefined, false, false),
       ).toEqual({});
     });
-    test('getSelectExtraFormData - col: "testCol", value: null, emptyFilter: false, inverseSelection: false', () => {
+    it('getSelectExtraFormData - col: "testCol", value: null, emptyFilter: false, inverseSelection: false', () => {
       expect(getSelectExtraFormData('testCol', null, false, false)).toEqual({});
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('getDataRecordFormatter', () => {
-    test('default formatter returns expected values', () => {
+    it('default formatter returns expected values', () => {
       const formatter = getDataRecordFormatter();
       expect(formatter(null, GenericDataType.String)).toEqual(NULL_STRING);
       expect(formatter(null, GenericDataType.Numeric)).toEqual(NULL_STRING);
@@ -177,7 +173,7 @@ describe('Filter utils', () => {
       );
     });
 
-    test('formatter with defined formatters returns expected values', () => {
+    it('formatter with defined formatters returns expected values', () => {
       const formatter = getDataRecordFormatter({
         timeFormatter: getTimeFormatter(TimeFormats.DATABASE_DATETIME),
         numberFormatter: getNumberFormatter(NumberFormats.SMART_NUMBER),

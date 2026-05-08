@@ -1,3 +1,5 @@
+/* eslint-disable react/sort-prop-types */
+/* eslint-disable react/jsx-handler-names */
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,14 +20,8 @@
  */
 
 import { ScreenGridLayer } from '@deck.gl/aggregation-layers';
+import { CategoricalColorNamespace, JsonObject, t } from '@superset-ui/core';
 import { Color } from '@deck.gl/core';
-import {
-  JsonObject,
-  QueryFormData,
-  CategoricalColorNamespace,
-  t,
-} from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
 import {
   COLOR_SCHEME_TYPES,
   ColorSchemeType,
@@ -36,29 +32,14 @@ import { commonLayerProps, getColorRange } from '../common';
 import TooltipRow from '../../TooltipRow';
 import { GetLayerType, createDeckGLComponent } from '../../factory';
 import { HIGHLIGHT_COLOR_ARRAY, TRANSPARENT_COLOR_ARRAY } from '../../utils';
-import {
-  createTooltipContent,
-  CommonTooltipRows,
-} from '../../utilities/tooltipUtils';
-
-const MoreRecordsIndicator = styled.div`
-  margin-top: ${({ theme }) => theme.sizeUnit}px;
-  font-size: ${({ theme }) => theme.fontSizeSM}px;
-  color: ${({ theme }) => theme.colorTextSecondary};
-`;
 
 export function getPoints(data: JsonObject[]) {
   return data.map(d => d.position);
 }
 
-function defaultTooltipGenerator(o: JsonObject, formData: QueryFormData) {
-  const metricLabel = formData.size?.label || formData.size?.value || 'Weight';
-  const points = o.points || [];
-  const pointCount = points.length || 0;
-
+function setTooltipContent(o: JsonObject) {
   return (
     <div className="deckgl-tooltip">
-      {CommonTooltipRows.centroid(o)}
       <TooltipRow
         // eslint-disable-next-line prefer-template
         label={t('Longitude and Latitude') + ': '}
@@ -69,35 +50,6 @@ function defaultTooltipGenerator(o: JsonObject, formData: QueryFormData) {
         label={t('Weight') + ': '}
         value={`${o.object?.value}`}
       />
-      <TooltipRow
-        label={`${metricLabel}: `}
-        value={`${o.object?.cellWeight}`}
-      />
-      <TooltipRow label="Points: " value={`${pointCount} records`} />
-      {points.length > 0 && points.length <= 3 && (
-        <div style={{ marginTop: 8, fontSize: '12px' }}>
-          <strong>Records:</strong>
-          {points.slice(0, 3).map((point: JsonObject, index: number) => (
-            <div key={index} style={{ marginTop: 4, paddingLeft: '8px' }}>
-              {Object.entries(point).map(([key, value]) =>
-                key !== 'position' &&
-                key !== 'weight' &&
-                key !== '__timestamp' &&
-                key !== 'points' ? (
-                  <span key={key} style={{ marginRight: '8px' }}>
-                    <strong>{key}:</strong> {String(value)}
-                  </span>
-                ) : null,
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-      {points.length > 3 && (
-        <MoreRecordsIndicator>
-          ... and {points.length - 3} more records
-        </MoreRecordsIndicator>
-      )}
     </div>
   );
 }
@@ -117,13 +69,14 @@ export const getLayer: GetLayerType<ScreenGridLayer> = function ({
   let data = payload.data.features;
 
   if (fd.js_data_mutator) {
+    // Applying user defined data mutator if defined
     const jsFnMutator = sandboxedEval(fd.js_data_mutator);
     data = jsFnMutator(data);
   }
 
   const colorSchemeType = fd.color_scheme_type as ColorSchemeType & 'default';
   const colorRange = getColorRange({
-    defaultBreakpointsColor: fd.default_breakpoint_color,
+    defaultBreakpointsColor: fd.deafult_breakpoint_color,
     colorBreakpoints: fd.color_breakpoints,
     fixedColor: fd.color_picker,
     colorSchemeType,
@@ -141,54 +94,8 @@ export const getLayer: GetLayerType<ScreenGridLayer> = function ({
     [189, 0, 38],
   ] as Color[];
 
-  const cellSize = fd.grid_size || 50;
-  const cellToPointsMap = new Map();
-
-  data.forEach((point: JsonObject) => {
-    const { position } = point;
-    if (position) {
-      const cellX = Math.floor(position[0] / (cellSize * 0.01));
-      const cellY = Math.floor(position[1] / (cellSize * 0.01));
-      const cellKey = `${cellX},${cellY}`;
-
-      if (!cellToPointsMap.has(cellKey)) {
-        cellToPointsMap.set(cellKey, []);
-      }
-      cellToPointsMap.get(cellKey).push(point);
-    }
-  });
-
-  const tooltipContent = createTooltipContent(fd, (o: JsonObject) =>
-    defaultTooltipGenerator(o, fd),
-  );
-
-  const customOnHover = (info: JsonObject) => {
-    if (info.picked) {
-      const cellCenter = info.coordinate;
-      const cellX = Math.floor(cellCenter[0] / (cellSize * 0.01));
-      const cellY = Math.floor(cellCenter[1] / (cellSize * 0.01));
-      const cellKey = `${cellX},${cellY}`;
-
-      const pointsInCell = cellToPointsMap.get(cellKey) || [];
-      const enhancedInfo = {
-        ...info,
-        object: {
-          ...info.object,
-          points: pointsInCell,
-        },
-      };
-
-      setTooltip({
-        content: tooltipContent(enhancedInfo),
-        x: info.x,
-        y: info.y,
-      });
-    } else {
-      setTooltip(null);
-    }
-    return true;
-  };
-
+  // Passing a layer creator function instead of a layer since the
+  // layer needs to be regenerated at each render
   return new ScreenGridLayer({
     id: `screengrid-layer-${fd.slice_id}` as const,
     data,
@@ -204,15 +111,13 @@ export const getLayer: GetLayerType<ScreenGridLayer> = function ({
       formData: fd,
       setDataMask,
       setTooltip,
-      setTooltipContent: tooltipContent,
+      setTooltipContent,
       filterState,
       onContextMenu,
       emitCrossFilters,
     }),
     getWeight: aggFunc,
     colorScaleType: colorSchemeType === 'default' ? 'linear' : 'quantize',
-    onHover: customOnHover,
-    pickable: true,
     opacity: filterState?.value ? 0.3 : 1,
   });
 };

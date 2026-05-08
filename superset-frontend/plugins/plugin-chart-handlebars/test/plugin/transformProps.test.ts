@@ -16,8 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, QueryFormData, VizType } from '@superset-ui/core';
-import { supersetTheme } from '@apache-superset/core/ui';
+import {
+  ChartProps,
+  QueryFormData,
+  supersetTheme,
+  VizType,
+} from '@superset-ui/core';
 import { HandlebarsQueryFormData } from '../../src/types';
 import transformProps from '../../src/plugin/transformProps';
 

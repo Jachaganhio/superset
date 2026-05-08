@@ -16,18 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
-import { styled, Alert } from '@apache-superset/core/ui';
+import { t, styled } from '@superset-ui/core';
 import { useCallback, useEffect, useRef, useState, ReactNode } from 'react';
 import cx from 'classnames';
 import TableCollection from '@superset-ui/core/components/TableCollection';
 import BulkTagModal from 'src/features/tags/BulkTagModal';
 import {
+  Alert,
   Button,
   Checkbox,
   Icons,
   EmptyState,
-  Loading,
   type EmptyStateProps,
 } from '@superset-ui/core/components';
 import CardCollection from './CardCollection';
@@ -92,16 +91,6 @@ const ListViewStyles = styled.div`
       margin-top: ${theme.sizeUnit * 2}px;
       color: ${theme.colorText};
     }
-  `}
-`;
-
-const FullPageLoadingWrapper = styled.div`
-  ${({ theme }) => `
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 50vh;
-    padding: ${theme.sizeUnit * 16}px;
   `}
 `;
 
@@ -420,7 +409,7 @@ export function ListView<T extends object = any>({
                           cta
                           onClick={() =>
                             action.onSelect(
-                              selectedFlatRows.map((r: any) => r.original),
+                              selectedFlatRows.map(r => r.original),
                             )
                           }
                         >
@@ -456,42 +445,34 @@ export function ListView<T extends object = any>({
             />
           )}
           {viewMode === 'table' && (
-            <>
-              {loading && rows.length === 0 ? (
-                <FullPageLoadingWrapper>
-                  <Loading />
-                </FullPageLoadingWrapper>
-              ) : (
-                <TableCollection
-                  getTableProps={getTableProps}
-                  getTableBodyProps={getTableBodyProps}
-                  prepareRow={prepareRow}
-                  headerGroups={headerGroups}
-                  setSortBy={setSortBy}
-                  rows={rows}
-                  columns={columns}
-                  loading={loading && rows.length > 0}
-                  highlightRowId={highlightRowId}
-                  columnsForWrapText={columnsForWrapText}
-                  bulkSelectEnabled={bulkSelectEnabled}
-                  selectedFlatRows={selectedFlatRows}
-                  toggleRowSelected={(rowId, value) => {
-                    const row = rows.find((r: any) => r.id === rowId);
-                    if (row) {
-                      prepareRow(row);
-                      (row as any).toggleRowSelected(value);
-                    }
-                  }}
-                  toggleAllRowsSelected={toggleAllRowsSelected}
-                  pageIndex={pageIndex}
-                  pageSize={pageSize}
-                  totalCount={count}
-                  onPageChange={newPageIndex => {
-                    gotoPage(newPageIndex);
-                  }}
-                />
-              )}
-            </>
+            <TableCollection
+              getTableProps={getTableProps}
+              getTableBodyProps={getTableBodyProps}
+              prepareRow={prepareRow}
+              headerGroups={headerGroups}
+              setSortBy={setSortBy}
+              rows={rows}
+              columns={columns}
+              loading={loading}
+              highlightRowId={highlightRowId}
+              columnsForWrapText={columnsForWrapText}
+              bulkSelectEnabled={bulkSelectEnabled}
+              selectedFlatRows={selectedFlatRows}
+              toggleRowSelected={(rowId, value) => {
+                const row = rows.find(r => r.id === rowId);
+                if (row) {
+                  prepareRow(row);
+                  row.toggleRowSelected(value);
+                }
+              }}
+              toggleAllRowsSelected={toggleAllRowsSelected}
+              pageIndex={pageIndex}
+              pageSize={pageSize}
+              totalCount={count}
+              onPageChange={newPageIndex => {
+                gotoPage(newPageIndex);
+              }}
+            />
           )}
           {!loading && rows.length === 0 && (
             <EmptyWrapper className={viewMode} data-test="empty-state">

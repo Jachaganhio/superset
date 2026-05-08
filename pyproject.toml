@@ -35,8 +35,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    # no bounds for apache-superset-core until we have a stable version
-    "apache-superset-core",
     "backoff>=1.8.0",
     "celery>=5.3.6, <6.0.0",
     "click>=8.0.3",
@@ -48,7 +46,7 @@ dependencies = [
     "cryptography>=42.0.4, <45.0.0",
     "deprecation>=2.1.0, <2.2.0",
     "flask>=2.2.5, <3.0.0",
-    "flask-appbuilder>=5.0.2,<6",
+    "flask-appbuilder>=5.0.0,<6",
     "flask-caching>=2.1.0, <3",
     "flask-compress>=1.13, <2.0",
     "flask-talisman>=1.0.0, <2.0",
@@ -69,7 +67,6 @@ dependencies = [
     "markdown>=3.0",
     # marshmallow>=4 has issues: https://github.com/apache/superset/issues/33162
     "marshmallow>=3.0, <4",
-    "marshmallow-union>=0.1",
     "msgpack>=1.0.0, <1.1",
     "nh3>=0.2.11, <0.3",
     "numpy>1.23.5, <2.3",
@@ -84,7 +81,6 @@ dependencies = [
     "pgsanity",
     "Pillow>=11.0.0, <12",
     "polyline>=2.0.0, <3.0",
-    "pydantic>=2.8.0",
     "pyparsing>=3.0.6, <4",
     "python-dateutil",
     "python-dotenv", # optional dependencies for Flask but required for Superset, see https://flask.palletsprojects.com/en/stable/installation/#optional-dependencies
@@ -105,7 +101,6 @@ dependencies = [
     "tabulate>=0.9.0, <1.0",
     "typing-extensions>=4, <5",
     "waitress; sys_platform == 'win32'",
-    "watchdog>=6.0.0",
     "wtforms>=2.3.3, <4",
     "wtforms-json",
     "xlsxwriter>=3.0.7, <3.1",
@@ -125,8 +120,8 @@ cockroachdb = ["cockroachdb>=0.3.5, <0.4"]
 crate = ["sqlalchemy-cratedb>=0.40.1, <1"]
 databend = ["databend-sqlalchemy>=0.3.2, <1.0"]
 databricks = [
-    "databricks-sql-connector==4.1.2",
-    "databricks-sqlalchemy==1.0.5",
+    "databricks-sql-connector>=2.0.2, <3",
+    "sqlalchemy-databricks>=0.2.0",
 ]
 db2 = ["ibm-db-sa>0.3.8, <=0.4.0"]
 denodo = ["denodo-sqlalchemy~=1.0.6"]
@@ -139,7 +134,6 @@ solr = ["sqlalchemy-solr >= 0.2.0"]
 elasticsearch = ["elasticsearch-dbapi>=0.2.9, <0.3.0"]
 exasol = ["sqlalchemy-exasol >= 2.4.0, <3.0"]
 excel = ["xlrd>=1.2.0, <1.3"]
-fastmcp = ["fastmcp>=2.13.0.2"]
 firebird = ["sqlalchemy-firebird>=0.7.0, <0.8"]
 firebolt = ["firebolt-sqlalchemy>=1.0.0, <2"]
 gevent = ["gevent>=23.9.1"]
@@ -196,8 +190,6 @@ doris = ["pydoris>=1.0.0, <2.0.0"]
 oceanbase = ["oceanbase_py>=0.0.1"]
 ydb = ["ydb-sqlalchemy>=0.1.2"]
 development = [
-    # no bounds for apache-superset-extensions-cli until a stable version
-    "apache-superset-extensions-cli",
     "docker",
     "flask-testing",
     "freezegun",
@@ -229,8 +221,8 @@ documentation = "https://superset.apache.org/docs/intro"
 combine_as_imports = true
 include_trailing_comma = true
 line_length = 88
-known_first_party = "superset, apache-superset-core, apache-superset-extensions-cli"
-known_third_party = "alembic, apispec, backoff, celery, click, colorama, cron_descriptor, croniter, cryptography, dateutil, deprecation, flask, flask_appbuilder, flask_babel, flask_caching, flask_compress, flask_jwt_extended, flask_login, flask_migrate, flask_sqlalchemy, flask_talisman, flask_testing, flask_wtf, freezegun, geohash, geopy, holidays, humanize, isodate, jinja2, jwt, markdown, markupsafe, marshmallow, marshmallow-union, msgpack, nh3, numpy, pandas, parameterized, parsedatetime, pgsanity, polyline, prison, progress, pyarrow, sqlalchemy_bigquery, pyhive, pyparsing, pytest, pytest_mock, pytz, redis, requests, selenium, setuptools, shillelagh, simplejson, slack, sqlalchemy, sqlalchemy_utils, typing_extensions, urllib3, werkzeug, wtforms, wtforms_json, yaml"
+known_first_party = "superset"
+known_third_party = "alembic, apispec, backoff, celery, click, colorama, cron_descriptor, croniter, cryptography, dateutil, deprecation, flask, flask_appbuilder, flask_babel, flask_caching, flask_compress, flask_jwt_extended, flask_login, flask_migrate, flask_sqlalchemy, flask_talisman, flask_testing, flask_wtf, freezegun, geohash, geopy, holidays, humanize, isodate, jinja2, jwt, markdown, markupsafe, marshmallow, msgpack, nh3, numpy, pandas, parameterized, parsedatetime, pgsanity, polyline, prison, progress, pyarrow, sqlalchemy_bigquery, pyhive, pyparsing, pytest, pytest_mock, pytz, redis, requests, selenium, setuptools, shillelagh, simplejson, slack, sqlalchemy, sqlalchemy_utils, typing_extensions, urllib3, werkzeug, wtforms, wtforms_json, yaml"
 multi_line_output = 3
 order_by_type = false
 
@@ -315,7 +307,6 @@ select = [
     "E",
     "F",
     "F",
-    "G",
     "I",
     "N",
     "PT",
@@ -331,7 +322,6 @@ ignore = [
     "PT006",
     "T201",
     "N999",
-    "G201",
 ]
 extend-select = ["I"]
 
@@ -434,7 +424,3 @@ python-geohash = "0"
 # TODO REMOVE THESE DEPS FROM CODEBASE
 paramiko = "3"  # GPL
 pyxlsb = "1"  # GPL
-
-[tool.uv.sources]
-apache-superset-core = { path = "./superset-core", editable = true }
-apache-superset-extensions-cli = { path = "./superset-extensions-cli", editable = true }

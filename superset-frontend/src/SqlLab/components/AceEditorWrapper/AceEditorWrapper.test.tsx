@@ -68,13 +68,12 @@ const setup = (queryEditor: QueryEditor, store?: Store) =>
     },
   );
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('AceEditorWrapper', () => {
   beforeEach(() => {
     (FullSQLEditor as any as jest.Mock).mockClear();
   });
 
-  test('renders ace editor including sql value', async () => {
+  it('renders ace editor including sql value', async () => {
     const store = createStore(initialState, reducerIndex);
     const { getByTestId } = setup(defaultQueryEditor, store);
     await waitFor(() => expect(getByTestId('react-ace')).toBeInTheDocument());
@@ -84,7 +83,7 @@ describe('AceEditorWrapper', () => {
     );
   });
 
-  test('renders current sql for unrelated unsaved changes', () => {
+  it('renders current sql for unrelated unsaved changes', () => {
     const expectedSql = 'SELECT updated_column\nFROM updated_table\nWHERE';
     const store = createStore(
       {
@@ -109,7 +108,7 @@ describe('AceEditorWrapper', () => {
     );
   });
 
-  test('skips rerendering for updating cursor position', () => {
+  it('skips rerendering for updating cursor position', () => {
     const store = createStore(initialState, reducerIndex);
     setup(defaultQueryEditor, store);
 

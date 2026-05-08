@@ -20,8 +20,7 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { IconTooltip, List } from '@superset-ui/core/components';
 import { nanoid } from 'nanoid';
-import { t } from '@superset-ui/core';
-import { withTheme } from '@apache-superset/core/ui';
+import { t, withTheme } from '@superset-ui/core';
 import {
   SortableContainer,
   SortableHandle,

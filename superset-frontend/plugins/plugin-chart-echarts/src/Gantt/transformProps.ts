@@ -27,14 +27,14 @@ import {
   CategoricalColorNamespace,
   DataRecord,
   DataRecordValue,
+  GenericDataType,
   getColumnLabel,
   getNumberFormatter,
   t,
   tooltipHtml,
 } from '@superset-ui/core';
-import { extendedDayjs as dayjs } from '@superset-ui/core/utils/dates';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import { CallbackDataParams } from 'echarts/types/src/util/types';
+import dayjs from 'dayjs';
 import {
   Cartesian2dCoordSys,
   EchartsGanttChartProps,
@@ -131,7 +131,6 @@ export default function transformProps(chartProps: EchartsGanttChartProps) {
     legendMargin,
     legendOrientation,
     legendType,
-    legendSort,
     showLegend,
     yAxisTitle,
     yAxisTitleMargin,
@@ -332,18 +331,6 @@ export default function transformProps(chartProps: EchartsGanttChartProps) {
     },
   );
 
-  const legendData = series
-    .map(entry => {
-      const { name } = entry;
-      if (name === null || name === undefined) return '';
-      return String(name);
-    })
-    .filter(name => name !== '')
-    .sort((a, b) => {
-      if (!legendSort) return 0;
-      return legendSort === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
-    });
-
   const tooltipFormatterMap = {
     [GenericDataType.Numeric]: tooltipValuesFormatter,
     [GenericDataType.String]: undefined,
@@ -379,7 +366,6 @@ export default function transformProps(chartProps: EchartsGanttChartProps) {
         zoomable,
         legendState,
       ),
-      data: legendData,
     },
     grid: {
       ...defaultGrid,

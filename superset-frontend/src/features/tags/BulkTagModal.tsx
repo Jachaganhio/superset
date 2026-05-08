@@ -18,8 +18,7 @@
  */
 import { useState, useEffect, FC } from 'react';
 import { ModalTitleWithIcon } from 'src/components/ModalTitleWithIcon';
-import { t, SupersetClient } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { t, styled, SupersetClient } from '@superset-ui/core';
 import {
   FormLabel,
   AsyncSelect,

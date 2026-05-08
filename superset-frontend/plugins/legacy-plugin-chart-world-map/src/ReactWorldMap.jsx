@@ -17,8 +17,7 @@
  * under the License.
  */
 import PropTypes from 'prop-types';
-import { reactify } from '@superset-ui/core';
-import { styled, useTheme } from '@apache-superset/core/ui';
+import { styled, reactify, useTheme } from '@superset-ui/core';
 import WorldMap from './WorldMap';
 
 const ReactWorldMap = reactify(WorldMap);

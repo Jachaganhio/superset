@@ -31,9 +31,10 @@ import {
   isFeatureEnabled,
   isPhysicalColumn,
   NumberFormatter,
+  styled,
   t,
+  useTheme,
 } from '@superset-ui/core';
-import { styled, useTheme } from '@apache-superset/core/ui';
 import { aggregatorTemplates, PivotTable, sortAs } from './react-pivottable';
 import {
   FilterType,
@@ -432,7 +433,7 @@ export default function PivotTableChart(props: PivotTableProps) {
 
       const [key, val] = filtersEntries[filtersEntries.length - 1];
 
-      let updatedFilters = { ...selectedFilters };
+      let updatedFilters = { ...(selectedFilters || {}) };
       // multi select
       // if (selectedFilters && isActiveFilterValue(key, val)) {
       //   updatedFilters[key] = selectedFilters[key].filter((x: DataRecordValue) => x !== val);

@@ -46,7 +46,6 @@ from sqlalchemy import (
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy.sql.elements import ColumnElement, literal_column
-from superset_core.api.models import Query as CoreQuery, SavedQuery as CoreSavedQuery
 
 from superset import security_manager
 from superset.exceptions import SupersetParseError, SupersetSecurityException
@@ -63,7 +62,6 @@ from superset.sql.parse import (
     Table,
 )
 from superset.sqllab.limiting_factor import LimitingFactor
-from superset.superset_typing import QueryData, QueryObjectDict
 from superset.utils import json
 from superset.utils.core import (
     get_column_name,
@@ -96,10 +94,10 @@ class SqlTablesMixin:  # pylint: disable=too-few-public-methods
 
 
 class Query(
-    CoreQuery,
     SqlTablesMixin,
     ExtraJSONMixin,
     ExploreMixin,
+    Model,
 ):  # pylint: disable=abstract-method,too-many-public-methods
     """ORM model for SQL query
 
@@ -239,8 +237,7 @@ class Query(
         return None
 
     @property
-    def data(self) -> QueryData:
-        """Returns query data for the frontend"""
+    def data(self) -> dict[str, Any]:
         order_by_choices = []
         for col in self.columns:
             column_name = str(col.column_name or "")
@@ -332,7 +329,7 @@ class Query(
     def default_endpoint(self) -> str:
         return ""
 
-    def get_extra_cache_keys(self, query_obj: QueryObjectDict) -> list[Hashable]:
+    def get_extra_cache_keys(self, query_obj: dict[str, Any]) -> list[Hashable]:
         return []
 
     @property
@@ -390,11 +387,11 @@ class Query(
 
 
 class SavedQuery(
-    CoreSavedQuery,
     SqlTablesMixin,
     AuditMixinNullable,
     ExtraJSONMixin,
     ImportExportMixin,
+    Model,
 ):
     """ORM model for SQL query"""
 

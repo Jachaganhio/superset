@@ -91,7 +91,7 @@ class QueryObjectFactory:  # pylint: disable=too-few-public-methods
     def _convert_to_model(self, datasource: DatasourceDict) -> BaseDatasource:
         return self._datasource_dao.get_datasource(
             datasource_type=DatasourceType(datasource["type"]),
-            database_id_or_uuid=datasource["id"],
+            datasource_id=int(datasource["id"]),
         )
 
     def _process_extras(

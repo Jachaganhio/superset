@@ -17,8 +17,7 @@
  * under the License.
  */
 import { useState } from 'react';
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 import cx from 'classnames';
 import { Button, Modal } from '@superset-ui/core/components';
 import withToasts, {

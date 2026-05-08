@@ -36,60 +36,60 @@ test('creates hydrate action from initial data', () => {
   expect(dispatch).toHaveBeenCalledWith(
     expect.objectContaining({
       type: HYDRATE_EXPLORE,
-      data: expect.objectContaining({
-        charts: expect.objectContaining({
-          371: expect.objectContaining({
+      data: {
+        charts: {
+          371: {
             id: 371,
             chartAlert: null,
             chartStatus: null,
             chartStackTrace: null,
             chartUpdateEndTime: null,
             chartUpdateStartTime: 0,
-            latestQueryFormData: expect.objectContaining({
+            latestQueryFormData: {
               cache_timeout: undefined,
               datasource: '8__table',
               slice_id: 371,
               url_params: undefined,
               viz_type: VizType.Table,
-            }),
-            sliceFormData: expect.objectContaining({
+            },
+            sliceFormData: {
               cache_timeout: undefined,
               datasource: '8__table',
               slice_id: 371,
               url_params: undefined,
               viz_type: VizType.Table,
-            }),
+            },
             queryController: null,
             queriesResponse: null,
             triggerQuery: false,
             lastRendered: 0,
-          }),
-        }),
-        datasources: expect.objectContaining({
-          '8__table': expect.anything(),
-        }),
-        saveModal: expect.objectContaining({
+          },
+        },
+        datasources: {
+          '8__table': exploreInitialData.dataset,
+        },
+        saveModal: {
           dashboards: [],
           saveModalAlert: null,
           isVisible: false,
-        }),
-        explore: expect.objectContaining({
+        },
+        explore: {
           can_add: false,
           can_download: false,
           can_overwrite: false,
           isDatasourceMetaLoading: false,
           isStarred: false,
           triggerRender: false,
-          datasource: expect.anything(),
+          datasource: exploreInitialData.dataset,
           controls: expect.any(Object),
-          form_data: expect.anything(),
-          slice: expect.anything(),
+          form_data: exploreInitialData.form_data,
+          slice: exploreInitialData.slice,
           standalone: null,
           force: null,
           saveAction: null,
           common: {},
-        }),
-      }),
+        },
+      },
     }),
   );
 });
@@ -109,61 +109,61 @@ test('creates hydrate action with existing state', () => {
   expect(dispatch).toHaveBeenCalledWith(
     expect.objectContaining({
       type: HYDRATE_EXPLORE,
-      data: expect.objectContaining({
-        charts: expect.objectContaining({
-          371: expect.objectContaining({
+      data: {
+        charts: {
+          371: {
             id: 371,
             chartAlert: null,
             chartStatus: null,
             chartStackTrace: null,
             chartUpdateEndTime: null,
             chartUpdateStartTime: 0,
-            latestQueryFormData: expect.objectContaining({
+            latestQueryFormData: {
               cache_timeout: undefined,
               datasource: '8__table',
               slice_id: 371,
               url_params: undefined,
               viz_type: VizType.Table,
-            }),
-            sliceFormData: expect.objectContaining({
+            },
+            sliceFormData: {
               cache_timeout: undefined,
               datasource: '8__table',
               slice_id: 371,
               url_params: undefined,
               viz_type: VizType.Table,
-            }),
+            },
             queryController: null,
             queriesResponse: null,
             triggerQuery: false,
             lastRendered: 0,
-          }),
-        }),
-        datasources: expect.objectContaining({
-          '8__table': expect.anything(),
-        }),
-        saveModal: expect.objectContaining({
+          },
+        },
+        datasources: {
+          '8__table': exploreInitialData.dataset,
+        },
+        saveModal: {
           dashboards: [],
           saveModalAlert: null,
           isVisible: false,
-        }),
-        explore: expect.objectContaining({
+        },
+        explore: {
           can_add: false,
           can_download: false,
           can_overwrite: false,
           isDatasourceMetaLoading: false,
           isStarred: false,
           triggerRender: false,
-          datasource: expect.anything(),
+          datasource: exploreInitialData.dataset,
           controls: expect.any(Object),
           controlsTransferred: ['all_columns'],
-          form_data: expect.anything(),
-          slice: expect.anything(),
+          form_data: exploreInitialData.form_data,
+          slice: exploreInitialData.slice,
           standalone: null,
           force: null,
           saveAction: null,
           common: {},
-        }),
-      }),
+        },
+      },
     }),
   );
 });

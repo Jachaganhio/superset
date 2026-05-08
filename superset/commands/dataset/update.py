@@ -20,7 +20,6 @@ import logging
 from collections import Counter
 from functools import partial
 from typing import Any, cast, Optional
-from uuid import UUID
 
 from flask_appbuilder.models.sqla import Model
 from marshmallow import ValidationError
@@ -44,7 +43,7 @@ from superset.commands.dataset.exceptions import (
     DatasetUpdateFailedError,
     MultiCatalogDisabledValidationError,
 )
-from superset.connectors.sqla.models import SqlaTable
+from superset.connectors.sqla.models import SqlaTable, SqlMetric, TableColumn
 from superset.daos.dataset import DatasetDAO
 from superset.datasets.schemas import FolderSchema
 from superset.exceptions import SupersetParseError, SupersetSecurityException
@@ -209,23 +208,8 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
             self._validate_metrics(metrics, exceptions)
 
         if folders := self._properties.get("folders"):
-            valid_uuids: set[UUID] = set()
-            if metrics:
-                valid_uuids.update(
-                    UUID(metric["uuid"]) for metric in metrics if "uuid" in metric
-                )
-            else:
-                valid_uuids.update(metric.uuid for metric in self._model.metrics)
-
-            if columns:
-                valid_uuids.update(
-                    UUID(column["uuid"]) for column in columns if "uuid" in column
-                )
-            else:
-                valid_uuids.update(column.uuid for column in self._model.columns)
-
             try:
-                validate_folders(folders, valid_uuids)
+                validate_folders(folders, self._model.metrics, self._model.columns)
             except ValidationError as ex:
                 exceptions.append(ex)
 
@@ -288,7 +272,8 @@ class UpdateDatasetCommand(UpdateMixin, BaseCommand):
 
 def validate_folders(  # noqa: C901
     folders: list[FolderSchema],
-    valid_uuids: set[UUID],
+    metrics: list[SqlMetric],
+    columns: list[TableColumn],
 ) -> None:
     """
     Additional folder validation.
@@ -300,7 +285,12 @@ def validate_folders(  # noqa: C901
     if not is_feature_enabled("DATASET_FOLDERS"):
         raise ValidationError("Dataset folders are not enabled")
 
-    queue: list[tuple[FolderSchema, list[UUID]]] = [(folder, []) for folder in folders]
+    existing = {
+        *[metric.uuid for metric in metrics],
+        *[column.uuid for column in columns],
+    }
+
+    queue: list[tuple[FolderSchema, list[str]]] = [(folder, []) for folder in folders]
     seen_uuids = set()
     seen_fqns = set()  # fully qualified folder names
     while queue:
@@ -325,7 +315,7 @@ def validate_folders(  # noqa: C901
                 raise ValidationError(f"Folder cannot have name '{name}'")
 
         # check if metric/column UUID exists
-        elif not name and uuid not in valid_uuids:
+        elif not name and uuid not in existing:
             raise ValidationError(f"Invalid UUID: {uuid}")
 
         # traverse children

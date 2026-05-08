@@ -17,8 +17,7 @@
  * under the License.
  */
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { HandlerFunction, JsonValue } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { HandlerFunction, JsonValue, styled } from '@superset-ui/core';
 import {
   RadioButtonOption,
   sharedControlComponents,

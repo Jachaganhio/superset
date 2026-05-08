@@ -18,9 +18,8 @@
  */
 import { PureComponent } from 'react';
 import cx from 'classnames';
-import { css, styled } from '@apache-superset/core/ui';
+import { css, styled } from '@superset-ui/core';
 import { DragDroppable } from 'src/dashboard/components/dnd/DragDroppable';
-import type { ConnectDragSource } from 'react-dnd';
 import { NEW_COMPONENTS_SOURCE_ID } from 'src/dashboard/util/constants';
 import { NEW_COMPONENT_SOURCE_TYPE } from 'src/dashboard/util/componentTypes';
 
@@ -82,7 +81,7 @@ export default class DraggableNewComponent extends PureComponent<DraggableNewCom
         depth={0}
         editMode
       >
-        {({ dragSourceRef }: { dragSourceRef: ConnectDragSource }) => (
+        {({ dragSourceRef }) => (
           <NewComponent ref={dragSourceRef} data-test="new-component">
             <NewComponentPlaceholder
               className={cx('new-component-placeholder', className)}

@@ -46,7 +46,7 @@ const ownerUser: UserWithPermissionsAndRoles = {
 const adminUser: UserWithPermissionsAndRoles = {
   ...ownerUser,
   roles: {
-    ...ownerUser?.roles,
+    ...(ownerUser?.roles || {}),
     Admin: [['can_write', 'Dashboard']],
   },
   userId: 2,
@@ -104,26 +104,25 @@ jest.mock('@superset-ui/core', () => ({
 
 const mockedIsFeatureEnabled = isFeatureEnabled as jest.Mock;
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('canUserEditDashboard', () => {
-  test('allows owners to edit', () => {
+  it('allows owners to edit', () => {
     expect(canUserEditDashboard(dashboard, ownerUser)).toEqual(true);
   });
-  test('allows admin users to edit regardless of ownership', () => {
+  it('allows admin users to edit regardless of ownership', () => {
     expect(canUserEditDashboard(dashboard, adminUser)).toEqual(true);
   });
-  test('rejects non-owners', () => {
+  it('rejects non-owners', () => {
     expect(canUserEditDashboard(dashboard, outsiderUser)).toEqual(false);
   });
-  test('rejects nonexistent users', () => {
+  it('rejects nonexistent users', () => {
     expect(canUserEditDashboard(dashboard, null)).toEqual(false);
   });
-  test('rejects missing roles', () => {
+  it('rejects missing roles', () => {
     // in redux, when there is no user, the user is actually set to an empty object,
     // so we need to handle missing roles as well as a missing user.s
     expect(canUserEditDashboard(dashboard, {})).toEqual(false);
   });
-  test('rejects "admins" if the admin role does not have edit rights for some reason', () => {
+  it('rejects "admins" if the admin role does not have edit rights for some reason', () => {
     expect(
       canUserEditDashboard(dashboard, {
         ...adminUser,
@@ -185,7 +184,6 @@ test('userHasPermission returns true if user has permission', () => {
   ).toEqual(true);
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('canUserSaveAsDashboard with RBAC feature flag disabled', () => {
   beforeAll(() => {
     mockedIsFeatureEnabled.mockImplementation(
@@ -197,20 +195,19 @@ describe('canUserSaveAsDashboard with RBAC feature flag disabled', () => {
     mockedIsFeatureEnabled.mockRestore();
   });
 
-  test('allows owners', () => {
+  it('allows owners', () => {
     expect(canUserSaveAsDashboard(dashboard, ownerUser)).toEqual(true);
   });
 
-  test('allows admin users', () => {
+  it('allows admin users', () => {
     expect(canUserSaveAsDashboard(dashboard, adminUser)).toEqual(true);
   });
 
-  test('allows non-owners', () => {
+  it('allows non-owners', () => {
     expect(canUserSaveAsDashboard(dashboard, outsiderUser)).toEqual(true);
   });
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('canUserSaveAsDashboard with RBAC feature flag enabled', () => {
   beforeAll(() => {
     mockedIsFeatureEnabled.mockImplementation(
@@ -222,15 +219,15 @@ describe('canUserSaveAsDashboard with RBAC feature flag enabled', () => {
     mockedIsFeatureEnabled.mockRestore();
   });
 
-  test('allows owners', () => {
+  it('allows owners', () => {
     expect(canUserSaveAsDashboard(dashboard, ownerUser)).toEqual(true);
   });
 
-  test('allows admin users', () => {
+  it('allows admin users', () => {
     expect(canUserSaveAsDashboard(dashboard, adminUser)).toEqual(true);
   });
 
-  test('reject non-owners', () => {
+  it('reject non-owners', () => {
     expect(canUserSaveAsDashboard(dashboard, outsiderUser)).toEqual(false);
   });
 });

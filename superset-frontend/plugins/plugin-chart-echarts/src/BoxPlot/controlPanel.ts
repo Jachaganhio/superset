@@ -158,7 +158,6 @@ const config: ControlPanelConfig = {
             },
           },
         ],
-        ['zoomable'],
       ],
     },
   ],

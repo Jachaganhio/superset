@@ -16,33 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import {
-  FunctionComponent,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  ChangeEvent,
-} from 'react';
-import { omit } from 'lodash';
+import { FunctionComponent, useState, useEffect, ChangeEvent } from 'react';
 
-import { t } from '@superset-ui/core';
-import { css, styled, useTheme, Alert } from '@apache-superset/core/ui';
+import { css, styled, t, useTheme } from '@superset-ui/core';
 import { useSingleViewResource } from 'src/views/CRUD/hooks';
 import { useThemeContext } from 'src/theme/ThemeProvider';
-import { useBeforeUnload } from 'src/hooks/useBeforeUnload';
-import SupersetText from 'src/utils/textUtils';
 
 import { Icons } from '@superset-ui/core/components/Icons';
 import withToasts from 'src/components/MessageToasts/withToasts';
 import {
+  Input,
+  Modal,
+  JsonEditor,
   Button,
   Form,
-  Input,
-  JsonEditor,
-  Modal,
-  Space,
   Tooltip,
+  Alert,
 } from '@superset-ui/core/components';
 import { useJsonValidation } from '@superset-ui/core/components/AsyncAceEditor';
 import { Typography } from '@superset-ui/core/components/Typography';
@@ -63,7 +52,7 @@ interface ThemeModalProps {
 
 type ThemeStringKeys = keyof Pick<
   ThemeObject,
-  OnlyKeyWithType<ThemeObject, string>
+  OnlyKeyWithType<ThemeObject, String>
 >;
 
 const StyledJsonEditor = styled.div`
@@ -110,22 +99,12 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
   const { setTemporaryTheme } = useThemeContext();
   const [disableSave, setDisableSave] = useState<boolean>(true);
   const [currentTheme, setCurrentTheme] = useState<ThemeObject | null>(null);
-  const [initialTheme, setInitialTheme] = useState<ThemeObject | null>(null);
   const [isHidden, setIsHidden] = useState<boolean>(true);
-  const [showConfirmAlert, setShowConfirmAlert] = useState<boolean>(false);
   const isEditMode = theme !== null;
   const isSystemTheme = currentTheme?.is_system === true;
   const isReadOnly = isSystemTheme;
 
   const canDevelopThemes = canDevelop;
-
-  // SupersetText URL configurations
-  const themeEditorUrl =
-    SupersetText?.THEME_MODAL?.THEME_EDITOR_URL ||
-    'https://ant.design/theme-editor';
-  const documentationUrl =
-    SupersetText?.THEME_MODAL?.DOCUMENTATION_URL ||
-    'https://superset.apache.org/docs/configuration/theming/';
 
   // JSON validation annotations using reusable hook
   const jsonAnnotations = useJsonValidation(currentTheme?.json_data, {
@@ -142,35 +121,29 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
   } = useSingleViewResource<ThemeObject>('theme', t('theme'), addDangerToast);
 
   // Functions
-  const hasUnsavedChanges = useCallback(() => {
-    if (!currentTheme || !initialTheme || isReadOnly) return false;
-    return (
-      currentTheme.theme_name !== initialTheme.theme_name ||
-      currentTheme.json_data !== initialTheme.json_data
-    );
-  }, [currentTheme, initialTheme, isReadOnly]);
-
-  const hide = useCallback(() => {
+  const hide = () => {
     onHide();
     setCurrentTheme(null);
-    setInitialTheme(null);
-    setShowConfirmAlert(false);
-  }, [onHide]);
+  };
 
-  const onSave = useCallback(() => {
+  const onSave = () => {
     if (isEditMode) {
       // Edit
       if (currentTheme?.id) {
-        const themeData = omit(currentTheme, [
-          'id',
-          'created_by',
-          'changed_by',
-          'changed_on_delta_humanized',
-        ]);
+        const update_id = currentTheme.id;
+        delete currentTheme.id;
+        delete currentTheme.created_by;
+        delete currentTheme.changed_by;
+        delete currentTheme.changed_on_delta_humanized;
 
-        updateResource(currentTheme.id, themeData).then(response => {
-          if (!response) return;
-          if (onThemeAdd) onThemeAdd();
+        updateResource(update_id, currentTheme).then(response => {
+          if (!response) {
+            return;
+          }
+
+          if (onThemeAdd) {
+            onThemeAdd();
+          }
 
           hide();
         });
@@ -178,115 +151,69 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
     } else if (currentTheme) {
       // Create
       createResource(currentTheme).then(response => {
-        if (!response) return;
-        if (onThemeAdd) onThemeAdd();
+        if (!response) {
+          return;
+        }
+
+        if (onThemeAdd) {
+          onThemeAdd();
+        }
 
         hide();
       });
     }
-  }, [
-    currentTheme,
-    isEditMode,
-    updateResource,
-    createResource,
-    onThemeAdd,
-    hide,
-  ]);
+  };
 
-  const handleCancel = useCallback(() => {
-    if (hasUnsavedChanges()) {
-      setShowConfirmAlert(true);
-    } else {
-      hide();
-    }
-  }, [hasUnsavedChanges, hide]);
-
-  const handleConfirmCancel = useCallback(() => {
-    hide();
-  }, [hide]);
-
-  const isValidJson = useCallback((str?: string) => {
-    if (!str) return false;
-    try {
-      JSON.parse(str);
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
-
-  const onApply = useCallback(() => {
+  const onApply = () => {
     if (currentTheme?.json_data && isValidJson(currentTheme.json_data)) {
       try {
         const themeConfig = JSON.parse(currentTheme.json_data);
-
         setTemporaryTheme(themeConfig);
-
-        if (onThemeApply) onThemeApply();
-        if (addSuccessToast) addSuccessToast(t('Local theme set for preview'));
+        if (onThemeApply) {
+          onThemeApply();
+        }
+        if (addSuccessToast) {
+          addSuccessToast(t('Local theme set for preview'));
+        }
       } catch (error) {
         addDangerToast(t('Failed to apply theme: Invalid JSON'));
       }
     }
-  }, [
-    currentTheme?.json_data,
-    isValidJson,
-    setTemporaryTheme,
-    onThemeApply,
-    addSuccessToast,
-    addDangerToast,
-  ]);
+  };
 
-  const modalTitle = useMemo(() => {
-    if (isEditMode) {
-      return isReadOnly
-        ? t('View theme properties')
-        : t('Edit theme properties');
+  const onThemeNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { target } = event;
+
+    const data = {
+      ...currentTheme,
+      theme_name: currentTheme ? currentTheme.theme_name : '',
+      json_data: currentTheme ? currentTheme.json_data : '',
+    };
+
+    data[target.name as ThemeStringKeys] = target.value;
+    setCurrentTheme(data);
+  };
+
+  const onJsonDataChange = (jsonData: string) => {
+    const data = {
+      ...currentTheme,
+      theme_name: currentTheme ? currentTheme.theme_name : '',
+      json_data: jsonData,
+    };
+    setCurrentTheme(data);
+  };
+
+  const isValidJson = (str?: string) => {
+    if (!str) return false;
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
     }
-    return t('Add theme');
-  }, [isEditMode, isReadOnly]);
+  };
 
-  const modalIcon = useMemo(() => {
-    const Icon = isEditMode ? Icons.EditOutlined : Icons.PlusOutlined;
-    return (
-      <Icon
-        iconSize="l"
-        css={css`
-          margin: auto ${supersetTheme.sizeUnit * 2}px auto 0;
-        `}
-      />
-    );
-  }, [isEditMode, supersetTheme.sizeUnit]);
-
-  const onThemeNameChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const { target } = event;
-
-      const data = {
-        ...currentTheme,
-        theme_name: currentTheme?.theme_name || '',
-        json_data: currentTheme?.json_data || '',
-      };
-
-      data[target.name as ThemeStringKeys] = target.value;
-      setCurrentTheme(data);
-    },
-    [currentTheme],
-  );
-
-  const onJsonDataChange = useCallback(
-    (jsonData: string) => {
-      const data = {
-        ...currentTheme,
-        theme_name: currentTheme?.theme_name || '',
-        json_data: jsonData,
-      };
-      setCurrentTheme(data);
-    },
-    [currentTheme],
-  );
-
-  const validate = useCallback(() => {
+  const validate = () => {
     if (isReadOnly) {
       setDisableSave(true);
       return;
@@ -301,12 +228,7 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
     } else {
       setDisableSave(true);
     }
-  }, [
-    currentTheme?.theme_name,
-    currentTheme?.json_data,
-    isReadOnly,
-    isValidJson,
-  ]);
+  };
 
   // Initialize
   useEffect(() => {
@@ -316,115 +238,87 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
         (theme && theme?.id !== currentTheme.id) ||
         (isHidden && show))
     ) {
-      if (theme?.id && !loading) fetchResource(theme.id);
+      if (theme?.id && !loading) {
+        fetchResource(theme.id);
+      }
     } else if (
       !isEditMode &&
       (!currentTheme || currentTheme.id || (isHidden && show))
     ) {
-      const newTheme = {
+      setCurrentTheme({
         theme_name: '',
         json_data: JSON.stringify({}, null, 2),
-      };
-      setCurrentTheme(newTheme);
-      setInitialTheme(newTheme);
+      });
     }
-  }, [theme, show, isEditMode, currentTheme, isHidden, loading, fetchResource]);
+  }, [theme, show]);
 
   useEffect(() => {
     if (resource) {
       setCurrentTheme(resource);
-      setInitialTheme(resource);
     }
   }, [resource]);
 
   // Validation
   useEffect(() => {
     validate();
-  }, [validate]);
+  }, [
+    currentTheme ? currentTheme.theme_name : '',
+    currentTheme ? currentTheme.json_data : '',
+    isReadOnly,
+  ]);
 
   // Show/hide
-  useEffect(() => {
-    if (isHidden && show) setIsHidden(false);
-  }, [isHidden, show]);
-
-  // Handle browser navigation/reload with unsaved changes
-  useBeforeUnload(show && hasUnsavedChanges());
+  if (isHidden && show) {
+    setIsHidden(false);
+  }
 
   return (
     <Modal
       disablePrimaryButton={isReadOnly || disableSave}
       onHandledPrimaryAction={isReadOnly ? undefined : onSave}
-      onHide={handleCancel}
+      onHide={hide}
       primaryButtonName={isEditMode ? t('Save') : t('Add')}
       show={show}
       width="55%"
-      centered
-      footer={
-        showConfirmAlert ? (
-          <Alert
-            closable={false}
-            type="warning"
-            message={t('You have unsaved changes')}
-            description={t(
-              'Your changes will be lost if you leave without saving.',
-            )}
-            css={{
-              textAlign: 'left',
-            }}
-            action={
-              <Space>
-                <Button
-                  key="keep-editing"
-                  buttonStyle="tertiary"
-                  onClick={() => setShowConfirmAlert(false)}
-                >
-                  {t('Keep editing')}
-                </Button>
-                <Button
-                  key="discard"
-                  buttonStyle="secondary"
-                  onClick={handleConfirmCancel}
-                >
-                  {t('Discard')}
-                </Button>
-                <Button
-                  key="save"
-                  buttonStyle="primary"
-                  onClick={() => {
-                    setShowConfirmAlert(false);
-                    onSave();
-                  }}
-                  disabled={disableSave}
-                >
-                  {t('Save')}
-                </Button>
-              </Space>
-            }
-          />
-        ) : (
-          [
-            <Button key="cancel" onClick={handleCancel} buttonStyle="secondary">
-              {isReadOnly ? t('Close') : t('Cancel')}
-            </Button>,
-            ...(!isReadOnly
-              ? [
-                  <Button
-                    key="save"
-                    onClick={onSave}
-                    disabled={disableSave}
-                    buttonStyle="primary"
-                  >
-                    {isEditMode ? t('Save') : t('Add')}
-                  </Button>,
-                ]
-              : []),
-          ]
-        )
-      }
+      footer={[
+        <Button key="cancel" onClick={hide} buttonStyle="secondary">
+          {isReadOnly ? t('Close') : t('Cancel')}
+        </Button>,
+        ...(!isReadOnly
+          ? [
+              <Button
+                key="save"
+                onClick={onSave}
+                disabled={disableSave}
+                buttonStyle="primary"
+              >
+                {isEditMode ? t('Save') : t('Add')}
+              </Button>,
+            ]
+          : []),
+      ]}
       title={
         <Typography.Title level={4} data-test="theme-modal-title">
-          {modalIcon}
-          {modalTitle}
+          {isEditMode ? (
+            <Icons.EditOutlined
+              iconSize="l"
+              css={css`
+                margin: auto ${supersetTheme.sizeUnit * 2}px auto 0;
+              `}
+            />
+          ) : (
+            <Icons.PlusOutlined
+              iconSize="l"
+              css={css`
+                margin: auto ${supersetTheme.sizeUnit * 2}px auto 0;
+              `}
+            />
+          )}
+          {isEditMode
+            ? isReadOnly
+              ? t('View theme properties')
+              : t('Edit theme properties')
+            : t('Add theme')}
         </Typography.Title>
       }
     >
@@ -456,7 +350,7 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
                 <span>
                   {t('Design with')}{' '}
                   <a
-                    href={themeEditorUrl}
+                    href="https://ant.design/theme-editor"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -464,7 +358,7 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
                   </a>
                   {t(', then paste the JSON below. See our')}{' '}
                   <a
-                    href={documentationUrl}
+                    href="https://superset.apache.org/docs/configuration/theming/"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -482,7 +376,7 @@ const ThemeModal: FunctionComponent<ThemeModalProps> = ({
                 onChange={onJsonDataChange}
                 tabSize={2}
                 width="100%"
-                height="250px"
+                height="300px"
                 wrapEnabled
                 readOnly={isReadOnly}
                 showGutter

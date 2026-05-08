@@ -23,6 +23,7 @@ import {
   userEvent,
   within,
 } from 'spec/helpers/testing-library';
+import { VizType } from '@superset-ui/core';
 import { buildErrorTooltipMessage } from './buildErrorTooltipMessage';
 import AlertReportModal, { AlertReportModalProps } from './AlertReportModal';
 import { AlertObject, NotificationMethodOption } from './types';
@@ -94,7 +95,7 @@ const generateMockPayload = (dashboard = true) => {
     chart: {
       id: 1,
       slice_name: 'test chart',
-      viz_type: 'table',
+      viz_type: VizType.Table,
       value: 1,
     },
   };
@@ -218,8 +219,8 @@ const comboboxSelect = async (
 test('properly renders add alert text', () => {
   const addAlertProps = generateMockedProps();
   render(<AlertReportModal {...addAlertProps} />, { useRedux: true });
-  // The title is now in the modal header, not as a heading role
-  expect(screen.getByText('Add alert')).toBeInTheDocument();
+  const addAlertHeading = screen.getByRole('heading', { name: /add alert/i });
+  expect(addAlertHeading).toBeInTheDocument();
   const addButton = screen.getByRole('button', { name: /add/i });
   expect(addButton).toBeInTheDocument();
 });
@@ -228,8 +229,10 @@ test('properly renders edit alert text', async () => {
   render(<AlertReportModal {...generateMockedProps(false, true)} />, {
     useRedux: true,
   });
-  // The title is now in the modal header, not as a heading role
-  expect(screen.getByText('Edit alert')).toBeInTheDocument();
+  const editAlertHeading = screen.getByRole('heading', {
+    name: /edit alert/i,
+  });
+  expect(editAlertHeading).toBeInTheDocument();
   const saveButton = screen.getByRole('button', { name: /save/i });
   expect(saveButton).toBeInTheDocument();
 });
@@ -238,8 +241,10 @@ test('properly renders add report text', () => {
   render(<AlertReportModal {...generateMockedProps(true)} />, {
     useRedux: true,
   });
-  // The title is now in the modal header, not as a heading role
-  expect(screen.getByText('Add report')).toBeInTheDocument();
+  const addReportHeading = screen.getByRole('heading', {
+    name: /add report/i,
+  });
+  expect(addReportHeading).toBeInTheDocument();
   const addButton = screen.getByRole('button', { name: /add/i });
   expect(addButton).toBeInTheDocument();
 });
@@ -249,8 +254,10 @@ test('properly renders edit report text', async () => {
     useRedux: true,
   });
 
-  // The title is now in the modal header, not as a heading role
-  expect(screen.getByText('Edit report')).toBeInTheDocument();
+  const editReportHeading = screen.getByRole('heading', {
+    name: /edit report/i,
+  });
+  expect(editReportHeading).toBeInTheDocument();
   const saveButton = screen.getByRole('button', { name: /save/i });
   expect(saveButton).toBeInTheDocument();
 });
@@ -279,7 +286,7 @@ test('renders 5 checkmarks for a valid alert', async () => {
   });
 
   // Wait for validation to complete by waiting for the modal to fully render
-  await screen.findByText('Edit alert');
+  await screen.findByText('Edit Alert');
 
   const checkmarks = await screen.findAllByRole('img', {
     name: /check-circle/i,
@@ -452,7 +459,7 @@ test('renders tab selection when Dashboard is selected', async () => {
   expect(
     screen.getByRole('combobox', { name: /dashboard/i }),
   ).toBeInTheDocument();
-  expect(screen.getAllByText(/select tab/i)).toHaveLength(1);
+  expect(screen.getByText(/select tab/i)).toBeInTheDocument();
 });
 
 test('changes to content options when chart is selected', async () => {
@@ -665,16 +672,4 @@ test('removes notification method on clicking trash can', async () => {
   expect(
     screen.getAllByRole('combobox', { name: /delivery method/i }).length,
   ).toBe(1);
-});
-
-test('renders dashboard filter dropdowns', async () => {
-  render(<AlertReportModal {...generateMockedProps(true, true)} />, {
-    useRedux: true,
-  });
-
-  userEvent.click(screen.getByTestId('contents-panel'));
-  const filterOptionDropdown = screen.getByRole('combobox', {
-    name: /select filter/i,
-  });
-  expect(filterOptionDropdown).toBeInTheDocument();
 });

@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 import {
   render,
   screen,
-  userEvent,
+  fireEvent,
   waitFor,
 } from 'spec/helpers/testing-library';
 import {
@@ -27,8 +28,8 @@ import {
   getExtensionsRegistry,
   makeApi,
 } from '@superset-ui/core';
-import setupCodeOverrides from 'src/setup/setupCodeOverrides';
-import DashboardEmbedModal from '.';
+import setupExtensions from 'src/setup/setupExtensions';
+import DashboardEmbedModal from './index';
 
 const defaultResponse = {
   result: { uuid: 'uuid', dashboard_id: '1', allowed_domains: ['example.com'] },
@@ -57,15 +58,15 @@ const setMockApiNotFound = () => {
 
 const setup = () => {
   render(<DashboardEmbedModal {...defaultProps} />, { useRedux: true });
+  resetMockApi();
 };
 
 beforeEach(() => {
   jest.clearAllMocks();
   resetMockApi();
-  getExtensionsRegistry().set('embedded.modal', undefined);
 });
 
-test('renders the embed modal', async () => {
+test('renders', async () => {
   setup();
   expect(await screen.findByText('Embed')).toBeInTheDocument();
 });
@@ -77,15 +78,15 @@ test('renders loading state', async () => {
   });
 });
 
-test('renders modal content with settings', async () => {
-  setup();
+test('renders the modal default content', async () => {
+  render(<DashboardEmbedModal {...defaultProps} />, { useRedux: true });
   expect(await screen.findByText('Settings')).toBeInTheDocument();
   expect(
     screen.getByText(new RegExp(/Allowed Domains/, 'i')),
   ).toBeInTheDocument();
 });
 
-test('shows Deactivate and Save changes buttons when ready to embed', async () => {
+test('renders the correct actions when dashboard is ready to embed', async () => {
   setup();
   expect(
     await screen.findByRole('button', { name: 'Deactivate' }),
@@ -95,51 +96,50 @@ test('shows Deactivate and Save changes buttons when ready to embed', async () =
   ).toBeInTheDocument();
 });
 
-test('shows Enable embedding button when not ready to embed', async () => {
+test('renders the correct actions when dashboard is not ready to embed', async () => {
   setMockApiNotFound();
-  render(<DashboardEmbedModal {...defaultProps} />, { useRedux: true });
+  setup();
   expect(
     await screen.findByRole('button', { name: 'Enable embedding' }),
   ).toBeInTheDocument();
 });
 
-test('enables embedding when Enable embedding button is clicked', async () => {
+test('enables embedding', async () => {
   setMockApiNotFound();
-  render(<DashboardEmbedModal {...defaultProps} />, { useRedux: true });
+  setup();
 
   const enableEmbed = await screen.findByRole('button', {
     name: 'Enable embedding',
   });
   expect(enableEmbed).toBeInTheDocument();
 
-  resetMockApi();
-  await userEvent.click(enableEmbed);
+  fireEvent.click(enableEmbed);
 
   expect(
     await screen.findByRole('button', { name: 'Deactivate' }),
   ).toBeInTheDocument();
 });
 
-test('shows and hides confirmation alert when deactivating', async () => {
+test('shows and hides the confirmation modal on deactivation', async () => {
   setup();
 
   const deactivate = await screen.findByRole('button', { name: 'Deactivate' });
-  await userEvent.click(deactivate);
+  fireEvent.click(deactivate);
 
   expect(await screen.findByText('Disable embedding?')).toBeInTheDocument();
   expect(
     screen.getByText('This will remove your current embed configuration.'),
   ).toBeInTheDocument();
 
-  const confirmBtn = screen.getByRole('button', { name: 'Deactivate' });
-  await userEvent.click(confirmBtn);
+  const okBtn = screen.getByRole('button', { name: 'OK' });
+  fireEvent.click(okBtn);
 
   await waitFor(() => {
     expect(screen.queryByText('Disable embedding?')).not.toBeInTheDocument();
   });
 });
 
-test('enables Save Changes button when allowed domains are modified', async () => {
+test('enables the "Save Changes" button', async () => {
   setup();
 
   const allowedDomainsInput = await screen.findByRole('textbox', {
@@ -151,24 +151,21 @@ test('enables Save Changes button when allowed domains are modified', async () =
   expect(saveChangesBtn).toBeDisabled();
   expect(allowedDomainsInput).toBeInTheDocument();
 
-  await userEvent.clear(allowedDomainsInput);
-  await userEvent.type(allowedDomainsInput, 'test.com');
+  fireEvent.change(allowedDomainsInput, { target: { value: 'test.com' } });
   expect(saveChangesBtn).toBeEnabled();
 });
 
-test('renders extension component when registered', async () => {
+test('adds extension to DashboardEmbedModal', async () => {
   const extensionsRegistry = getExtensionsRegistry();
 
   extensionsRegistry.set('embedded.modal', () => (
     <>dashboard.embed.modal.extension component</>
   ));
 
-  setupCodeOverrides();
+  setupExtensions();
   setup();
 
   expect(
     await screen.findByText('dashboard.embed.modal.extension component'),
   ).toBeInTheDocument();
-
-  extensionsRegistry.set('embedded.modal', undefined);
 });

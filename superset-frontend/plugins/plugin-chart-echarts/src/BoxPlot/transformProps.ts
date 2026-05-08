@@ -73,7 +73,6 @@ export default function transformProps(
     yAxisTitleMargin,
     yAxisTitlePosition,
     sliceId,
-    zoomable,
   } = formData as BoxPlotQueryFormData;
   const refs: Refs = {};
   const colorFn = CategoricalColorNamespace.getScale(colorScheme as string);
@@ -285,26 +284,6 @@ export default function transformProps(
       },
     },
     series,
-    toolbox: {
-      show: zoomable,
-      feature: {
-        dataZoom: {
-          title: {
-            zoom: 'zoom area',
-            back: 'restore zoom',
-          },
-        },
-      },
-    },
-    dataZoom: zoomable
-      ? [
-          {
-            type: 'inside',
-            zoomOnMouseWheel: false,
-            moveOnMouseWheel: true,
-          },
-        ]
-      : [],
   };
 
   return {

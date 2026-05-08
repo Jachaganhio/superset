@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
-import { SupersetTheme } from '@apache-superset/core/ui';
+import { SupersetTheme, t } from '@superset-ui/core';
 import { Switch } from '@superset-ui/core/components/Switch';
 import {
   InfoTooltip,

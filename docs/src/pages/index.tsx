@@ -460,23 +460,15 @@ export default function Home(): JSX.Element {
   const changeToDark = () => {
     const navbar = document.body.querySelector('.navbar');
     const logo = document.body.querySelector('.navbar__logo img');
-    if (navbar) {
-      navbar.classList.add('navbar--dark');
-    }
-    if (logo) {
-      logo.setAttribute('src', '/img/superset-logo-horiz-dark.svg');
-    }
+    navbar.classList.add('navbar--dark');
+    logo.setAttribute('src', '/img/superset-logo-horiz-dark.svg');
   };
 
   const changeToLight = () => {
     const navbar = document.body.querySelector('.navbar');
     const logo = document.body.querySelector('.navbar__logo img');
-    if (navbar) {
-      navbar.classList.remove('navbar--dark');
-    }
-    if (logo) {
-      logo.setAttribute('src', '/img/superset-logo-horiz.svg');
-    }
+    navbar.classList.remove('navbar--dark');
+    logo.setAttribute('src', '/img/superset-logo-horiz.svg');
   };
 
   // Set up dark <-> light navbar change
@@ -484,9 +476,7 @@ export default function Home(): JSX.Element {
     changeToDark();
 
     const navbarToggle = document.body.querySelector('.navbar__toggle');
-    if (navbarToggle) {
-      navbarToggle.addEventListener('click', () => changeToLight());
-    }
+    navbarToggle.addEventListener('click', () => changeToLight());
 
     const scrollListener = () => {
       if (window.scrollY > 0) {

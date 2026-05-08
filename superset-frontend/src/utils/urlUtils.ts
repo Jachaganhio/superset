@@ -161,8 +161,6 @@ export function getDashboardPermalink({
   dataMask,
   activeTabs,
   anchor, // the anchor part of the link which corresponds to the tab/chart id
-  chartStates, // chart-level customizations (optional)
-  includeChartState = false, // whether to include chart state in permalink (FALSE by default)
 }: {
   dashboardId: string | number;
   /**
@@ -178,28 +176,14 @@ export function getDashboardPermalink({
    * and highlighted upon page load.
    */
   anchor?: string;
-  /**
-   * Chart-level state (column order, sorting, filtering, etc.)
-   */
-  chartStates?: JsonObject;
-  /**
-   * Whether to include chart state in the permalink (default: false)
-   */
-  includeChartState?: boolean;
 }) {
-  const payload: JsonObject = {
+  // only encode filter state if non-empty
+  return getPermalink(`/api/v1/dashboard/${dashboardId}/permalink`, {
     urlParams: getDashboardUrlParams(),
     dataMask,
     activeTabs,
     anchor,
-  };
-
-  // Only include chart states when explicitly requested AND when they exist
-  if (includeChartState && chartStates && Object.keys(chartStates).length > 0) {
-    payload.chartStates = chartStates;
-  }
-
-  return getPermalink(`/api/v1/dashboard/${dashboardId}/permalink`, payload);
+  });
 }
 
 const externalUrlRegex =

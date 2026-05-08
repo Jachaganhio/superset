@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { css } from '@apache-superset/core/ui';
+import { css } from '@superset-ui/core';
 import { Flex } from '.';
 import type { FlexProps } from './types';
 

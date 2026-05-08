@@ -18,12 +18,9 @@
  */
 import { useEffect, useState, FunctionComponent } from 'react';
 
-import { t } from '@superset-ui/core';
-import { styled, css, useTheme } from '@apache-superset/core/ui';
-import { Dayjs } from 'dayjs';
+import { t, styled, css, useTheme } from '@superset-ui/core';
+import dayjs from 'dayjs';
 import { extendedDayjs } from '../../utils/dates';
-import 'dayjs/plugin/updateLocale';
-import 'dayjs/plugin/calendar';
 import { Icons } from '../Icons';
 import type { LastUpdatedProps } from './types';
 
@@ -49,7 +46,9 @@ export const LastUpdated: FunctionComponent<LastUpdatedProps> = ({
   update,
 }) => {
   const theme = useTheme();
-  const [timeSince, setTimeSince] = useState<Dayjs>(extendedDayjs(updatedAt));
+  const [timeSince, setTimeSince] = useState<dayjs.Dayjs>(
+    extendedDayjs(updatedAt),
+  );
 
   useEffect(() => {
     setTimeSince(() => extendedDayjs(updatedAt));

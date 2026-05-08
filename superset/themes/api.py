@@ -207,7 +207,7 @@ class ThemeRestApi(BaseSupersetModelRestApi):
         except SystemThemeInUseError as ex:
             return self.response_422(message=str(ex))
         except ThemeDeleteFailedError as ex:
-            logger.exception("Theme delete failed for ID: %s", pk)
+            logger.exception(f"Theme delete failed for ID: {pk}")
             return self.response_422(message=str(ex))
 
     @expose("/", methods=("DELETE",))
@@ -268,7 +268,7 @@ class ThemeRestApi(BaseSupersetModelRestApi):
         except SystemThemeInUseError as ex:
             return self.response_422(message=str(ex))
         except ThemeDeleteFailedError as ex:
-            logger.exception("Theme delete failed for IDs: %s", item_ids)
+            logger.exception(f"Theme delete failed for IDs: {item_ids}")
             return self.response_422(message=str(ex))
 
     @expose("/<int:pk>", methods=("PUT",))
@@ -326,7 +326,7 @@ class ThemeRestApi(BaseSupersetModelRestApi):
                 return self.response_400(message="Request body is required")
 
             # Log the incoming request for debugging
-            logger.debug("PUT request data for theme %s: %s", pk, request.json)
+            logger.debug(f"PUT request data for theme {pk}: {request.json}")
 
             # Filter out read-only fields that shouldn't be in the schema
             filtered_data = {
@@ -337,9 +337,7 @@ class ThemeRestApi(BaseSupersetModelRestApi):
 
             item = self.edit_model_schema.load(filtered_data)
         except ValidationError as error:
-            logger.exception(
-                "Validation error in PUT /theme/%s: %s", pk, error.messages
-            )
+            logger.exception(f"Validation error in PUT /theme/{pk}: {error.messages}")
             return self.response_400(message=error.messages)
 
         try:
@@ -350,7 +348,7 @@ class ThemeRestApi(BaseSupersetModelRestApi):
         except SystemThemeProtectedError:
             return self.response_403()
         except Exception as ex:
-            logger.exception("Unexpected error in PUT /theme/%s", pk)
+            logger.exception(f"Unexpected error in PUT /theme/{pk}")
             return self.response_422(message=str(ex))
 
     @expose("/", methods=("POST",))
@@ -398,10 +396,10 @@ class ThemeRestApi(BaseSupersetModelRestApi):
             if not request.json:
                 return self.response_400(message="Request body is required")
 
-            logger.debug("POST request data for new theme: %s", request.json)
+            logger.debug(f"POST request data for new theme: {request.json}")
             item = self.add_model_schema.load(request.json)
         except ValidationError as error:
-            logger.exception("Validation error in POST /theme: %s", error.messages)
+            logger.exception(f"Validation error in POST /theme: {error.messages}")
             return self.response_400(message=error.messages)
 
         try:

@@ -56,7 +56,6 @@ afterEach(() => {
   pathStub.mockReset();
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('componentDidMount', () => {
   let uriStub = jest.spyOn(URI.prototype, 'search');
   let replaceState = jest.spyOn(window.history, 'replaceState');

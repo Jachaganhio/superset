@@ -221,11 +221,11 @@ class EmailNotification(BaseNotification):  # pylint: disable=too-few-public-met
         return json.loads(self._recipient.recipient_config_json)["target"]
 
     def _get_cc(self) -> str:
-        # To accommodate backward compatibility
+        # To accomadate backward compatability
         return json.loads(self._recipient.recipient_config_json).get("ccTarget", "")
 
     def _get_bcc(self) -> str:
-        # To accommodate backward compatibility
+        # To accomadate backward compatability
         return json.loads(self._recipient.recipient_config_json).get("bccTarget", "")
 
     @statsd_gauge("reports.email.send")

@@ -171,7 +171,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         from superset.explore.api import ExploreRestApi
         from superset.explore.form_data.api import ExploreFormDataRestApi
         from superset.explore.permalink.api import ExplorePermalinkRestApi
-        from superset.extensions.view import ExtensionsView
         from superset.importexport.api import ImportExportRestApi
         from superset.queries.api import QueryRestApi
         from superset.queries.saved_queries.api import SavedQueryRestApi
@@ -269,12 +268,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         appbuilder.add_api(SqlLabRestApi)
         appbuilder.add_api(SqlLabPermalinkRestApi)
         appbuilder.add_api(LogRestApi)
-
-        if feature_flag_manager.is_feature_enabled("ENABLE_EXTENSIONS"):
-            from superset.extensions.api import ExtensionsRestApi
-
-            appbuilder.add_api(ExtensionsRestApi)
-
         #
         # Setup regular views
         #
@@ -397,17 +390,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             category_icon="",
         )
 
-        appbuilder.add_view(
-            ExtensionsView,
-            "Extensions",
-            label=_("Extensions"),
-            category="Manage",
-            category_label=_("Manage"),
-            menu_cond=lambda: feature_flag_manager.is_feature_enabled(
-                "ENABLE_EXTENSIONS"
-            ),
-        )
-
         #
         # Setup views with no menu
         #
@@ -518,43 +500,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             icon="fa-lock",
         )
 
-    def init_core_api_dependencies(self) -> None:
-        """Initialize core API dependency injection for direct import patterns."""
-        from superset.core.api.core_api_injection import (
-            initialize_core_api_dependencies,
-        )
-
-        initialize_core_api_dependencies()
-
-    def init_extensions(self) -> None:
-        from superset.extensions.utils import (
-            eager_import,
-            get_extensions,
-            install_in_memory_importer,
-        )
-
-        try:
-            extensions = get_extensions()
-        except Exception:  # pylint: disable=broad-except  # noqa: S110
-            # If the db hasn't been initialized yet, an exception will be raised.
-            # It's fine to ignore this, as in this case there are no extensions
-            # present yet.
-            return
-
-        for extension in extensions.values():
-            if backend_files := extension.backend:
-                install_in_memory_importer(backend_files)
-
-            backend = extension.manifest.get("backend")
-
-            if backend and (entrypoints := backend.get("entryPoints")):
-                for entrypoint in entrypoints:
-                    try:
-                        eager_import(entrypoint)
-                    except Exception as ex:  # pylint: disable=broad-except  # noqa: S110
-                        # Surface exceptions during initialization of extensions
-                        print(ex)
-
     def init_app_in_ctx(self) -> None:
         """
         Runs init logic in the context of the app
@@ -577,10 +522,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
         self.superset_app.sync_config_to_db()
 
         self.init_views()
-
-        if feature_flag_manager.is_feature_enabled("ENABLE_EXTENSIONS"):
-            self.init_core_api_dependencies()
-            self.init_extensions()
 
     def check_secret_key(self) -> None:
         def log_default_secret_key_warning() -> None:
@@ -633,17 +574,6 @@ class SupersetAppInitializer:  # pylint: disable=too-many-public-methods
             for k, v in self.superset_app.config["DEFAULT_HTTP_HEADERS"].items():
                 if k not in response.headers:
                     response.headers[k] = v
-            return response
-
-        @self.superset_app.after_request
-        def cleanup_analytics_memory(response: Response) -> Response:
-            """Force garbage collection after each request if feature flag enabled"""
-            if feature_flag_manager.is_feature_enabled(
-                "FORCE_GARBAGE_COLLECTION_AFTER_EVERY_REQUEST"
-            ):
-                import gc
-
-                gc.collect()
             return response
 
         @self.superset_app.context_processor

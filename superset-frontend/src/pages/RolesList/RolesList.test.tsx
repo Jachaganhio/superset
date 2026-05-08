@@ -39,20 +39,20 @@ const roleEndpoint = 'glob:*/api/v1/security/roles/*';
 const permissionsEndpoint = 'glob:*/api/v1/security/permissions-resources/?*';
 const usersEndpoint = 'glob:*/api/v1/security/users/?*';
 
-const mockRoles = new Array(3).fill(undefined).map((_, i) => ({
+const mockRoles = [...new Array(3)].map((_, i) => ({
   id: i,
   name: `role ${i}`,
   user_ids: [i, i + 1],
   permission_ids: [i, i + 1, i + 2],
 }));
 
-const mockPermissions = new Array(10).fill(undefined).map((_, i) => ({
+const mockPermissions = [...new Array(10)].map((_, i) => ({
   id: i,
   permission: { name: `permission_${i}` },
   view_menu: { name: `view_menu_${i}` },
 }));
 
-const mockUsers = new Array(5).fill(undefined).map((_, i) => ({
+const mockUsers = [...new Array(5)].map((_, i) => ({
   id: i,
   username: `user_${i}`,
   first_name: `User`,
@@ -100,7 +100,6 @@ fetchMock.get(usersEndpoint, {
 fetchMock.delete(roleEndpoint, {});
 fetchMock.put(roleEndpoint, {});
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('RolesList', () => {
   async function renderAndWait() {
     const mounted = act(async () => {
@@ -125,12 +124,12 @@ describe('RolesList', () => {
     fetchMock.resetHistory();
   });
 
-  test('renders', async () => {
+  it('renders', async () => {
     await renderAndWait();
     expect(await screen.findByText('List Roles')).toBeInTheDocument();
   });
 
-  test('fetches roles on load', async () => {
+  it('fetches roles on load', async () => {
     await renderAndWait();
     await waitFor(() => {
       const calls = fetchMock.calls(rolesEndpoint);
@@ -138,7 +137,7 @@ describe('RolesList', () => {
     });
   });
 
-  test('fetches permissions on load', async () => {
+  it('fetches permissions on load', async () => {
     await renderAndWait();
     await waitFor(() => {
       const permissionCalls = fetchMock.calls(permissionsEndpoint);
@@ -146,27 +145,27 @@ describe('RolesList', () => {
     });
   });
 
-  test('renders filters options', async () => {
+  it('renders filters options', async () => {
     await renderAndWait();
 
     const typeFilter = screen.queryAllByTestId('filters-select');
     expect(typeFilter).toHaveLength(4);
   });
 
-  test('renders correct list columns', async () => {
+  it('renders correct list columns', async () => {
     await renderAndWait();
 
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
 
-    const nameColumn = await within(table).findByTitle('Name');
-    const actionsColumn = await within(table).findByTitle('Actions');
+    const nameColumn = await within(table).findByText('Name');
+    const actionsColumn = await within(table).findByText('Actions');
 
     expect(nameColumn).toBeInTheDocument();
     expect(actionsColumn).toBeInTheDocument();
   });
 
-  test('opens add modal when Add Role button is clicked', async () => {
+  it('opens add modal when Add Role button is clicked', async () => {
     await renderAndWait();
 
     const addButton = screen.getByTestId('add-role-button');
@@ -175,7 +174,7 @@ describe('RolesList', () => {
     expect(screen.queryByTestId('Add Role-modal')).toBeInTheDocument();
   });
 
-  test('open duplicate modal when duplicate button is clicked', async () => {
+  it('open duplicate modal when duplicate button is clicked', async () => {
     await renderAndWait();
 
     const table = screen.getByRole('table');
@@ -190,7 +189,7 @@ describe('RolesList', () => {
     ).toBeInTheDocument();
   });
 
-  test('open edit modal when edit button is clicked', async () => {
+  it('open edit modal when edit button is clicked', async () => {
     await renderAndWait();
 
     const table = screen.getByRole('table');

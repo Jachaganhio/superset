@@ -19,10 +19,10 @@
 import {
   isFeatureEnabled,
   FeatureFlag,
+  styled,
   SupersetClient,
   t,
 } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
 import { useSelector } from 'react-redux';
 import { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
@@ -274,17 +274,12 @@ function DashboardList(props: DashboardListProps) {
     );
   }
 
-  const handleBulkDashboardExport = async (dashboardsToExport: Dashboard[]) => {
+  const handleBulkDashboardExport = (dashboardsToExport: Dashboard[]) => {
     const ids = dashboardsToExport.map(({ id }) => id);
-    setPreparingExport(true);
-    try {
-      await handleResourceExport('dashboard', ids, () => {
-        setPreparingExport(false);
-      });
-    } catch (error) {
+    handleResourceExport('dashboard', ids, () => {
       setPreparingExport(false);
-      addDangerToast(t('There was an issue exporting the selected dashboards'));
-    }
+    });
+    setPreparingExport(true);
   };
 
   function handleBulkDashboardDelete(dashboardsToDelete: Dashboard[]) {

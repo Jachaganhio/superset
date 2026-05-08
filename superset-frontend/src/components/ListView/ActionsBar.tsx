@@ -36,7 +36,7 @@
  * under the License.
  */
 import { ReactElement } from 'react';
-import { styled } from '@apache-superset/core/ui';
+import { styled } from '@superset-ui/core';
 import {
   IconNameType,
   Icons,

@@ -159,15 +159,6 @@ export const getSlicePayload = async (
     }
   }
 
-  const queryContext = await buildV1ChartDataPayload({
-    formData,
-    force: false,
-    resultFormat: 'json',
-    resultType: 'full',
-    setDataMask: null,
-    ownState: null,
-  });
-
   const payload: Partial<PayloadSlice> = {
     params: JSON.stringify(formData),
     slice_name: sliceName,
@@ -176,7 +167,16 @@ export const getSlicePayload = async (
     datasource_type: datasourceType,
     dashboards,
     owners,
-    query_context: JSON.stringify(queryContext),
+    query_context: JSON.stringify(
+      await buildV1ChartDataPayload({
+        formData,
+        force: false,
+        resultFormat: 'json',
+        resultType: 'full',
+        setDataMask: null,
+        ownState: null,
+      }),
+    ),
   };
 
   return payload;

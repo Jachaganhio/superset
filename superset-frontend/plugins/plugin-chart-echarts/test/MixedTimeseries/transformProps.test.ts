@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartProps, VizType } from '@superset-ui/core';
-import { supersetTheme } from '@apache-superset/core/ui';
+import { ChartProps, supersetTheme, VizType } from '@superset-ui/core';
 import {
   LegendOrientation,
   LegendType,
@@ -82,7 +81,6 @@ const formData: EchartsMixedTimeseriesFormData = {
   forecastPeriods: [],
   forecastInterval: 0,
   forecastSeasonalityDaily: 0,
-  legendSort: null,
 };
 
 const queriesData = [
@@ -118,7 +116,7 @@ const chartPropsConfig = {
   theme: supersetTheme,
 };
 
-test('should transform chart props for viz with showQueryIdentifiers=false', () => {
+it('should transform chart props for viz with showQueryIdentifiers=false', () => {
   const chartPropsConfigWithoutIdentifiers = {
     ...chartPropsConfig,
     formData: {
@@ -159,7 +157,7 @@ test('should transform chart props for viz with showQueryIdentifiers=false', () 
   ]);
 });
 
-test('should transform chart props for viz with showQueryIdentifiers=true', () => {
+it('should transform chart props for viz with showQueryIdentifiers=true', () => {
   const chartPropsConfigWithIdentifiers = {
     ...chartPropsConfig,
     formData: {
@@ -200,67 +198,7 @@ test('should transform chart props for viz with showQueryIdentifiers=true', () =
   ]);
 });
 
-describe('legend sorting', () => {
-  const getChartProps = (overrides = {}) =>
-    new ChartProps({
-      ...chartPropsConfig,
-      formData: {
-        ...formData,
-        ...overrides,
-        showQueryIdentifiers: true,
-      },
-    });
-
-  it('sort legend by data', () => {
-    const chartProps = getChartProps({
-      legendSort: null,
-    });
-    const transformed = transformProps(
-      chartProps as EchartsMixedTimeseriesProps,
-    );
-
-    expect((transformed.echartOptions.legend as any).data).toEqual([
-      'sum__num (Query A), girl',
-      'sum__num (Query A), boy',
-      'sum__num (Query B), girl',
-      'sum__num (Query B), boy',
-    ]);
-  });
-
-  it('sort legend by label ascending', () => {
-    const chartProps = getChartProps({
-      legendSort: 'asc',
-    });
-    const transformed = transformProps(
-      chartProps as EchartsMixedTimeseriesProps,
-    );
-
-    expect((transformed.echartOptions.legend as any).data).toEqual([
-      'sum__num (Query A), boy',
-      'sum__num (Query A), girl',
-      'sum__num (Query B), boy',
-      'sum__num (Query B), girl',
-    ]);
-  });
-
-  it('sort legend by label descending', () => {
-    const chartProps = getChartProps({
-      legendSort: 'desc',
-    });
-    const transformed = transformProps(
-      chartProps as EchartsMixedTimeseriesProps,
-    );
-
-    expect((transformed.echartOptions.legend as any).data).toEqual([
-      'sum__num (Query B), girl',
-      'sum__num (Query B), boy',
-      'sum__num (Query A), girl',
-      'sum__num (Query A), boy',
-    ]);
-  });
-});
-
-test('legend margin: top orientation sets grid.top correctly', () => {
+it('legend margin: top orientation sets grid.top correctly', () => {
   const chartPropsConfigWithoutIdentifiers = {
     ...chartPropsConfig,
     formData: {
@@ -275,7 +213,7 @@ test('legend margin: top orientation sets grid.top correctly', () => {
   expect((transformed.echartOptions.grid as any).top).toEqual(270);
 });
 
-test('legend margin: bottom orientation sets grid.bottom correctly', () => {
+it('legend margin: bottom orientation sets grid.bottom correctly', () => {
   const chartPropsConfigWithoutIdentifiers = {
     ...chartPropsConfig,
     formData: {
@@ -291,7 +229,7 @@ test('legend margin: bottom orientation sets grid.bottom correctly', () => {
   expect((transformed.echartOptions.grid as any).bottom).toEqual(270);
 });
 
-test('legend margin: left orientation sets grid.left correctly', () => {
+it('legend margin: left orientation sets grid.left correctly', () => {
   const chartPropsConfigWithoutIdentifiers = {
     ...chartPropsConfig,
     formData: {
@@ -307,7 +245,7 @@ test('legend margin: left orientation sets grid.left correctly', () => {
   expect((transformed.echartOptions.grid as any).left).toEqual(270);
 });
 
-test('legend margin: right orientation sets grid.right correctly', () => {
+it('legend margin: right orientation sets grid.right correctly', () => {
   const chartPropsConfigWithoutIdentifiers = {
     ...chartPropsConfig,
     formData: {

@@ -17,8 +17,7 @@
  * under the License.
  */
 import { useResizeDetector } from 'react-resize-detector';
-import { SupersetClient } from '@superset-ui/core';
-import { css } from '@apache-superset/core/ui';
+import { css, SupersetClient } from '@superset-ui/core';
 import { useDatasetMetadataBar } from './useDatasetMetadataBar';
 
 export default {

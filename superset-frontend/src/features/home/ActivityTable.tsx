@@ -18,8 +18,7 @@
  */
 import { useEffect, useState } from 'react';
 import { extendedDayjs } from '@superset-ui/core/utils/dates';
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 import { setItem, LocalStorageKeys } from 'src/utils/localStorageHelpers';
 import { Link } from 'react-router-dom';
 import { ListViewCard } from '@superset-ui/core/components';
@@ -101,7 +100,7 @@ const getEntityUrl = (entity: ActivityObject) => {
 
 const getEntityLastActionOn = (entity: ActivityObject) => {
   if ('time' in entity) {
-    return t('Viewed %s', (extendedDayjs(entity.time) as any).fromNow());
+    return t('Viewed %s', extendedDayjs(entity.time).fromNow());
   }
 
   let time: number | string | undefined | null;
@@ -112,7 +111,7 @@ const getEntityLastActionOn = (entity: ActivityObject) => {
   if ('changed_on_utc' in entity) time = entity.changed_on_utc;
   return t(
     'Modified %s',
-    time == null ? UNKNOWN_TIME : (extendedDayjs(time) as any).fromNow(),
+    time == null ? UNKNOWN_TIME : extendedDayjs(time).fromNow(),
   );
 };
 

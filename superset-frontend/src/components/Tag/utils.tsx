@@ -23,7 +23,7 @@ import {
   SupersetClient,
   t,
 } from '@superset-ui/core';
-import type { TagType } from 'src/types/TagType';
+import Tag from 'src/types/TagType';
 
 import rison from 'rison';
 import { cacheWrapper } from 'src/utils/cacheWrapper';
@@ -43,7 +43,7 @@ type SelectTagsValue = {
 };
 
 export const tagToSelectOption = (
-  tag: TagType & { table_name: string },
+  tag: Tag & { table_name: string },
 ): SelectTagsValue => ({
   value: tag.id,
   label: tag.name,

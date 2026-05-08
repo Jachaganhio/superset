@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-// Test comment for pre-commit
 import {
   forwardRef,
   ReactNode,
@@ -40,8 +39,8 @@ import {
   isFeatureEnabled,
   QueryFormData,
   t,
+  useTheme,
 } from '@superset-ui/core';
-import { useTheme } from '@apache-superset/core/ui';
 import { RootState } from 'src/dashboard/types';
 import { MenuItem } from '@superset-ui/core/components/Menu';
 import { usePermissions } from 'src/hooks/usePermissions';
@@ -185,11 +184,7 @@ const ChartContextMenu = (
   const showDrillBy =
     isFeatureEnabled(FeatureFlag.DrillBy) &&
     canDrillBy &&
-    isDisplayed(ContextMenuItem.DrillBy) &&
-    !(
-      formData.matrixify_enable_vertical_layout === true ||
-      formData.matrixify_enable_horizontal_layout === true
-    ); // Disable drill by when matrixify is enabled
+    isDisplayed(ContextMenuItem.DrillBy);
 
   const datasetResource = useDatasetDrillInfo(
     formData.datasource,
@@ -235,9 +230,9 @@ const ChartContextMenu = (
     datasetResource.status,
     datasetResource.result,
     showDrillBy,
-    enhancedFilters?.drillBy?.groupbyFieldName,
+    filters?.drillBy?.groupbyFieldName,
     formData.x_axis,
-    formData[enhancedFilters?.drillBy?.groupbyFieldName ?? ''],
+    formData[filters?.drillBy?.groupbyFieldName ?? ''],
     additionalConfig?.drillBy?.excludedColumns,
     loadDrillByOptionsExtension,
   ]);
@@ -273,7 +268,7 @@ const ChartContextMenu = (
     setShowModal: setDrillModalIsOpen,
     dataset: filteredDataset,
     isLoadingDataset,
-    ...additionalConfig?.drillToDetail,
+    ...(additionalConfig?.drillToDetail || {}),
   });
 
   if (showCrossFilters) {
@@ -442,7 +437,7 @@ const ChartContextMenu = (
         <DrillDetailModal
           initialFilters={modalFilters}
           chartId={id}
-          formData={drillFormData}
+          formData={formData}
           showModal={drillModalIsOpen}
           onHideModal={() => {
             setDrillModalIsOpen(false);
@@ -453,10 +448,10 @@ const ChartContextMenu = (
       {showDrillByModal &&
         drillByColumn &&
         filteredDataset &&
-        enhancedFilters?.drillBy && (
+        filters?.drillBy && (
           <DrillByModal
             column={drillByColumn}
-            drillByConfig={enhancedFilters?.drillBy}
+            drillByConfig={filters?.drillBy}
             formData={formData}
             onHideModal={handleCloseDrillByModal}
             dataset={filteredDataset}

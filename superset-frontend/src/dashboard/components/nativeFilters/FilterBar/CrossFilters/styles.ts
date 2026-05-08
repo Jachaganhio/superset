@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { css } from '@apache-superset/core/ui';
+import { css } from '@superset-ui/core';
 
 export const ellipsisCss = css`
   white-space: nowrap;

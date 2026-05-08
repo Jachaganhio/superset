@@ -17,7 +17,7 @@
  * under the License.
  */
 import { Icons } from '@superset-ui/core/components/Icons';
-import { css, useTheme } from '@apache-superset/core/ui';
+import { css, useTheme } from '@superset-ui/core';
 import { IconTooltip } from '.';
 import type { IconTooltipProps } from './types';
 

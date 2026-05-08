@@ -22,8 +22,15 @@ import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { useQueryParams, BooleanParam } from 'use-query-params';
 import { isEmpty } from 'lodash';
-import { t, SupersetClient, getExtensionsRegistry } from '@superset-ui/core';
-import { styled, css, SupersetTheme, useTheme } from '@apache-superset/core/ui';
+import {
+  t,
+  styled,
+  css,
+  SupersetTheme,
+  SupersetClient,
+  getExtensionsRegistry,
+  useTheme,
+} from '@superset-ui/core';
 import {
   Tag,
   Tooltip,
@@ -562,6 +569,7 @@ const RightMenu = ({
         icon: <Icons.DownOutlined iconSize="xs" />,
         children: buildNewDropdownItems(),
         popupOffset: NAVBAR_MENU_POPUP_OFFSET,
+        ...{ 'data-test': 'new-dropdown' },
       });
     }
 

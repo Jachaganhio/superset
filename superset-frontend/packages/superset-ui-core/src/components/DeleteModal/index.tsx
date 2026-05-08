@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { t, styled } from '@superset-ui/core';
 import { useState, useRef, useEffect, ChangeEvent } from 'react';
 import { FormLabel } from '../Form';
 import { Input, InputRef } from '../Input';

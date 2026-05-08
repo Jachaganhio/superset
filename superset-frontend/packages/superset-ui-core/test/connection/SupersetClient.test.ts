@@ -79,7 +79,7 @@ describe('SupersetClient', () => {
       SupersetClientClass.prototype,
       'isAuthenticated',
     );
-    const csrfSpy = jest.spyOn(SupersetClientClass.prototype, 'fetchCSRFToken');
+    const csrfSpy = jest.spyOn(SupersetClientClass.prototype, 'getCSRFToken');
     const requestSpy = jest.spyOn(SupersetClientClass.prototype, 'request');
     const getGuestTokenSpy = jest.spyOn(
       SupersetClientClass.prototype,

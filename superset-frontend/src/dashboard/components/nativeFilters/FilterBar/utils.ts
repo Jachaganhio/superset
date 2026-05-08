@@ -17,12 +17,12 @@
  * under the License.
  */
 
-import { DataMaskStateWithId, Filter, FilterState } from '@superset-ui/core';
-import { useSelector } from 'react-redux';
-import { createSelector } from '@reduxjs/toolkit';
 import { areObjectsEqual } from 'src/reduxUtils';
+import { DataMaskStateWithId, Filter, FilterState } from '@superset-ui/core';
 import { testWithId } from 'src/utils/testUtils';
 import { RootState } from 'src/dashboard/types';
+import { useSelector } from 'react-redux';
+import { createSelector } from '@reduxjs/toolkit';
 
 export const getOnlyExtraFormData = (data: DataMaskStateWithId) =>
   Object.values(data).reduce(
@@ -34,10 +34,6 @@ export const checkIsMissingRequiredValue = (
   filter: Filter,
   filterState?: FilterState,
 ) => {
-  const isRequired = !!filter.controlValues?.enableEmptyFilter;
-
-  if (!isRequired) return false;
-
   const value = filterState?.value;
   // TODO: this property should be unhardcoded
   return (
@@ -59,29 +55,22 @@ export const checkIsApplyDisabled = (
   if (!checkIsValidateError(dataMaskSelected)) {
     return true;
   }
-
   const dataSelectedValues = Object.values(dataMaskSelected);
   const dataAppliedValues = Object.values(dataMaskApplied);
-
-  const hasMissingRequiredFilter = filters.some(filter =>
-    checkIsMissingRequiredValue(
-      filter,
-      dataMaskSelected?.[filter?.id]?.filterState,
-    ),
-  );
-
-  const areEqual = areObjectsEqual(
-    getOnlyExtraFormData(dataMaskSelected),
-    getOnlyExtraFormData(dataMaskApplied),
-    { ignoreUndefined: true },
-  );
-
-  const result =
-    areEqual ||
+  return (
+    areObjectsEqual(
+      getOnlyExtraFormData(dataMaskSelected),
+      getOnlyExtraFormData(dataMaskApplied),
+      { ignoreUndefined: true },
+    ) ||
     dataSelectedValues.length !== dataAppliedValues.length ||
-    hasMissingRequiredFilter;
-
-  return result;
+    filters.some(filter =>
+      checkIsMissingRequiredValue(
+        filter,
+        dataMaskSelected?.[filter?.id]?.filterState,
+      ),
+    )
+  );
 };
 
 const chartsVerboseMapSelector = createSelector(

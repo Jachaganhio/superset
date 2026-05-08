@@ -24,4 +24,3 @@ export * from './forecastInterval';
 export * from './chartTitle';
 export * from './echartsTimeSeriesQuery';
 export * from './timeComparison';
-export * from './matrixify';

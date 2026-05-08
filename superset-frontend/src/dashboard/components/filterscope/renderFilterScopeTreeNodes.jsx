@@ -17,7 +17,7 @@
  * under the License.
  */
 import cx from 'classnames';
-import { styled } from '@apache-superset/core/ui';
+import { styled } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { CHART_TYPE } from 'src/dashboard/util/componentTypes';
 

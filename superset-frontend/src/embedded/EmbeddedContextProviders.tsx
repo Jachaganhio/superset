@@ -22,12 +22,13 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { QueryParamProvider } from 'use-query-params';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { DynamicPluginProvider } from 'src/components';
+import { FlashProvider, DynamicPluginProvider } from 'src/components';
 import { EmbeddedUiConfigProvider } from 'src/components/UiConfigContext';
 import { SupersetThemeProvider } from 'src/theme/ThemeProvider';
 import { ThemeController } from 'src/theme/ThemeController';
-import type { ThemeStorage } from '@apache-superset/core/ui';
+import type { ThemeStorage } from '@superset-ui/core';
 import { store } from 'src/views/store';
+import getBootstrapData from 'src/utils/getBootstrapData';
 
 /**
  * In-memory implementation of ThemeStorage interface for embedded contexts.
@@ -55,6 +56,7 @@ const themeController = new ThemeController({
 
 export const getThemeController = (): ThemeController => themeController;
 
+const { common } = getBootstrapData();
 const extensionsRegistry = getExtensionsRegistry();
 
 export const EmbeddedContextProviders: React.FC = ({ children }) => {
@@ -66,22 +68,24 @@ export const EmbeddedContextProviders: React.FC = ({ children }) => {
     <SupersetThemeProvider themeController={themeController}>
       <ReduxProvider store={store}>
         <DndProvider backend={HTML5Backend}>
-          <EmbeddedUiConfigProvider>
-            <DynamicPluginProvider>
-              <QueryParamProvider
-                ReactRouterRoute={Route}
-                stringifyOptions={{ encode: false }}
-              >
-                {RootContextProviderExtension ? (
-                  <RootContextProviderExtension>
-                    {children}
-                  </RootContextProviderExtension>
-                ) : (
-                  children
-                )}
-              </QueryParamProvider>
-            </DynamicPluginProvider>
-          </EmbeddedUiConfigProvider>
+          <FlashProvider messages={common.flash_messages}>
+            <EmbeddedUiConfigProvider>
+              <DynamicPluginProvider>
+                <QueryParamProvider
+                  ReactRouterRoute={Route}
+                  stringifyOptions={{ encode: false }}
+                >
+                  {RootContextProviderExtension ? (
+                    <RootContextProviderExtension>
+                      {children}
+                    </RootContextProviderExtension>
+                  ) : (
+                    children
+                  )}
+                </QueryParamProvider>
+              </DynamicPluginProvider>
+            </EmbeddedUiConfigProvider>
+          </FlashProvider>
         </DndProvider>
       </ReduxProvider>
     </SupersetThemeProvider>

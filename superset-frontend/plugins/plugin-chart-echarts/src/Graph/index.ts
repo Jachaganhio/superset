@@ -20,9 +20,7 @@ import { Behavior, t } from '@superset-ui/core';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from './images/thumbnail.png';
-import thumbnailDark from './images/thumbnail-dark.png';
 import example from './images/example.jpg';
-import exampleDark from './images/example-dark.jpg';
 import buildQuery from './buildQuery';
 import { EchartsChartPlugin } from '../types';
 
@@ -38,7 +36,7 @@ export default class EchartsGraphChartPlugin extends EchartsChartPlugin {
         description: t(
           'Displays connections between entities in a graph structure. Useful for mapping relationships and showing which nodes are important in a network. Graph charts can be configured to be force-directed or circulate. If your data has a geospatial component, try the deck.gl Arc chart.',
         ),
-        exampleGallery: [{ url: example, urlDark: exampleDark }],
+        exampleGallery: [{ url: example }],
         name: t('Graph Chart'),
         tags: [
           t('Circular'),
@@ -51,7 +49,6 @@ export default class EchartsGraphChartPlugin extends EchartsChartPlugin {
           t('Featured'),
         ],
         thumbnail,
-        thumbnailDark,
         behaviors: [
           Behavior.InteractiveChart,
           Behavior.DrillToDetail,

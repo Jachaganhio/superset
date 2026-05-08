@@ -18,8 +18,13 @@
  */
 import { CSSProperties, ReactNode, useCallback } from 'react';
 
-import { t, useCSSTextTruncation } from '@superset-ui/core';
-import { css, styled, useTheme } from '@apache-superset/core/ui';
+import {
+  css,
+  styled,
+  t,
+  useCSSTextTruncation,
+  useTheme,
+} from '@superset-ui/core';
 
 import { Icons } from '@superset-ui/core/components/Icons';
 import { Tooltip } from '@superset-ui/core/components/Tooltip';

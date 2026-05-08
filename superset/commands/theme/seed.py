@@ -59,8 +59,9 @@ class SeedSystemThemesCommand(BaseCommand):
                     theme_config = json.loads(referenced_theme.json_data)
                     # Add a note about the theme being copied from UUID reference
                     theme_config["NOTE"] = (
-                        "Copied at startup from theme UUID %s based on config reference"
-                    ) % original_uuid
+                        f"Copied at startup from theme UUID {original_uuid} "
+                        f"based on config reference"
+                    )
                     logger.debug(
                         "Copied theme definition from UUID %s for system theme %s",
                         original_uuid,
@@ -92,7 +93,7 @@ class SeedSystemThemesCommand(BaseCommand):
 
         if existing_theme:
             existing_theme.json_data = json_data
-            logger.debug("Updated system theme: %s", theme_name)
+            logger.debug(f"Updated system theme: {theme_name}")
         else:
             new_theme = Theme(
                 theme_name=theme_name,
@@ -100,7 +101,7 @@ class SeedSystemThemesCommand(BaseCommand):
                 is_system=True,
             )
             db.session.add(new_theme)
-            logger.debug("Created system theme: %s", theme_name)
+            logger.debug(f"Created system theme: {theme_name}")
 
     def validate(self) -> None:
         """Validate that the command can be executed."""

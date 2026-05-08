@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { GenericDataType } from '@apache-superset/core/api/core';
+import { GenericDataType } from '@superset-ui/core';
 import { getColorFormatters } from '@superset-ui/chart-controls';
 import { BigNumberTotalChartProps } from '../types';
 import transformProps from './transformProps';

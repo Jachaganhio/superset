@@ -33,8 +33,6 @@ import {
   viewport,
   spatial,
   mapboxStyle,
-  tooltipContents,
-  tooltipTemplate,
   legendPosition,
   generateDeckGLColorSchemeControls,
 } from '../../utilities/Shared_DeckGL';
@@ -51,8 +49,6 @@ const config: ControlPanelConfig = {
         ['row_limit'],
         [filterNulls],
         ['adhoc_filters'],
-        [tooltipContents],
-        [tooltipTemplate],
       ],
     },
     {

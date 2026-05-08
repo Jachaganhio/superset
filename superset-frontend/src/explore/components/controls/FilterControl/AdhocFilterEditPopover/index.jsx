@@ -20,8 +20,7 @@ import { createRef, Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Icons, Select } from '@superset-ui/core/components';
 import { ErrorBoundary } from 'src/components';
-import { t, SupersetClient } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t, SupersetClient } from '@superset-ui/core';
 
 import Tabs from '@superset-ui/core/components/Tabs';
 import adhocMetricType from 'src/explore/components/controls/MetricControl/adhocMetricType';
@@ -373,7 +372,6 @@ export default class AdhocFilterEditPopover extends Component {
                     options={this.props.options}
                     height={this.state.height}
                     activeKey={this.state.activeKey}
-                    datasource={datasource}
                   />
                 </ErrorBoundary>
               ),

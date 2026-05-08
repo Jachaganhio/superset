@@ -128,9 +128,13 @@ const Select = forwardRef(
     const shouldShowSearch = allowNewOptions ? true : showSearch;
     const [selectValue, setSelectValue] = useState(value);
     const [inputValue, setInputValue] = useState('');
+    const [isLoading, setIsLoading] = useState(loading);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [visibleOptions, setVisibleOptions] = useState<SelectOptionsType>([]);
+    const [maxTagCount, setMaxTagCount] = useState(
+      propsMaxTagCount ?? MAX_TAG_COUNT,
+    );
     const [onChangeCount, setOnChangeCount] = useState(0);
     const previousChangeCount = usePrevious(onChangeCount, 0);
     const fireOnChange = useCallback(
@@ -138,11 +142,11 @@ const Select = forwardRef(
       [onChangeCount],
     );
 
-    const maxTagCount = oneLine
-      ? isDropdownVisible
-        ? 0
-        : 1
-      : (propsMaxTagCount ?? MAX_TAG_COUNT);
+    useEffect(() => {
+      if (oneLine) {
+        setMaxTagCount(isDropdownVisible ? 0 : 1);
+      }
+    }, [isDropdownVisible, oneLine]);
 
     // Prevent maxTagCount change during click events to avoid click target disappearing
     const [stableMaxTagCount, setStableMaxTagCount] = useState(maxTagCount);
@@ -533,8 +537,6 @@ const Select = forwardRef(
       ],
     );
 
-    const isLoading = loading ?? false;
-
     const popupRender = (
       originNode: ReactElement & { ref?: RefObject<HTMLElement> },
     ) =>
@@ -560,6 +562,12 @@ const Select = forwardRef(
       setSelectOptions(initialOptions);
       setVisibleOptions(initialOptions);
     }, [initialOptions]);
+
+    useEffect(() => {
+      if (loading !== undefined && loading !== isLoading) {
+        setIsLoading(loading);
+      }
+    }, [isLoading, loading]);
 
     useEffect(() => {
       setSelectValue(value);

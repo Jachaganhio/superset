@@ -18,19 +18,18 @@
  */
 import { ReactNode, CSSProperties, PureComponent } from 'react';
 import cx from 'classnames';
-import { addAlpha } from '@superset-ui/core';
-import { css, styled } from '@apache-superset/core/ui';
+import { addAlpha, css, styled } from '@superset-ui/core';
 
 type ShouldFocusContainer = HTMLDivElement & {
-  contains: (event_target: EventTarget & HTMLElement) => boolean;
+  contains: (event_target: EventTarget & HTMLElement) => Boolean;
 };
 
 interface WithPopoverMenuProps {
   children: ReactNode;
-  disableClick: boolean;
+  disableClick: Boolean;
   menuItems: ReactNode[];
-  onChangeFocus: (focus: boolean) => void;
-  isFocused: boolean;
+  onChangeFocus: (focus: Boolean) => void;
+  isFocused: Boolean;
   // Event argument is left as "any" because of the clash. In defaultProps it seems
   // like it should be React.FocusEvent<>, however from handleClick() we can also
   // derive that type is EventListenerOrEventListenerObject.
@@ -38,13 +37,13 @@ interface WithPopoverMenuProps {
     event: any,
     container: ShouldFocusContainer,
     menuRef: HTMLDivElement | null,
-  ) => boolean;
-  editMode: boolean;
+  ) => Boolean;
+  editMode: Boolean;
   style: CSSProperties;
 }
 
 interface WithPopoverMenuState {
-  isFocused: boolean;
+  isFocused: Boolean;
 }
 
 const WithPopoverMenuStyles = styled.div`
@@ -141,12 +140,12 @@ export default class WithPopoverMenu extends PureComponent<
     this.handleClick = this.handleClick.bind(this);
   }
 
-  componentDidUpdate(prevProps: WithPopoverMenuProps) {
-    if (this.props.editMode && this.props.isFocused && !this.state.isFocused) {
+  UNSAFE_componentWillReceiveProps(nextProps: WithPopoverMenuProps) {
+    if (nextProps.editMode && nextProps.isFocused && !this.state.isFocused) {
       document.addEventListener('click', this.handleClick);
       document.addEventListener('drag', this.handleClick);
       this.setState({ isFocused: true });
-    } else if (this.state.isFocused && !this.props.editMode) {
+    } else if (this.state.isFocused && !nextProps.editMode) {
       document.removeEventListener('click', this.handleClick);
       document.removeEventListener('drag', this.handleClick);
       this.setState({ isFocused: false });
@@ -166,7 +165,7 @@ export default class WithPopoverMenu extends PureComponent<
     this.menuRef = ref;
   }
 
-  shouldHandleFocusChange(shouldFocus: boolean): boolean {
+  shouldHandleFocusChange(shouldFocus: Boolean): boolean {
     const { disableClick } = this.props;
     const { isFocused } = this.state;
 
@@ -226,7 +225,7 @@ export default class WithPopoverMenu extends PureComponent<
         {children}
         {editMode && isFocused && (menuItems?.length ?? 0) > 0 && (
           <PopoverMenuStyles ref={this.setMenuRef}>
-            {menuItems.map((node: ReactNode, i: number) => (
+            {menuItems.map((node: ReactNode, i: Number) => (
               <div className="menu-item" key={`menu-item-${i}`}>
                 {node}
               </div>

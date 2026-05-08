@@ -57,13 +57,13 @@ DEFAULT_BATCH_SIZE = int(os.environ.get("BATCH_SIZE", 1000))
 def get_table_column(
     table_name: str,
     column_name: str,
-) -> Optional[dict[str, Any]]:
+) -> Optional[list[dict[str, Any]]]:
     """
     Get the specified column.
 
     :param table_name: The Table name
     :param column_name: The column name
-    :returns: The column dictionary or None if not found
+    :returns: The column
     """
 
     insp = inspect(op.get_context().bind)
@@ -227,13 +227,7 @@ def drop_fks_for_table(
 
         for fk_name in foreign_key_names:
             logger.info(
-                "Dropping foreign key %s%s%s from table %s%s%s...",  # noqa: E501
-                GREEN,
-                fk_name,
-                RESET,
-                GREEN,
-                table_name,
-                RESET,
+                f"Dropping foreign key {GREEN}{fk_name}{RESET} from table {GREEN}{table_name}{RESET}..."  # noqa: E501
             )
             op.drop_constraint(fk_name, table_name, type_="foreignkey")
 
@@ -252,12 +246,12 @@ def create_table(table_name: str, *columns: SchemaItem, **kwargs: Any) -> None:
     just like when calling alembic's method create_table()
     """
     if has_table(table_name=table_name):
-        logger.info("Table %s%s%s already exists. Skipping...", LRED, table_name, RESET)
+        logger.info(f"Table {LRED}{table_name}{RESET} already exists. Skipping...")
         return
 
-    logger.info("Creating table %s%s%s...", GREEN, table_name, RESET)
+    logger.info(f"Creating table {GREEN}{table_name}{RESET}...")
     op.create_table(table_name, *columns, **kwargs)
-    logger.info("Table %s%s%s created.", GREEN, table_name, RESET)
+    logger.info(f"Table {GREEN}{table_name}{RESET} created.")
 
 
 def drop_table(table_name: str) -> None:
@@ -273,13 +267,13 @@ def drop_table(table_name: str) -> None:
     """  # noqa: E501
 
     if not has_table(table_name=table_name):
-        logger.info("Table %s%s%s doesn't exist. Skipping...", GREEN, table_name, RESET)
+        logger.info(f"Table {GREEN}{table_name}{RESET} doesn't exist. Skipping...")
         return
 
-    logger.info("Dropping table %s%s%s...", GREEN, table_name, RESET)
+    logger.info(f"Dropping table {GREEN}{table_name}{RESET}...")
     drop_fks_for_table(table_name)
     op.drop_table(table_name=table_name)
-    logger.info("Table %s%s%s dropped.", GREEN, table_name, RESET)
+    logger.info(f"Table {GREEN}{table_name}{RESET} dropped.")
 
 
 def batch_operation(
@@ -301,31 +295,17 @@ def batch_operation(
     """  # noqa: E501
     if count <= 0:
         logger.info(
-            "No records to process in batch %s(count <= 0)%s for callable %sother_callable_example%s. Skipping...",  # noqa: E501
-            LRED,
-            RESET,
-            LRED,
-            RESET,
+            f"No records to process in batch {LRED}(count <= 0){RESET} for callable {LRED}other_callable_example{RESET}. Skipping..."  # noqa: E501
         )
         return
     for offset in range(0, count, batch_size):
         percentage = (offset / count) * 100 if count else 0
-        logger.info(
-            "Progress: %s/%s (%.2f%%)",
-            "{:,}".format(offset),
-            "{:,}".format(count),
-            percentage,
-        )
+        logger.info(f"Progress: {offset:,}/{count:,} ({percentage:.2f}%)")
         callable(offset, min(offset + batch_size, count))
 
-    logger.info("Progress: %s/%s (100%%)", "{:,}".format(count), "{:,}".format(count))
+    logger.info(f"Progress: {count:,}/{count:,} (100%)")
     logger.info(
-        "End: %s%s%s batch operation %ssuccessfully%s executed.",  # noqa: E501
-        GREEN,
-        callable.__name__,
-        RESET,
-        GREEN,
-        RESET,
+        f"End: {GREEN}{callable.__name__}{RESET} batch operation {GREEN}successfully{RESET} executed."  # noqa: E501
     )
 
 
@@ -346,13 +326,7 @@ def add_columns(table_name: str, *columns: Column) -> None:
     for col in columns:
         if table_has_column(table_name=table_name, column_name=col.name):
             logger.info(
-                "Column %s%s%s already present on table %s%s%s. Skipping...",  # noqa: E501
-                LRED,
-                col.name,
-                RESET,
-                LRED,
-                table_name,
-                RESET,
+                f"Column {LRED}{col.name}{RESET} already present on table {LRED}{table_name}{RESET}. Skipping..."  # noqa: E501
             )
         else:
             cols_to_add.append(col)
@@ -360,13 +334,7 @@ def add_columns(table_name: str, *columns: Column) -> None:
     with op.batch_alter_table(table_name) as batch_op:
         for col in cols_to_add:
             logger.info(
-                "Adding column %s%s%s to table %s%s%s...",  # noqa: E501
-                GREEN,
-                col.name,
-                RESET,
-                GREEN,
-                table_name,
-                RESET,
+                f"Adding column {GREEN}{col.name}{RESET} to table {GREEN}{table_name}{RESET}..."  # noqa: E501
             )
             batch_op.add_column(col)
 
@@ -388,13 +356,7 @@ def drop_columns(table_name: str, *columns: str) -> None:
     for col in columns:
         if not table_has_column(table_name=table_name, column_name=col):
             logger.info(
-                "Column %s%s%s is not present on table %s%s%s. Skipping...",  # noqa: E501
-                LRED,
-                col,
-                RESET,
-                LRED,
-                table_name,
-                RESET,
+                f"Column {LRED}{col}{RESET} is not present on table {LRED}{table_name}{RESET}. Skipping..."  # noqa: E501
             )
         else:
             cols_to_drop.append(col)
@@ -402,13 +364,7 @@ def drop_columns(table_name: str, *columns: str) -> None:
     with op.batch_alter_table(table_name) as batch_op:
         for col in cols_to_drop:
             logger.info(
-                "Dropping column %s%s%s from table %s%s%s...",  # noqa: E501
-                GREEN,
-                col,
-                RESET,
-                GREEN,
-                table_name,
-                RESET,
+                f"Dropping column {GREEN}{col}{RESET} from table {GREEN}{table_name}{RESET}..."  # noqa: E501
             )
             batch_op.drop_column(col)
 
@@ -430,24 +386,12 @@ def create_index(
 
     if table_has_index(table=table_name, index=index_name):
         logger.info(
-            "Table %s%s%s already has index %s%s%s. Skipping...",  # noqa: E501
-            LRED,
-            table_name,
-            RESET,
-            LRED,
-            index_name,
-            RESET,
+            f"Table {LRED}{table_name}{RESET} already has index {LRED}{index_name}{RESET}. Skipping..."  # noqa: E501
         )
         return
 
     logger.info(
-        "Creating index %s%s%s on table %s%s%s",
-        GREEN,
-        index_name,
-        RESET,
-        GREEN,
-        table_name,
-        RESET,
+        f"Creating index {GREEN}{index_name}{RESET} on table {GREEN}{table_name}{RESET}"
     )
 
     op.create_index(
@@ -471,24 +415,12 @@ def drop_index(table_name: str, index_name: str) -> None:
 
     if not table_has_index(table=table_name, index=index_name):
         logger.info(
-            "Table %s%s%s doesn't have index %s%s%s. Skipping...",  # noqa: E501
-            LRED,
-            table_name,
-            RESET,
-            LRED,
-            index_name,
-            RESET,
+            f"Table {LRED}{table_name}{RESET} doesn't have index {LRED}{index_name}{RESET}. Skipping..."  # noqa: E501
         )
         return
 
     logger.info(
-        "Dropping index %s%s%s from table %s%s%s...",  # noqa: E501
-        GREEN,
-        index_name,
-        RESET,
-        GREEN,
-        table_name,
-        RESET,
+        f"Dropping index {GREEN}{index_name}{RESET} from table {GREEN}{table_name}{RESET}..."  # noqa: E501
     )
 
     op.drop_index(table_name=table_name, index_name=index_name)
@@ -516,10 +448,7 @@ def create_fks_for_table(
 
     if not has_table(table_name):
         logger.warning(
-            "Table %s%s%s does not exist. Skipping foreign key creation.",  # noqa: E501
-            LRED,
-            table_name,
-            RESET,
+            f"Table {LRED}{table_name}{RESET} does not exist. Skipping foreign key creation."  # noqa: E501
         )
         return
 
@@ -527,13 +456,7 @@ def create_fks_for_table(
         # SQLite requires batch mode since ALTER TABLE is limited
         with op.batch_alter_table(table_name) as batch_op:
             logger.info(
-                "Creating foreign key %s%s%s on table %s%s%s (SQLite mode)...",  # noqa: E501
-                GREEN,
-                foreign_key_name,
-                RESET,
-                GREEN,
-                table_name,
-                RESET,
+                f"Creating foreign key {GREEN}{foreign_key_name}{RESET} on table {GREEN}{table_name}{RESET} (SQLite mode)..."  # noqa: E501
             )
             batch_op.create_foreign_key(
                 foreign_key_name,
@@ -545,13 +468,7 @@ def create_fks_for_table(
     else:
         # Standard FK creation for other databases
         logger.info(
-            "Creating foreign key %s%s%s on table %s%s%s...",  # noqa: E501
-            GREEN,
-            foreign_key_name,
-            RESET,
-            GREEN,
-            table_name,
-            RESET,
+            f"Creating foreign key {GREEN}{foreign_key_name}{RESET} on table {GREEN}{table_name}{RESET}..."  # noqa: E501
         )
         op.create_foreign_key(
             foreign_key_name,
@@ -624,11 +541,7 @@ USING safe_to_jsonb({column});
             json.loads(value)
         except json.JSONDecodeError:
             logger.warning(
-                "Invalid JSON value in column %s for %s=%s: %s",
-                column,
-                pk,
-                row_pk,
-                value,
+                f"Invalid JSON value in column {column} for {pk}={row_pk}: {value}"
             )
             continue
         stmt_update = update(t).where(t.c[pk] == row_pk).values({tmp_column: value})

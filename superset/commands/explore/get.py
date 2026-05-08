@@ -37,7 +37,6 @@ from superset.exceptions import SupersetException
 from superset.explore.exceptions import WrongEndpointError
 from superset.explore.permalink.exceptions import ExplorePermalinkGetFailedError
 from superset.extensions import security_manager
-from superset.superset_typing import BaseDatasourceData, QueryData
 from superset.utils import core as utils, json
 from superset.views.utils import (
     get_datasource_info,
@@ -136,8 +135,9 @@ class GetExploreCommand(BaseCommand, ABC):
         utils.merge_extra_filters(form_data)
         utils.merge_request_params(form_data, request.args)
 
-        datasource_data: BaseDatasourceData | QueryData = {
-            "type": self._datasource_type or "unknown",
+        # TODO: this is a dummy placeholder - should be refactored to being just `None`
+        datasource_data: dict[str, Any] = {
+            "type": self._datasource_type,
             "name": datasource_name,
             "columns": [],
             "metrics": [],

@@ -16,8 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { t, getExtensionsRegistry } from '@superset-ui/core';
-import { styled, SupersetTheme, Alert } from '@apache-superset/core/ui';
+import {
+  t,
+  styled,
+  SupersetTheme,
+  getExtensionsRegistry,
+} from '@superset-ui/core';
 
 import {
   FunctionComponent,
@@ -35,6 +39,7 @@ import { useHistory } from 'react-router-dom';
 import { setItem, LocalStorageKeys } from 'src/utils/localStorageHelpers';
 import Tabs from '@superset-ui/core/components/Tabs';
 import {
+  Alert,
   Button,
   Icons,
   LabeledErrorBoundInput as ValidatedInput,
@@ -256,10 +261,9 @@ export function dbReducer(
   action: DBReducerActionType,
 ): Partial<DatabaseObject> | null {
   const trimmedState = {
-    ...state,
+    ...(state || {}),
   };
   let query = {};
-  // eslint-disable-next-line camelcase
   let query_input = '';
   let parametersCatalog;
   let actionPayloadJson;
@@ -271,7 +275,7 @@ export function dbReducer(
       try {
         // we don't want to stringify encoded strings twice
         actionPayloadJson = JSON.parse(action.payload.json || '{}');
-      } catch {
+      } catch (e) {
         actionPayloadJson = action.payload.json;
       }
       return {
@@ -428,11 +432,9 @@ export function dbReducer(
         },
       };
     case ActionType.SetSSHTunnelLoginMethod: {
-      // eslint-disable-next-line camelcase
       let ssh_tunnel = {};
       if (trimmedState?.ssh_tunnel) {
         // remove any attributes that are considered sensitive
-        // eslint-disable-next-line camelcase
         ssh_tunnel = pick(trimmedState.ssh_tunnel, [
           'id',
           'server_address',
@@ -443,12 +445,10 @@ export function dbReducer(
       if (action.payload.login_method === AuthType.PrivateKey) {
         return {
           ...trimmedState,
-          // eslint-disable-next-line camelcase
           ssh_tunnel: {
             private_key: trimmedState?.ssh_tunnel?.private_key,
             private_key_password:
               trimmedState?.ssh_tunnel?.private_key_password,
-            // eslint-disable-next-line camelcase
             ...ssh_tunnel,
           },
         };
@@ -456,10 +456,8 @@ export function dbReducer(
       if (action.payload.login_method === AuthType.Password) {
         return {
           ...trimmedState,
-          // eslint-disable-next-line camelcase
           ssh_tunnel: {
             password: trimmedState?.ssh_tunnel?.password,
-            // eslint-disable-next-line camelcase
             ...ssh_tunnel,
           },
         };
@@ -501,7 +499,6 @@ export function dbReducer(
           ...trimmedState.parameters,
           query: Object.fromEntries(new URLSearchParams(action.payload.value)),
         },
-        // eslint-disable-next-line camelcase
         query_input: action.payload.value,
       };
     case ActionType.TextChange:
@@ -512,7 +509,6 @@ export function dbReducer(
     case ActionType.Fetched:
       // convert query to a string and store in query_input
       query = action.payload?.parameters?.query || {};
-      // eslint-disable-next-line camelcase
       query_input = Object.entries(query)
         .map(([key, value]) => `${key}=${value}`)
         .join('&');
@@ -541,7 +537,6 @@ export function dbReducer(
             ...(action.payload.parameters || trimmedState.parameters),
             catalog: payloadCatalog,
           },
-          // eslint-disable-next-line camelcase
           query_input,
         };
       }
@@ -552,7 +547,6 @@ export function dbReducer(
         configuration_method: action.payload.configuration_method,
         parameters: action.payload.parameters || trimmedState.parameters,
         ssh_tunnel: action.payload.ssh_tunnel || trimmedState.ssh_tunnel,
-        // eslint-disable-next-line camelcase
         query_input,
       };
 
@@ -849,7 +843,7 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
       return;
     }
     // Clone DB object
-    const dbToUpdate = { ...db };
+    const dbToUpdate = { ...(db || {}) };
 
     if (dbToUpdate.configuration_method === ConfigurationMethod.DynamicForm) {
       // Validate DB before saving
@@ -872,14 +866,12 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
         return;
       }
 
-      // eslint-disable-next-line camelcase
       const parameters_schema = isEditMode
         ? dbToUpdate.parameters_schema?.properties
         : dbModel?.parameters.properties;
       const additionalEncryptedExtra = JSON.parse(
         dbToUpdate.masked_encrypted_extra || '{}',
       );
-      // eslint-disable-next-line camelcase
       const paramConfigArray = Object.keys(parameters_schema || {});
 
       paramConfigArray.forEach(paramConfig => {
@@ -889,7 +881,6 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
          * backend when the database is created or edited.
          */
         if (
-          // eslint-disable-next-line camelcase
           parameters_schema[paramConfig]['x-encrypted-extra'] &&
           dbToUpdate.parameters?.[paramConfig as keyof DatabaseParameters]
         ) {
@@ -1041,19 +1032,15 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
     }
   };
 
-  // eslint-disable-next-line camelcase
   const setDatabaseModel = (database_name: string) => {
-    // eslint-disable-next-line camelcase
     if (database_name === 'Other') {
       // Allow users to connect to DB via legacy SQLA form
       setDB({
         type: ActionType.DbSelected,
         payload: {
-          // eslint-disable-next-line camelcase
           database_name,
           configuration_method: ConfigurationMethod.SqlalchemyUri,
           engine: undefined,
-          // eslint-disable-next-line camelcase
           engine_information: {
             supports_file_upload: true,
           },
@@ -1061,35 +1048,27 @@ const DatabaseModal: FunctionComponent<DatabaseModalProps> = ({
       });
     } else {
       const selectedDbModel = availableDbs?.databases.filter(
-        // eslint-disable-next-line camelcase
         (db: DatabaseObject) => db.name === database_name,
       )[0];
       if (!selectedDbModel) return;
       const {
         engine,
         parameters,
-        // eslint-disable-next-line camelcase
         engine_information,
-        // eslint-disable-next-line camelcase
         default_driver,
-        // eslint-disable-next-line camelcase
         sqlalchemy_uri_placeholder,
       } = selectedDbModel;
       const isDynamic = parameters !== undefined;
       setDB({
         type: ActionType.DbSelected,
         payload: {
-          // eslint-disable-next-line camelcase
           database_name,
           engine,
           configuration_method: isDynamic
             ? ConfigurationMethod.DynamicForm
             : ConfigurationMethod.SqlalchemyUri,
-          // eslint-disable-next-line camelcase
           engine_information,
-          // eslint-disable-next-line camelcase
           driver: default_driver,
-          // eslint-disable-next-line camelcase
           sqlalchemy_uri_placeholder,
         },
       });

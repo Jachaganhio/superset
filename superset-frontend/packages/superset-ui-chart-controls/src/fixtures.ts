@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { DatasourceType } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
+import { DatasourceType, GenericDataType } from '@superset-ui/core';
 import { Dataset } from './types';
 
 export const TestDataset: Dataset = {

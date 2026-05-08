@@ -24,8 +24,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
-import { SupersetClient, SupersetError, t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, SupersetClient, SupersetError, t } from '@superset-ui/core';
 import rison from 'rison';
 import RefreshLabel from '@superset-ui/core/components/RefreshLabel';
 import { useToasts } from 'src/components/MessageToasts/withToasts';

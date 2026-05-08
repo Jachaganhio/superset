@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ReactNode, isValidElement } from 'react';
+import { ReactNode } from 'react';
 import {
   ascending as d3ascending,
   quantile as d3quantile,
@@ -73,29 +73,15 @@ export function commonLayerProps({
     tooltipContentGenerator = sandboxedEval(fd.js_tooltip);
   }
   if (tooltipContentGenerator) {
-    let currentTooltipContent: ReactNode = null;
-
-    const isCustomTooltip = (content: ReactNode): boolean =>
-      isValidElement(content) &&
-      content.props?.['data-tooltip-type'] === 'custom';
-
     onHover = (o: JsonObject) => {
       if (o.picked) {
-        currentTooltipContent = tooltipContentGenerator(o);
-      }
-
-      if (
-        currentTooltipContent &&
-        (o.picked || isCustomTooltip(currentTooltipContent))
-      ) {
         setTooltip({
-          content: currentTooltipContent,
+          content: tooltipContentGenerator(o),
           x: o.x,
           y: o.y,
         });
       } else {
         setTooltip(null);
-        currentTooltipContent = null;
       }
       return true;
     };

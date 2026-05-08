@@ -27,8 +27,7 @@ import {
   saveDashboardRequest,
   setOverrideConfirm,
 } from 'src/dashboard/actions/dashboardState';
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { t, styled } from '@superset-ui/core';
 import { SAVE_TYPE_OVERWRITE_CONFIRMED } from 'src/dashboard/util/constants';
 
 const STICKY_HEADER_TOP = 16;

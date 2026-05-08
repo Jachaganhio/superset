@@ -17,8 +17,7 @@
  * under the License.
  */
 import { useCallback, useEffect, useMemo, useState, MouseEvent } from 'react';
-import { isFeatureEnabled, FeatureFlag, t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { isFeatureEnabled, FeatureFlag, styled, t } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 import Tabs from '@superset-ui/core/components/Tabs';
 import {

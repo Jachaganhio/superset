@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { styled, css } from '@apache-superset/core/ui';
+import { styled, css } from '@superset-ui/core';
 
 export const ControlSubSectionHeader = styled.div`
   ${({ theme }) => css`

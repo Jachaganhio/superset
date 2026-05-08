@@ -70,7 +70,7 @@ export default function EchartsTimeseries({
     const element = extraControlRef.current;
     if (!element) {
       setExtraControlHeight(0);
-      return;
+      return undefined;
     }
 
     const updateHeight = () => {
@@ -306,7 +306,6 @@ export default function EchartsTimeseries({
         eventHandlers={eventHandlers}
         zrEventHandlers={zrEventHandlers}
         selectedValues={selectedValues}
-        vizType={formData.vizType}
       />
     </>
   );

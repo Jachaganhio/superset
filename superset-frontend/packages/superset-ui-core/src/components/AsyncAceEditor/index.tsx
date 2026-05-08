@@ -32,7 +32,7 @@ import {
   AsyncEsmComponent,
   PlaceholderProps,
 } from '@superset-ui/core/components/AsyncEsmComponent';
-import { useTheme, css } from '@apache-superset/core/ui';
+import { useTheme, css } from '@superset-ui/core';
 import { Global } from '@emotion/react';
 
 export { getTooltipHTML } from './Tooltip';
@@ -124,33 +124,21 @@ export function AsyncAceEditor(
     const cssWorkerUrlPromise = import(
       'ace-builds/src-min-noconflict/worker-css'
     );
-    const javascriptWorkerUrlPromise = import(
-      'ace-builds/src-min-noconflict/worker-javascript'
-    );
-    const htmlWorkerUrlPromise = import(
-      'ace-builds/src-min-noconflict/worker-html'
-    );
     const acequirePromise = import('ace-builds/src-min-noconflict/ace');
 
     const [
       { default: ReactAceEditor },
       { config },
       { default: cssWorkerUrl },
-      { default: javascriptWorkerUrl },
-      { default: htmlWorkerUrl },
       { require: acequire },
     ] = await Promise.all([
       reactAcePromise,
       aceBuildsConfigPromise,
       cssWorkerUrlPromise,
-      javascriptWorkerUrlPromise,
-      htmlWorkerUrlPromise,
       acequirePromise,
     ]);
 
     config.setModuleUrl('ace/mode/css_worker', cssWorkerUrl);
-    config.setModuleUrl('ace/mode/javascript_worker', javascriptWorkerUrl);
-    config.setModuleUrl('ace/mode/html_worker', htmlWorkerUrl);
 
     await Promise.all(aceModules.map(x => aceModuleLoaders[x]()));
 
@@ -212,10 +200,10 @@ export function AsyncAceEditor(
         useEffect(() => {
           const editorInstance = (ref as React.RefObject<AceEditor>)?.current
             ?.editor;
-          if (!editorInstance) return;
+          if (!editorInstance) return undefined;
 
           const editorContainer = editorInstance.container;
-          if (!editorContainer) return;
+          if (!editorContainer) return undefined;
 
           // Cache DOM elements to avoid repeated queries on every command execution
           let cachedAutocompletePopup: HTMLElement | null = null;
@@ -263,8 +251,10 @@ export function AsyncAceEditor(
           const { commands } = editorInstance;
           commands.on('afterExec', handleAfterExec);
 
+          // Cleanup function to remove event listener and clear cached references
           return () => {
             commands.off('afterExec', handleAfterExec);
+            // Clear cached references to avoid memory leaks
             cachedAutocompletePopup = null;
             cachedTargetContainer = null;
           };
@@ -462,9 +452,7 @@ export const FullSQLEditor = AsyncAceEditor(
   {
     // a custom placeholder in SQL lab for less jumpy re-renders
     placeholder: () => {
-      // Use a hook to get theme colors
-      const theme = useTheme();
-      const gutterBackground = theme.colorBgElevated;
+      const gutterBackground = '#e8e8e8'; // from ace-github theme
       return (
         <div
           style={{

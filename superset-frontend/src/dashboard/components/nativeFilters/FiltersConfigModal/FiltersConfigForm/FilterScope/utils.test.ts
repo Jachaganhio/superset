@@ -24,7 +24,6 @@ import { buildTree } from './utils';
 // This test file is using data from a real example dashboard to test real world data sets.  ts-ignore is set for this entire file
 // until we can reconcile adjusting types to match the actual data structures used
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Ensure buildTree does not throw runtime errors when encountering an invalid node', () => {
   const node = {
     children: ['TABS-97PVJa11D_'],
@@ -18048,7 +18047,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
   ];
 
   const initiallyExcludedCharts: number[] = [];
-  test('Succeeds with valid', () => {
+  it('Succeeds with valid', () => {
     expect(() => {
       buildTree(
         // @ts-ignore
@@ -18063,7 +18062,7 @@ describe('Ensure buildTree does not throw runtime errors when encountering an in
     }).not.toThrow();
   });
 
-  test('Avoids runtime error with invalid inputs', () => {
+  it('Avoids runtime error with invalid inputs', () => {
     expect(() => {
       buildTree(
         // @ts-expect-error

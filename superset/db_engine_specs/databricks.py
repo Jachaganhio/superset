@@ -296,15 +296,11 @@ class DatabricksDynamicBaseEngineSpec(BasicParametersMixin, DatabricksBaseEngine
 
     @classmethod
     def extract_errors(
-        cls,
-        ex: Exception,
-        context: dict[str, Any] | None = None,
-        database_name: str | None = None,
+        cls, ex: Exception, context: dict[str, Any] | None = None
     ) -> list[SupersetError]:
         raw_message = cls._extract_error_message(ex)
 
         context = context or {}
-
         # access_token isn't currently parseable from the
         # databricks error response, but adding it in here
         # for reference if their error message changes
@@ -312,14 +308,7 @@ class DatabricksDynamicBaseEngineSpec(BasicParametersMixin, DatabricksBaseEngine
         for key, value in cls.context_key_mapping.items():
             context[key] = context.get(value)
 
-        db_engine_custom_errors = cls.get_database_custom_errors(database_name)
-        if not isinstance(db_engine_custom_errors, dict):
-            db_engine_custom_errors = {}
-
-        for regex, (message, error_type, extra) in [
-            *db_engine_custom_errors.items(),
-            *cls.custom_errors.items(),
-        ]:
+        for regex, (message, error_type, extra) in cls.custom_errors.items():
             match = regex.search(raw_message)
             if match:
                 params = {**context, **match.groupdict()}

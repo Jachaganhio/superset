@@ -32,9 +32,6 @@ const mockData = [
 ];
 const countValues = mockData.map(row => row.count);
 
-const strData = [{ name: 'Brian' }, { name: 'Carlos' }, { name: 'Diana' }];
-const strValues = strData.map(row => row.name);
-
 test('round', () => {
   expect(round(1)).toEqual(1);
   expect(round(1, 2)).toEqual(1);
@@ -359,90 +356,6 @@ test('getColorFunction with colorScheme undefined', () => {
   expect(colorFunction(100)).toBeUndefined();
 });
 
-test('getColorFunction BeginsWith', () => {
-  const colorFunction = getColorFunction(
-    {
-      operator: Comparator.BeginsWith,
-      targetValue: 'C',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    strValues,
-  );
-  expect(colorFunction('Brian')).toBeUndefined();
-  expect(colorFunction('Carlos')).toEqual('#FF0000FF');
-});
-
-test('getColorFunction EndsWith', () => {
-  const colorFunction = getColorFunction(
-    {
-      operator: Comparator.EndsWith,
-      targetValue: 'n',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    strValues,
-  );
-  expect(colorFunction('Carlos')).toBeUndefined();
-  expect(colorFunction('Brian')).toEqual('#FF0000FF');
-});
-
-test('getColorFunction Containing', () => {
-  const colorFunction = getColorFunction(
-    {
-      operator: Comparator.Containing,
-      targetValue: 'o',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    strValues,
-  );
-  expect(colorFunction('Diana')).toBeUndefined();
-  expect(colorFunction('Carlos')).toEqual('#FF0000FF');
-});
-
-test('getColorFunction NotContaining', () => {
-  const colorFunction = getColorFunction(
-    {
-      operator: Comparator.NotContaining,
-      targetValue: 'i',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    strValues,
-  );
-  expect(colorFunction('Diana')).toBeUndefined();
-  expect(colorFunction('Carlos')).toEqual('#FF0000FF');
-});
-
-test('getColorFunction Equal', () => {
-  const colorFunction = getColorFunction(
-    {
-      operator: Comparator.Equal,
-      targetValue: 'Diana',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    strValues,
-  );
-  expect(colorFunction('Carlos')).toBeUndefined();
-  expect(colorFunction('Diana')).toEqual('#FF0000FF');
-});
-
-test('getColorFunction None', () => {
-  const colorFunction = getColorFunction(
-    {
-      operator: Comparator.None,
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    strValues,
-  );
-  expect(colorFunction('Diana')).toEqual('#FF0000FF');
-  expect(colorFunction('Carlos')).toEqual('#FF0000FF');
-  expect(colorFunction('Brian')).toEqual('#FF0000FF');
-});
-
 test('correct column config', () => {
   const columnConfig = [
     {
@@ -488,47 +401,4 @@ test('correct column config', () => {
 test('undefined column config', () => {
   const colorFormatters = getColorFormatters(undefined, mockData);
   expect(colorFormatters.length).toEqual(0);
-});
-
-test('correct column string config', () => {
-  const columnConfigString = [
-    {
-      operator: Comparator.BeginsWith,
-      targetValue: 'D',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    {
-      operator: Comparator.EndsWith,
-      targetValue: 'n',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    {
-      operator: Comparator.Containing,
-      targetValue: 'o',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-    {
-      operator: Comparator.NotContaining,
-      targetValue: 'i',
-      colorScheme: '#FF0000',
-      column: 'name',
-    },
-  ];
-  const colorFormatters = getColorFormatters(columnConfigString, strData);
-  expect(colorFormatters.length).toEqual(4);
-
-  expect(colorFormatters[0].column).toEqual('name');
-  expect(colorFormatters[0].getColorFromValue('Diana')).toEqual('#FF0000FF');
-
-  expect(colorFormatters[1].column).toEqual('name');
-  expect(colorFormatters[1].getColorFromValue('Brian')).toEqual('#FF0000FF');
-
-  expect(colorFormatters[2].column).toEqual('name');
-  expect(colorFormatters[2].getColorFromValue('Carlos')).toEqual('#FF0000FF');
-
-  expect(colorFormatters[3].column).toEqual('name');
-  expect(colorFormatters[3].getColorFromValue('Carlos')).toEqual('#FF0000FF');
 });

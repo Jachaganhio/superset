@@ -20,7 +20,6 @@
 import { forwardRef, RefObject, MouseEvent } from 'react';
 import { Button } from '@superset-ui/core/components';
 import { ErrorAlert } from 'src/components';
-import { styled } from '@apache-superset/core/ui';
 
 interface ControlPanelAlertProps {
   title: string;
@@ -32,12 +31,6 @@ interface ControlPanelAlertProps {
   type: 'info' | 'warning' | 'error';
   className?: string;
 }
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: ${({ theme }) => theme.sizeUnit * 4}px;
-`;
 
 export const ExploreAlert = forwardRef(
   (
@@ -62,16 +55,14 @@ export const ExploreAlert = forwardRef(
       showIcon
     >
       {primaryButtonText && primaryButtonAction && (
-        <ButtonContainer>
+        <div>
           {secondaryButtonAction && secondaryButtonText && (
-            <Button buttonStyle="secondary" onClick={secondaryButtonAction}>
+            <Button onClick={secondaryButtonAction}>
               {secondaryButtonText}
             </Button>
           )}
-          <Button buttonStyle="secondary" onClick={primaryButtonAction}>
-            {primaryButtonText}
-          </Button>
-        </ButtonContainer>
+          <Button onClick={primaryButtonAction}>{primaryButtonText}</Button>
+        </div>
       )}
     </ErrorAlert>
   ),

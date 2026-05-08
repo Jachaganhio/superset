@@ -20,6 +20,7 @@ import {
   CurrencyFormatter,
   DataRecord,
   ensureIsArray,
+  GenericDataType,
   getMetricLabel,
   getNumberFormatter,
   getTimeFormatter,
@@ -28,7 +29,6 @@ import {
   rgbToHex,
   tooltipHtml,
 } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import type { ComposeOption } from 'echarts/core';
 import type { BarSeriesOption } from 'echarts/charts';
 import {
@@ -51,13 +51,11 @@ function formatTooltip({
   breakdownName,
   defaultFormatter,
   xAxisFormatter,
-  totalMark,
 }: {
   params: ICallbackDataParams[];
   breakdownName?: string;
   defaultFormatter: NumberFormatter | CurrencyFormatter;
   xAxisFormatter: (value: number | string, index: number) => string;
-  totalMark: string;
 }) {
   const series = params.find(
     param => param.seriesName !== ASSIST_MARK && param.data.value !== TOKEN,
@@ -68,7 +66,7 @@ function formatTooltip({
     return '';
   }
 
-  const isTotal = series?.seriesName === totalMark;
+  const isTotal = series?.seriesName === LEGEND.TOTAL;
   if (!series) {
     return NULL_STRING;
   }
@@ -84,7 +82,7 @@ function formatTooltip({
       defaultFormatter(series.data.originalValue),
     ]);
   }
-  rows.push([totalMark, defaultFormatter(series.data.totalSum)]);
+  rows.push([TOTAL_MARK, defaultFormatter(series.data.totalSum)]);
   return tooltipHtml(rows, title);
 }
 
@@ -93,15 +91,11 @@ function transformer({
   xAxis,
   metric,
   breakdown,
-  totalMark,
-  showTotal,
 }: {
   data: DataRecord[];
   xAxis: string;
   metric: string;
   breakdown?: string;
-  totalMark: string;
-  showTotal: boolean;
 }) {
   // Group by series (temporary map)
   const groupedData = data.reduce((acc, cur) => {
@@ -123,13 +117,11 @@ function transformer({
         0,
       );
       // Push total per period to the end of period values array
-      if (showTotal) {
-        tempValue.push({
-          [xAxis]: key,
-          [breakdown]: totalMark,
-          [metric]: sum,
-        });
-      }
+      tempValue.push({
+        [xAxis]: key,
+        [breakdown]: TOTAL_MARK,
+        [metric]: sum,
+      });
       transformedData.push(...tempValue);
     });
   } else {
@@ -145,12 +137,10 @@ function transformer({
       });
       total += sum;
     });
-    if (showTotal) {
-      transformedData.push({
-        [xAxis]: totalMark,
-        [metric]: total,
-      });
-    }
+    transformedData.push({
+      [xAxis]: TOTAL_MARK,
+      [metric]: total,
+    });
   }
 
   return transformedData;
@@ -189,21 +179,10 @@ export default function transformProps(
     xAxisLabel,
     yAxisFormat,
     showValue,
-    showTotal,
-    totalLabel,
-    increaseLabel,
-    decreaseLabel,
   } = formData;
   const defaultFormatter = currencyFormat?.symbol
     ? new CurrencyFormatter({ d3Format: yAxisFormat, currency: currencyFormat })
     : getNumberFormatter(yAxisFormat);
-
-  const totalMark = totalLabel || TOTAL_MARK;
-  const legendNames = {
-    INCREASE: increaseLabel || LEGEND.INCREASE,
-    DECREASE: decreaseLabel || LEGEND.DECREASE,
-    TOTAL: totalLabel || LEGEND.TOTAL,
-  };
 
   const seriesformatter = (params: ICallbackDataParams) => {
     const { data } = params;
@@ -226,8 +205,6 @@ export default function transformProps(
     breakdown: breakdownName,
     xAxis: xAxisName,
     metric: metricLabel,
-    totalMark,
-    showTotal,
   });
 
   const assistData: ISeriesData[] = [];
@@ -240,18 +217,18 @@ export default function transformProps(
   transformedData.forEach((datum, index, self) => {
     const totalSum = self.slice(0, index + 1).reduce((prev, cur, i) => {
       if (breakdownName) {
-        if (cur[breakdownName] !== totalMark || i === 0) {
+        if (cur[breakdownName] !== TOTAL_MARK || i === 0) {
           return prev + ((cur[metricLabel] as number) ?? 0);
         }
-      } else if (cur[xAxisName] !== totalMark) {
+      } else if (cur[xAxisName] !== TOTAL_MARK) {
         return prev + ((cur[metricLabel] as number) ?? 0);
       }
       return prev;
     }, 0);
 
     const isTotal =
-      (breakdownName && datum[breakdownName] === totalMark) ||
-      datum[xAxisName] === totalMark;
+      (breakdownName && datum[breakdownName] === TOTAL_MARK) ||
+      datum[xAxisName] === TOTAL_MARK;
 
     const originalValue = datum[metricLabel] as number;
     let value = originalValue;
@@ -293,9 +270,9 @@ export default function transformProps(
       : 'transparent';
 
     let opacity = 1;
-    if (legendState?.[legendNames.INCREASE] === false && value > 0) {
+    if (legendState?.[LEGEND.INCREASE] === false && value > 0) {
       opacity = 0;
-    } else if (legendState?.[legendNames.DECREASE] === false && value < 0) {
+    } else if (legendState?.[LEGEND.DECREASE] === false && value < 0) {
       opacity = 0;
     }
 
@@ -324,7 +301,7 @@ export default function transformProps(
   const xAxisData = transformedData.map(row => {
     let column = xAxisName;
     let value = row[xAxisName];
-    if (breakdownName && row[breakdownName] !== totalMark) {
+    if (breakdownName && row[breakdownName] !== TOTAL_MARK) {
       column = breakdownName;
       value = row[breakdownName];
     }
@@ -339,8 +316,8 @@ export default function transformProps(
   });
 
   const xAxisFormatter = (value: number | string, index: number) => {
-    if (value === totalMark) {
-      return totalMark;
+    if (value === TOTAL_MARK) {
+      return TOTAL_MARK;
     }
     if (coltypeMapping[xAxisColumns[index]] === GenericDataType.Temporal) {
       if (typeof value === 'string') {
@@ -393,7 +370,7 @@ export default function transformProps(
     },
     {
       ...seriesProps,
-      name: legendNames.INCREASE,
+      name: LEGEND.INCREASE,
       label: {
         ...labelProps,
         position: 'top',
@@ -405,7 +382,7 @@ export default function transformProps(
     },
     {
       ...seriesProps,
-      name: legendNames.DECREASE,
+      name: LEGEND.DECREASE,
       label: {
         ...labelProps,
         position: 'bottom',
@@ -417,7 +394,7 @@ export default function transformProps(
     },
     {
       ...seriesProps,
-      name: legendNames.TOTAL,
+      name: LEGEND.TOTAL,
       label: {
         ...labelProps,
         position: 'top',
@@ -440,7 +417,7 @@ export default function transformProps(
     legend: {
       show: showLegend,
       selected: legendState,
-      data: [legendNames.INCREASE, legendNames.DECREASE, legendNames.TOTAL],
+      data: [LEGEND.INCREASE, LEGEND.DECREASE, LEGEND.TOTAL],
     },
     xAxis: {
       data: xAxisData,
@@ -473,7 +450,6 @@ export default function transformProps(
           breakdownName,
           defaultFormatter,
           xAxisFormatter,
-          totalMark,
         }),
     },
     series: barSeries,

@@ -17,8 +17,12 @@
  * under the License.
  */
 
-import { useCSSTextTruncation, truncationCSS } from '@superset-ui/core';
-import { css, useTheme } from '@apache-superset/core/ui';
+import {
+  css,
+  useTheme,
+  useCSSTextTruncation,
+  truncationCSS,
+} from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 import { Tooltip } from '@superset-ui/core/components';
 import { FilterBarOrientation } from 'src/dashboard/types';

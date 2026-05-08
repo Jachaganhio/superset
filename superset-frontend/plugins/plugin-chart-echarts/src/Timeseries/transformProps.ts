@@ -26,6 +26,7 @@ import {
   CurrencyFormatter,
   ensureIsArray,
   tooltipHtml,
+  GenericDataType,
   getCustomFormatter,
   getMetricLabel,
   getNumberFormatter,
@@ -40,7 +41,6 @@ import {
   TimeseriesChartDataResponseResult,
   NumberFormats,
 } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import {
   extractExtraMetrics,
   getOriginalSeries,
@@ -152,7 +152,6 @@ export default function transformProps(
     legendOrientation,
     legendType,
     legendMargin,
-    legendSort,
     logAxis,
     markerEnabled,
     markerSize,
@@ -171,7 +170,6 @@ export default function transformProps(
     sortSeriesType,
     sortSeriesAscending,
     timeGrainSqla,
-    forceMaxInterval,
     timeCompare,
     timeShiftColor,
     stack,
@@ -189,7 +187,6 @@ export default function transformProps(
     xAxisSort,
     xAxisSortAsc,
     xAxisTimeFormat,
-    xAxisNumberFormat,
     xAxisTitle,
     xAxisTitleMargin,
     yAxisBounds,
@@ -486,9 +483,7 @@ export default function transformProps(
   const xAxisFormatter =
     xAxisDataType === GenericDataType.Temporal
       ? getXAxisFormatter(xAxisTimeFormat)
-      : xAxisDataType === GenericDataType.Numeric
-        ? getNumberFormatter(xAxisNumberFormat)
-        : String;
+      : String;
 
   const {
     setDataMask = () => {},
@@ -535,17 +530,11 @@ export default function transformProps(
     },
     minorTick: { show: minorTicks },
     minInterval:
-      xAxisType === AxisType.Time && timeGrainSqla && !forceMaxInterval
+      xAxisType === AxisType.Time && timeGrainSqla
         ? TIMEGRAIN_TO_TIMESTAMP[
             timeGrainSqla as keyof typeof TIMEGRAIN_TO_TIMESTAMP
           ]
         : 0,
-    maxInterval:
-      xAxisType === AxisType.Time && timeGrainSqla && forceMaxInterval
-        ? TIMEGRAIN_TO_TIMESTAMP[
-            timeGrainSqla as keyof typeof TIMEGRAIN_TO_TIMESTAMP
-          ]
-        : undefined,
     ...getMinAndMaxFromBounds(
       xAxisType,
       truncateXAxis,
@@ -702,10 +691,7 @@ export default function transformProps(
         padding,
       ),
       scrollDataIndex: legendIndex || 0,
-      data: legendData.sort((a: string, b: string) => {
-        if (!legendSort) return 0;
-        return legendSort === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
-      }) as string[],
+      data: legendData as string[],
     },
     series: dedupSeries(reorderForecastSeries(series) as SeriesOption[]),
     toolbox: {

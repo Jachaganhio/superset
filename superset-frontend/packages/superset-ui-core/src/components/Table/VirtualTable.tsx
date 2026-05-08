@@ -26,8 +26,7 @@ import classNames from 'classnames';
 import { useResizeDetector } from 'react-resize-detector';
 import { useEffect, useRef, useState, useCallback, CSSProperties } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
-import { safeHtmlSpan } from '@superset-ui/core';
-import { useTheme, styled } from '@apache-superset/core/ui';
+import { useTheme, styled, safeHtmlSpan } from '@superset-ui/core';
 
 import { TableSize, ETableAction } from './index';
 

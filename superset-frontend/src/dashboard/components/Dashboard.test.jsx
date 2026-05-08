@@ -39,7 +39,6 @@ import { getRelatedCharts } from 'src/dashboard/util/getRelatedCharts';
 
 jest.mock('src/dashboard/util/getRelatedCharts');
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('Dashboard', () => {
   const mockAddSlice = jest.fn();
   const mockRemoveSlice = jest.fn();
@@ -92,19 +91,18 @@ describe('Dashboard', () => {
     jest.clearAllMocks();
   });
 
-  test('should render the children component', () => {
+  it('should render the children component', () => {
     renderDashboard();
     expect(screen.getByText('Test')).toBeInTheDocument();
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('layout changes', () => {
     const layoutWithExtraChart = {
       ...props.layout,
       1001: newComponentFactory(CHART_TYPE, { chartId: 1001 }),
     };
 
-    test('should call addSliceToDashboard if a new slice is added to the layout', () => {
+    it('should call addSliceToDashboard if a new slice is added to the layout', () => {
       const { rerender } = renderDashboard();
 
       rerender(
@@ -118,7 +116,7 @@ describe('Dashboard', () => {
       expect(mockAddSlice).toHaveBeenCalled();
     });
 
-    test('should call removeSliceFromDashboard if a slice is removed from the layout', () => {
+    it('should call removeSliceFromDashboard if a slice is removed from the layout', () => {
       const { rerender } = renderDashboard({ layout: layoutWithExtraChart });
 
       const nextLayout = { ...layoutWithExtraChart };
@@ -136,9 +134,8 @@ describe('Dashboard', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('filter updates', () => {
-    test('should not call refresh when in editMode', () => {
+    it('should not call refresh when in editMode', () => {
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
       rerender(
@@ -159,7 +156,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).not.toHaveBeenCalled();
     });
 
-    test('should not call refresh when there is no change', () => {
+    it('should not call refresh when there is no change', () => {
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
       rerender(
@@ -173,7 +170,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).not.toHaveBeenCalled();
     });
 
-    test('should call refresh when native filters changed', () => {
+    it('should call refresh when native filters changed', () => {
       getRelatedCharts.mockReturnValue([230]);
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
@@ -198,7 +195,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).toHaveBeenCalled();
     });
 
-    test('should call refresh if a filter is added', () => {
+    it('should call refresh if a filter is added', () => {
       getRelatedCharts.mockReturnValue([1]);
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
@@ -217,7 +214,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).toHaveBeenCalled();
     });
 
-    test('should call refresh if a filter is removed', () => {
+    it('should call refresh if a filter is removed', () => {
       getRelatedCharts.mockReturnValue([1]); // Ensure we return some charts to refresh
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
@@ -236,7 +233,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).toHaveBeenCalledWith(true, 1);
     });
 
-    test('should call refresh if a filter is changed', () => {
+    it('should call refresh if a filter is changed', () => {
       getRelatedCharts.mockReturnValue([1]);
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
@@ -256,7 +253,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).toHaveBeenCalled();
     });
 
-    test('should call refresh with multiple chart ids', () => {
+    it('should call refresh with multiple chart ids', () => {
       getRelatedCharts.mockReturnValue([1, 2]);
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
@@ -276,7 +273,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).toHaveBeenCalled();
     });
 
-    test('should call refresh if a filter scope is changed', () => {
+    it('should call refresh if a filter scope is changed', () => {
       getRelatedCharts.mockReturnValue([2]);
       const { rerender } = renderDashboard({ activeFilters: OVERRIDE_FILTERS });
 
@@ -296,7 +293,7 @@ describe('Dashboard', () => {
       expect(mockTriggerQuery).toHaveBeenCalled();
     });
 
-    test('should call refresh with empty [] if a filter is changed but scope is not applicable', () => {
+    it('should call refresh with empty [] if a filter is changed but scope is not applicable', () => {
       getRelatedCharts.mockReturnValue([]);
       const { rerender } = renderDashboard({
         activeFilters: OVERRIDE_FILTERS,

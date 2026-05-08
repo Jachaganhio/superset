@@ -23,7 +23,7 @@ import {
   waitFor,
   within,
 } from 'spec/helpers/testing-library';
-import { ThemeMode } from '@apache-superset/core/ui';
+import { ThemeMode } from '@superset-ui/core';
 import { Menu } from '@superset-ui/core/components';
 import { ThemeSubMenuProps, useThemeMenuItems } from './useThemeMenuItems';
 
@@ -38,7 +38,6 @@ const TestComponent = (props: ThemeSubMenuProps) => {
   return <Menu items={[menuItem]} />;
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('useThemeMenuItems', () => {
   const defaultProps = {
     allowOSPreference: true,
@@ -67,7 +66,7 @@ describe('useThemeMenuItems', () => {
     jest.clearAllMocks();
   });
 
-  test('renders Light and Dark theme options by default', async () => {
+  it('renders Light and Dark theme options by default', async () => {
     renderThemeMenu();
 
     await userEvent.hover(await screen.findByRole('menuitem'));
@@ -77,7 +76,7 @@ describe('useThemeMenuItems', () => {
     expect(within(menu!).getByText('Dark')).toBeInTheDocument();
   });
 
-  test('does not render Match system option when allowOSPreference is false', async () => {
+  it('does not render Match system option when allowOSPreference is false', async () => {
     renderThemeMenu({ ...defaultProps, allowOSPreference: false });
     await userEvent.hover(await screen.findByRole('menuitem'));
 
@@ -86,7 +85,7 @@ describe('useThemeMenuItems', () => {
     });
   });
 
-  test('renders with allowOSPreference as true by default', async () => {
+  it('renders with allowOSPreference as true by default', async () => {
     renderThemeMenu();
 
     await userEvent.hover(await screen.findByRole('menuitem'));
@@ -95,7 +94,7 @@ describe('useThemeMenuItems', () => {
     expect(within(menu).getByText('Match system')).toBeInTheDocument();
   });
 
-  test('renders clear option when both hasLocalOverride and onClearLocalSettings are provided', async () => {
+  it('renders clear option when both hasLocalOverride and onClearLocalSettings are provided', async () => {
     const mockClear = jest.fn();
     renderThemeMenu({
       ...defaultProps,
@@ -109,7 +108,7 @@ describe('useThemeMenuItems', () => {
     expect(within(menu).getByText('Clear local theme')).toBeInTheDocument();
   });
 
-  test('does not render clear option when hasLocalOverride is false', async () => {
+  it('does not render clear option when hasLocalOverride is false', async () => {
     const mockClear = jest.fn();
     renderThemeMenu({
       ...defaultProps,
@@ -124,7 +123,7 @@ describe('useThemeMenuItems', () => {
     });
   });
 
-  test('calls setThemeMode with DEFAULT when Light is clicked', async () => {
+  it('calls setThemeMode with DEFAULT when Light is clicked', async () => {
     const mockSet = jest.fn();
     renderThemeMenu({ ...defaultProps, setThemeMode: mockSet });
 
@@ -135,7 +134,7 @@ describe('useThemeMenuItems', () => {
     expect(mockSet).toHaveBeenCalledWith(ThemeMode.DEFAULT);
   });
 
-  test('calls setThemeMode with DARK when Dark is clicked', async () => {
+  it('calls setThemeMode with DARK when Dark is clicked', async () => {
     const mockSet = jest.fn();
     renderThemeMenu({ ...defaultProps, setThemeMode: mockSet });
 
@@ -146,7 +145,7 @@ describe('useThemeMenuItems', () => {
     expect(mockSet).toHaveBeenCalledWith(ThemeMode.DARK);
   });
 
-  test('calls setThemeMode with SYSTEM when Match system is clicked', async () => {
+  it('calls setThemeMode with SYSTEM when Match system is clicked', async () => {
     const mockSet = jest.fn();
     renderThemeMenu({ ...defaultProps, setThemeMode: mockSet });
 
@@ -157,7 +156,7 @@ describe('useThemeMenuItems', () => {
     expect(mockSet).toHaveBeenCalledWith(ThemeMode.SYSTEM);
   });
 
-  test('calls onClearLocalSettings when Clear local theme is clicked', async () => {
+  it('calls onClearLocalSettings when Clear local theme is clicked', async () => {
     const mockClear = jest.fn();
     renderThemeMenu({
       ...defaultProps,
@@ -172,27 +171,27 @@ describe('useThemeMenuItems', () => {
     expect(mockClear).toHaveBeenCalledTimes(1);
   });
 
-  test('displays sun icon for DEFAULT theme', () => {
+  it('displays sun icon for DEFAULT theme', () => {
     renderThemeMenu({ ...defaultProps, themeMode: ThemeMode.DEFAULT });
     expect(screen.getByTestId('sun')).toBeInTheDocument();
   });
 
-  test('displays moon icon for DARK theme', () => {
+  it('displays moon icon for DARK theme', () => {
     renderThemeMenu({ ...defaultProps, themeMode: ThemeMode.DARK });
     expect(screen.getByTestId('moon')).toBeInTheDocument();
   });
 
-  test('displays format-painter icon for SYSTEM theme', () => {
+  it('displays format-painter icon for SYSTEM theme', () => {
     renderThemeMenu({ ...defaultProps, themeMode: ThemeMode.SYSTEM });
     expect(screen.getByTestId('format-painter')).toBeInTheDocument();
   });
 
-  test('displays override icon when hasLocalOverride is true', () => {
+  it('displays override icon when hasLocalOverride is true', () => {
     renderThemeMenu({ ...defaultProps, hasLocalOverride: true });
     expect(screen.getByTestId('thunderbolt')).toBeInTheDocument();
   });
 
-  test('renders Theme group header', async () => {
+  it('renders Theme group header', async () => {
     renderThemeMenu();
 
     await userEvent.hover(await screen.findByRole('menuitem'));
@@ -201,7 +200,7 @@ describe('useThemeMenuItems', () => {
     expect(within(menu).getByText('Theme')).toBeInTheDocument();
   });
 
-  test('renders sun icon for Light theme option', async () => {
+  it('renders sun icon for Light theme option', async () => {
     renderThemeMenu();
 
     await userEvent.hover(await screen.findByRole('menuitem'));
@@ -211,7 +210,7 @@ describe('useThemeMenuItems', () => {
     expect(within(lightOption!).getByTestId('sun')).toBeInTheDocument();
   });
 
-  test('renders moon icon for Dark theme option', async () => {
+  it('renders moon icon for Dark theme option', async () => {
     renderThemeMenu();
 
     await userEvent.hover(await screen.findByRole('menuitem'));
@@ -221,7 +220,7 @@ describe('useThemeMenuItems', () => {
     expect(within(darkOption!).getByTestId('moon')).toBeInTheDocument();
   });
 
-  test('renders format-painter icon for Match system option', async () => {
+  it('renders format-painter icon for Match system option', async () => {
     renderThemeMenu({ ...defaultProps, allowOSPreference: true });
 
     await userEvent.hover(await screen.findByRole('menuitem'));
@@ -233,7 +232,7 @@ describe('useThemeMenuItems', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders clear icon for Clear local theme option', async () => {
+  it('renders clear icon for Clear local theme option', async () => {
     renderThemeMenu({
       ...defaultProps,
       hasLocalOverride: true,
@@ -249,7 +248,7 @@ describe('useThemeMenuItems', () => {
     expect(within(clearOption!).getByTestId('clear')).toBeInTheDocument();
   });
 
-  test('renders divider before clear option when clear option is present', async () => {
+  it('renders divider before clear option when clear option is present', async () => {
     renderThemeMenu({
       ...defaultProps,
       hasLocalOverride: true,
@@ -264,7 +263,7 @@ describe('useThemeMenuItems', () => {
     expect(divider).toBeInTheDocument();
   });
 
-  test('does not render divider when clear option is not present', async () => {
+  it('does not render divider when clear option is not present', async () => {
     renderThemeMenu({ ...defaultProps });
 
     await userEvent.hover(await screen.findByRole('menuitem'));

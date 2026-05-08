@@ -159,7 +159,7 @@ export function resizeComponent({ id, width, height }) {
   };
 }
 
-// Drag and Drop --------------------------------------------------------------
+// Drag and drop --------------------------------------------------------------
 export const MOVE_COMPONENT = 'MOVE_COMPONENT';
 const moveComponent = setUnsavedChangesAfterAction(dropResult => ({
   type: MOVE_COMPONENT,

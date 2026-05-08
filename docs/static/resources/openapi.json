@@ -962,11 +962,8 @@
       "ChartDataDatasource": {
         "properties": {
           "id": {
-            "description": "Datasource id/uuid",
-            "oneOf": [
-              { "type": "integer" },
-              { "type": "string" }
-            ]
+            "description": "Datasource id",
+            "type": "integer"
           },
           "type": {
             "description": "Datasource type",

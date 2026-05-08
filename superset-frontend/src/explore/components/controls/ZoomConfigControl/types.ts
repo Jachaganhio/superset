@@ -70,8 +70,6 @@ export interface CreateDragGraphicOptions {
   onHeightDrag: (...args: any[]) => any;
   barWidth: number;
   chart: any;
-  fillColor?: string;
-  strokeColor?: string;
 }
 
 export interface CreateDragGraphicOption {
@@ -82,8 +80,6 @@ export interface CreateDragGraphicOption {
   barWidth: number;
   chart: any;
   add: boolean;
-  fillColor?: string;
-  strokeColor?: string;
 }
 
 export interface GetDragGraphicPositionOptions {

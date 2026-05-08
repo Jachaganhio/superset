@@ -22,11 +22,8 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from './images/thumbnail.png';
-import thumbnailDark from './images/thumbnail-dark.png';
 import example1 from './images/example1.png';
-import example1Dark from './images/example1-dark.png';
 import example2 from './images/example2.png';
-import example2Dark from './images/example2-dark.png';
 import { SankeyChartProps, SankeyFormData } from './types';
 
 // TODO: Implement cross filtering
@@ -58,14 +55,10 @@ export default class EchartsSankeyChartPlugin extends ChartPlugin<
           height corresponds to the visualized metric, providing a clear representation of
           value distribution and transformation.`,
         ),
-        exampleGallery: [
-          { url: example1, urlDark: example1Dark },
-          { url: example2, urlDark: example2Dark },
-        ],
+        exampleGallery: [{ url: example1 }, { url: example2 }],
         name: t('Sankey Chart'),
         tags: [t('Directional'), t('ECharts'), t('Distribution'), t('Flow')],
         thumbnail,
-        thumbnailDark,
       }),
       transformProps,
     });

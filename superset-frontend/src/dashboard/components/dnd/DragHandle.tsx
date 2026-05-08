@@ -17,7 +17,7 @@
  * under the License.
  */
 import { LegacyRef } from 'react';
-import { css, styled } from '@apache-superset/core/ui';
+import { css, styled } from '@superset-ui/core';
 import { Icons } from '@superset-ui/core/components/Icons';
 
 interface DragHandleProps {

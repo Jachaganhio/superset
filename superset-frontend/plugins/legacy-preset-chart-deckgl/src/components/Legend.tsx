@@ -20,8 +20,7 @@
  * under the License.
  */
 import { memo } from 'react';
-import { formatNumber } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { formatNumber, styled } from '@superset-ui/core';
 import { Color } from '@deck.gl/core';
 
 const StyledLegend = styled.div`
@@ -35,8 +34,6 @@ const StyledLegend = styled.div`
     outline: none;
     overflow-y: scroll;
     max-height: 200px;
-    border: 1px solid ${theme.colorBorder};
-    border-radius: ${theme.borderRadius}px;
 
     & ul {
       list-style: none;

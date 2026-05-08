@@ -19,7 +19,7 @@
 import * as reactRedux from 'react-redux';
 import fetchMock from 'fetch-mock';
 import { render, screen, userEvent } from 'spec/helpers/testing-library';
-import setupCodeOverrides from 'src/setup/setupCodeOverrides';
+import setupExtensions from 'src/setup/setupExtensions';
 import { getExtensionsRegistry } from '@superset-ui/core';
 import { Menu } from './Menu';
 
@@ -424,7 +424,7 @@ test('should render the plus menu (+) when user is not anonymous', async () => {
     useRouter: true,
     useTheme: true,
   });
-  expect(await screen.findByTestId('new-dropdown-icon')).toBeInTheDocument();
+  expect(await screen.findByTestId('new-dropdown')).toBeInTheDocument();
 });
 
 test('should NOT render the plus menu (+) when user is anonymous', async () => {
@@ -610,7 +610,7 @@ test('should render an extension component if one is supplied', async () => {
     <>navbar.right extension component</>
   ));
 
-  setupCodeOverrides();
+  setupExtensions();
 
   render(<Menu {...mockedProps} />, {
     useRouter: true,

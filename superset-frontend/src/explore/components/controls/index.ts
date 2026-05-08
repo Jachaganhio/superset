@@ -46,7 +46,6 @@ import DndColumnSelectControl, {
   DndColumnSelect,
   DndFilterSelect,
   DndMetricSelect,
-  DndColumnMetricSelect,
 } from './DndColumnSelectControl';
 import XAxisSortControl from './XAxisSortControl';
 import CurrencyControl from './CurrencyControl';
@@ -58,7 +57,6 @@ import ZoomConfigControl from './ZoomConfigControl/ZoomConfigControl';
 import NumberControl from './NumberControl';
 import TimeRangeControl from './TimeRangeControl';
 import ColorBreakpointsControl from './ColorBreakpointsControl';
-import MatrixifyDimensionControl from './MatrixifyDimensionControl';
 
 const extensionsRegistry = getExtensionsRegistry();
 const DateFilterControlExtension = extensionsRegistry.get(
@@ -81,7 +79,6 @@ const controlMap = {
   DndColumnSelect,
   DndFilterSelect,
   DndMetricSelect,
-  DndColumnMetricSelect,
   FixedOrMetricControl,
   ColorBreakpointsControl,
   HiddenControl,
@@ -106,7 +103,6 @@ const controlMap = {
   ZoomConfigControl,
   NumberControl,
   TimeRangeControl,
-  MatrixifyDimensionControl,
   ...sharedControlComponents,
 };
 export default controlMap;

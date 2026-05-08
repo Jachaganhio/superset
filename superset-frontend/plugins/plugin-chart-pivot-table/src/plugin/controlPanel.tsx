@@ -413,8 +413,6 @@ const config: ControlPanelConfig = {
                   ? (explore?.datasource as Dataset)?.verbose_map
                   : (explore?.datasource?.columns ?? {});
                 const chartStatus = chart?.chartStatus;
-                const { colnames, coltypes } =
-                  chart?.queriesResponse?.[0] ?? {};
                 const metricColumn = values.map(value => {
                   if (typeof value === 'string') {
                     return {
@@ -422,15 +420,9 @@ const config: ControlPanelConfig = {
                       label: Array.isArray(verboseMap)
                         ? value
                         : verboseMap[value],
-                      dataType: colnames && coltypes[colnames?.indexOf(value)],
                     };
                   }
-                  return {
-                    value: value.label,
-                    label: value.label,
-                    dataType:
-                      colnames && coltypes[colnames?.indexOf(value.label)],
-                  };
+                  return { value: value.label, label: value.label };
                 });
                 return {
                   removeIrrelevantConditions: chartStatus === 'success',

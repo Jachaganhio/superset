@@ -132,17 +132,12 @@ function ChartTable({
     setLoaded(true);
   }, [activeTab]);
 
-  const handleBulkChartExport = async (chartsToExport: Chart[]) => {
+  const handleBulkChartExport = (chartsToExport: Chart[]) => {
     const ids = chartsToExport.map(({ id }) => id);
-    setPreparingExport(true);
-    try {
-      await handleResourceExport('chart', ids, () => {
-        setPreparingExport(false);
-      });
-    } catch (error) {
+    handleResourceExport('chart', ids, () => {
       setPreparingExport(false);
-      addDangerToast(t('There was an issue exporting the selected charts'));
-    }
+    });
+    setPreparingExport(true);
   };
 
   const menuTabs = [

@@ -17,6 +17,7 @@
  * under the License.
  */
 import {
+  GenericDataType,
   NumberFormats,
   QueryFormColumn,
   getColumnLabel,
@@ -28,7 +29,6 @@ import {
   addAlpha,
   tooltipHtml,
 } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
 import memoizeOne from 'memoize-one';
 import { maxBy, minBy } from 'lodash';
 import type { ComposeOption } from 'echarts/core';

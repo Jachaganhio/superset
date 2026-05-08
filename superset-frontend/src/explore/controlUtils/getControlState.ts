@@ -171,8 +171,7 @@ export function getAllControlsState(
   formData: QueryFormData,
 ) {
   const controlsState: Record<string, ControlState<any> | null> = {};
-  getSectionsToRender(vizType, datasourceType).forEach(section => {
-    if (!section || !section.controlSetRows) return;
+  getSectionsToRender(vizType, datasourceType).forEach(section =>
     section.controlSetRows.forEach(fieldsetRow =>
       fieldsetRow.forEach((field: CustomControlItem) => {
         if (field?.config && field.name) {
@@ -184,7 +183,7 @@ export function getAllControlsState(
           );
         }
       }),
-    );
-  });
+    ),
+  );
   return controlsState;
 }

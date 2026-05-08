@@ -107,7 +107,6 @@ const getDashboardContextFormData = () => {
       filters: getAppliedFilterValues(sliceId, filterBoxFilters),
       nativeFilters,
       chartConfiguration,
-      chartCustomizationItems: [],
       dataMask,
       colorScheme,
       labelsColor,

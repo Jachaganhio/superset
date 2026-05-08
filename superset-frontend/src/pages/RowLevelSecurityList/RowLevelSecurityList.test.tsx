@@ -94,7 +94,6 @@ const mockUser = {
   userId: 1,
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('RuleList RTL', () => {
   async function renderAndWait() {
     const mounted = act(async () => {
@@ -111,17 +110,17 @@ describe('RuleList RTL', () => {
     return mounted;
   }
 
-  test('renders', async () => {
+  it('renders', async () => {
     await renderAndWait();
     expect(screen.getByText('Row Level Security')).toBeVisible();
   });
 
-  test('renders a ListView', async () => {
+  it('renders a ListView', async () => {
     await renderAndWait();
     expect(screen.getByTestId('rls-list-view')).toBeInTheDocument();
   });
 
-  test('fetched data', async () => {
+  it('fetched data', async () => {
     fetchMock.resetHistory();
     await renderAndWait();
     const apiCalls = fetchMock.calls(/rowlevelsecurity\/\?q/);
@@ -132,7 +131,7 @@ describe('RuleList RTL', () => {
     fetchMock.resetHistory();
   });
 
-  test('renders add rule button on empty state', async () => {
+  it('renders add rule button on empty state', async () => {
     fetchMock.get(
       ruleListEndpoint,
       { result: [], count: 0 },
@@ -149,7 +148,7 @@ describe('RuleList RTL', () => {
     );
   });
 
-  test('renders a "Rule" button to add a rule in bulk action', async () => {
+  it('renders a "Rule" button to add a rule in bulk action', async () => {
     await renderAndWait();
 
     const addRuleButton = await screen.findByTestId('add-rule');
@@ -158,7 +157,7 @@ describe('RuleList RTL', () => {
     expect(emptyAddRuleButton).not.toBeInTheDocument();
   });
 
-  test('renders filter options', async () => {
+  it('renders filter options', async () => {
     await renderAndWait();
 
     const searchFilters = screen.queryAllByTestId('filters-search');
@@ -168,18 +167,18 @@ describe('RuleList RTL', () => {
     expect(typeFilter).toHaveLength(3); // Update to expect 3 select filters
   });
 
-  test('renders correct list columns', async () => {
+  it('renders correct list columns', async () => {
     await renderAndWait();
 
     const table = screen.getByRole('table');
     expect(table).toBeInTheDocument();
 
-    const nameColumn = await within(table).findByTitle('Name');
-    const filterTypeColumn = await within(table).findByTitle('Filter Type');
-    const groupKeyColumn = await within(table).findByTitle('Group Key');
-    const clauseColumn = await within(table).findByTitle('Clause');
-    const modifiedColumn = await within(table).findByTitle('Last modified');
-    const actionsColumn = await within(table).findByTitle('Actions');
+    const nameColumn = await within(table).findByText('Name');
+    const filterTypeColumn = await within(table).findByText('Filter Type');
+    const groupKeyColumn = await within(table).findByText('Group Key');
+    const clauseColumn = await within(table).findByText('Clause');
+    const modifiedColumn = await within(table).findByText('Last modified');
+    const actionsColumn = await within(table).findByText('Actions');
 
     expect(nameColumn).toBeInTheDocument();
     expect(filterTypeColumn).toBeInTheDocument();
@@ -189,7 +188,7 @@ describe('RuleList RTL', () => {
     expect(actionsColumn).toBeInTheDocument();
   });
 
-  test('renders correct action buttons with write permission', async () => {
+  it('renders correct action buttons with write permission', async () => {
     await renderAndWait();
 
     const deleteActionIcon = screen.queryAllByTestId('rls-list-trash-icon');
@@ -199,7 +198,7 @@ describe('RuleList RTL', () => {
     expect(editActionIcon).toHaveLength(2);
   });
 
-  test('should not renders correct action buttons without write permission', async () => {
+  it('should not renders correct action buttons without write permission', async () => {
     fetchMock.get(
       ruleInfoEndpoint,
       { permissions: ['can_read'] },
@@ -221,7 +220,7 @@ describe('RuleList RTL', () => {
     );
   });
 
-  test('renders popover on new clicking rule button', async () => {
+  it('renders popover on new clicking rule button', async () => {
     await renderAndWait();
 
     const modal = screen.queryByTestId('rls-modal-title');

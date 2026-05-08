@@ -17,14 +17,21 @@
  * under the License.
  */
 import { useContext, useMemo, useState } from 'react';
-import { DatasourceType, Metric, QueryFormData, t } from '@superset-ui/core';
-import { css, styled, useTheme, Alert } from '@apache-superset/core/ui';
+import {
+  css,
+  DatasourceType,
+  Metric,
+  QueryFormData,
+  styled,
+  t,
+  useTheme,
+} from '@superset-ui/core';
 
 import { ControlConfig } from '@superset-ui/chart-controls';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { matchSorter, rankings } from 'match-sorter';
-import { Constants, Input } from '@superset-ui/core/components';
+import { Alert, Constants, Input } from '@superset-ui/core/components';
 import { SaveDatasetModal } from 'src/SqlLab/components/SaveDatasetModal';
 import { getDatasourceAsSaveableDataset } from 'src/utils/datasourceUtils';
 import { ExploreActions } from 'src/explore/actions/exploreActions';
@@ -51,7 +58,6 @@ export interface IDatasource {
   sql?: string | null;
   datasource_name?: string | null;
   name?: string | null;
-  catalog?: string | null;
   schema?: string | null;
 }
 

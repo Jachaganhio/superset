@@ -1327,43 +1327,20 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         return utils.error_msg_from_exception(ex)
 
     @classmethod
-    def get_database_custom_errors(
-        cls, database_name: str | None
-    ) -> dict[Any, tuple[str, SupersetErrorType, dict[str, Any]]]:
-        config_custom_errors = app.config.get("CUSTOM_DATABASE_ERRORS", {})
-        if not isinstance(config_custom_errors, dict):
-            return {}
-
-        if database_name and database_name in config_custom_errors:
-            database_errors = config_custom_errors[database_name]
-            if isinstance(database_errors, dict):
-                return database_errors
-        return {}
-
-    @classmethod
     def extract_errors(
-        cls,
-        ex: Exception,
-        context: dict[str, Any] | None = None,
-        database_name: str | None = None,
+        cls, ex: Exception, context: dict[str, Any] | None = None
     ) -> list[SupersetError]:
         raw_message = cls._extract_error_message(ex)
 
         context = context or {}
-        db_engine_custom_errors = cls.get_database_custom_errors(database_name)
-
-        for regex, (message, error_type, extra) in [
-            *db_engine_custom_errors.items(),
-            *cls.custom_errors.items(),
-        ]:
+        for regex, (message, error_type, extra) in cls.custom_errors.items():
             if match := regex.search(raw_message):
                 params = {**context, **match.groupdict()}
                 extra["engine_name"] = cls.engine_name
-                formatted_message = (message % params) if message else raw_message
                 return [
                     SupersetError(
                         error_type=error_type,
-                        message=formatted_message,
+                        message=message % params,
                         level=ErrorLevel.ERROR,
                         extra=extra,
                     )
@@ -1515,18 +1492,6 @@ class BaseEngineSpec:  # pylint: disable=too-many-public-methods
         if schema and cls.try_remove_schema_from_table_name:
             views = {re.sub(f"^{schema}\\.", "", view) for view in views}
         return views
-
-    @classmethod
-    def get_materialized_view_names(
-        cls,
-        database: Database,
-        inspector: Inspector,
-        schema: str | None,
-    ) -> set[str]:
-        """
-        Get all materialized views.
-        """
-        return set()
 
     @classmethod
     def get_indexes(

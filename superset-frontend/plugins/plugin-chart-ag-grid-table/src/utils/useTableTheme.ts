@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useTheme } from '@apache-superset/core/ui';
+import { useTheme } from '@superset-ui/core';
 import {
   colorSchemeDark,
   colorSchemeLight,
@@ -30,7 +30,7 @@ export const useIsDark = () => {
   return tinycolor(theme.colorBgContainer).isDark();
 };
 
-const useTableTheme = (): ReturnType<typeof themeQuartz.withPart> => {
+const useTableTheme = () => {
   const baseTheme = themeQuartz;
   const isDarkTheme = useIsDark();
   const tableTheme = isDarkTheme

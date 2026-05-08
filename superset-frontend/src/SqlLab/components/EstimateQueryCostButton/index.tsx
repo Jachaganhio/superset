@@ -18,10 +18,10 @@
  */
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { t } from '@superset-ui/core';
-import { css, styled, Alert } from '@apache-superset/core/ui';
+import { css, styled, t } from '@superset-ui/core';
 
 import {
+  Alert,
   Button,
   Loading,
   ModalTrigger,

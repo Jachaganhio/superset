@@ -26,6 +26,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import duration from 'dayjs/plugin/duration';
 import updateLocale from 'dayjs/plugin/updateLocale';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -35,13 +36,13 @@ dayjs.extend(customParseFormat);
 dayjs.extend(duration);
 dayjs.extend(updateLocale);
 dayjs.extend(localizedFormat);
+dayjs.extend(isSameOrBefore);
 
 dayjs.updateLocale('en', {
   invalidDate: 'Invalid date',
 });
 
 export const extendedDayjs = dayjs;
-export type { Dayjs };
 
 export const fDuration = function (
   t1: number,

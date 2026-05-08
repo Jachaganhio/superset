@@ -47,7 +47,6 @@ const createProps = () =>
     onHide: jest.fn(),
     onSave: jest.fn(),
     addSuccessToast: jest.fn(),
-    addDangerToast: jest.fn(),
   }) as PropertiesModalProps;
 
 fetchMock.get('glob:*/api/v1/chart/318*', {
@@ -148,9 +147,15 @@ test('Should render null when show:false', async () => {
 
   await waitFor(() => {
     expect(
-      screen.queryByRole('dialog', { name: 'Chart properties' }),
+      screen.queryByRole('dialog', { name: 'Edit Chart Properties' }),
     ).not.toBeInTheDocument();
   });
+});
+
+// Add cleanup after each test
+afterEach(async () => {
+  // Wait for any pending effects to complete
+  await new Promise(resolve => setTimeout(resolve, 0));
 });
 
 test('Should render when show:true', async () => {
@@ -161,7 +166,7 @@ test('Should render when show:true', async () => {
     () => {
       const modal = screen.getByRole('dialog');
       expect(modal).toBeInTheDocument();
-      expect(modal).toHaveTextContent('Chart properties');
+      expect(modal).toHaveTextContent('Edit Chart Properties');
       expect(modal).not.toHaveClass('ant-zoom-appear');
     },
     { timeout: 3000 },
@@ -173,7 +178,7 @@ test('Should have modal header', async () => {
   renderModal(props);
 
   await waitFor(() => {
-    expect(screen.getByText('Chart properties')).toBeVisible();
+    expect(screen.getByText('Edit Chart Properties')).toBeVisible();
     expect(screen.getByTestId('close-modal-btn')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Close' })).toBeVisible();
   });
@@ -187,7 +192,7 @@ test('"Close" button should call "onHide"', async () => {
     expect(props.onHide).toHaveBeenCalledTimes(0);
   });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+  userEvent.click(screen.getByRole('button', { name: 'Close' }));
 
   await waitFor(() => {
     expect(props.onHide).toHaveBeenCalledTimes(1);
@@ -201,26 +206,29 @@ test('Should render all elements inside modal', async () => {
 
   await waitFor(
     () => {
-      // Check we have the modal
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-      // Check for collapse sections instead of expecting all textboxes to be visible
-      expect(screen.getByText('General settings')).toBeInTheDocument();
-      expect(screen.getByText('Configuration')).toBeInTheDocument();
-      expect(screen.getByText('Advanced')).toBeInTheDocument();
-
-      // Only General settings is expanded by default
-      // Check for visible labels and fields in the expanded section
+      expect(screen.getAllByRole('textbox')).toHaveLength(5);
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Basic information' }),
+      ).toBeInTheDocument();
       expect(screen.getByText('Name')).toBeInTheDocument();
       expect(screen.getByText('Description')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('heading', { name: 'Configuration' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('Cache timeout')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('heading', { name: 'Access' }),
+      ).toBeInTheDocument();
       expect(screen.getByText('Owners')).toBeInTheDocument();
 
-      // Check that we have the expected number of textboxes visible
-      const textboxes = screen.getAllByRole('textbox');
-      expect(textboxes.length).toBeGreaterThanOrEqual(2); // At least Name and Description
-
-      // Owners combobox should be visible
-      expect(screen.getByRole('combobox')).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'Configuration' }),
+      ).toBeInTheDocument();
+      expect(screen.getByText('Certified by')).toBeInTheDocument();
+      expect(screen.getByText('Certification details')).toBeInTheDocument();
     },
     { timeout: 10000 },
   );
@@ -248,7 +256,7 @@ test('"Cancel" button should call "onHide"', async () => {
     expect(props.onHide).toHaveBeenCalledTimes(0);
   });
 
-  await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+  userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
   await waitFor(() => {
     expect(props.onHide).toHaveBeenCalledTimes(1);
@@ -256,7 +264,7 @@ test('"Cancel" button should call "onHide"', async () => {
   });
 });
 
-test('"Save" button should call "onSave" and "onHide"', async () => {
+test('"Save" button should call only "onSave"', async () => {
   const props = createProps();
   renderModal(props);
   await waitFor(() => {
@@ -265,7 +273,7 @@ test('"Save" button should call "onSave" and "onHide"', async () => {
 
     expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
   });
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await waitFor(() => {
     expect(props.onSave).toHaveBeenCalledTimes(1);
@@ -284,20 +292,12 @@ test('Empty "Certified by" should clear "Certification details"', async () => {
   };
   renderModal(noCertifiedByProps);
 
-  // Expand the Advanced section first to access certification details
-  const advancedPanel = screen.getByText('Advanced').closest('[role="tab"]');
-  if (advancedPanel) {
-    await userEvent.click(advancedPanel);
-  }
-
-  await waitFor(() => {
-    expect(
-      screen.getByRole('textbox', { name: 'Certification details' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('textbox', { name: 'Certification details' }),
-    ).toHaveValue('');
-  });
+  expect(
+    await screen.findByRole('textbox', { name: 'Certification details' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('textbox', { name: 'Certification details' }),
+  ).toHaveValue('');
 });
 
 test('"Name" should not be empty', async () => {
@@ -306,11 +306,11 @@ test('"Name" should not be empty', async () => {
 
   const name = screen.getByRole('textbox', { name: 'Name' });
 
-  await userEvent.clear(name);
+  userEvent.clear(name);
 
   expect(name).toHaveValue('');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await waitFor(() => {
     expect(props.onSave).toHaveBeenCalledTimes(0);
@@ -323,12 +323,12 @@ test('"Name" should not be empty when saved', async () => {
 
   const name = screen.getByRole('textbox', { name: 'Name' });
 
-  await userEvent.clear(name);
-  await userEvent.type(name, 'Test chart new name');
+  userEvent.clear(name);
+  userEvent.type(name, 'Test chart new name');
 
   expect(name).toHaveValue('Test chart new name');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await waitFor(() => {
     expect(props.onSave).toHaveBeenCalledTimes(1);
@@ -342,17 +342,11 @@ test('"Cache timeout" should not be empty when saved', async () => {
   const props = createProps();
   renderModal(props);
 
-  // Expand the Configuration section first to access cache timeout
-  const configPanel = screen.getByText('Configuration').closest('[role="tab"]');
-  if (configPanel) {
-    await userEvent.click(configPanel);
-  }
+  const cacheTimeout = screen.getByRole('textbox', { name: 'Cache timeout' });
 
-  const cacheTimeout = await screen.findByRole('textbox', {
-    name: 'Cache timeout',
-  });
   await userEvent.clear(cacheTimeout);
   await userEvent.type(cacheTimeout, '1000');
+
   expect(cacheTimeout).toHaveValue('1000');
 
   await userEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -369,21 +363,14 @@ test('"Description" should not be empty when saved', async () => {
   const props = createProps();
   renderModal(props);
 
-  // Wait for modal to be ready
-  await waitFor(() => {
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-  });
+  const description = screen.getByRole('textbox', { name: 'Description' });
 
-  // Find the description textarea (it's the second textbox, as Name is the first)
-  const textboxes = screen.getAllByRole('textbox');
-  const description = textboxes[1]; // Description is the textarea
-
-  await userEvent.clear(description);
-  await userEvent.type(description, 'Test description');
+  userEvent.clear(description);
+  userEvent.type(description, 'Test description');
 
   expect(description).toHaveValue('Test description');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await waitFor(() => {
     expect(props.onSave).toHaveBeenCalledTimes(1);
@@ -397,20 +384,14 @@ test('"Certified by" should not be empty when saved', async () => {
   const props = createProps();
   renderModal(props);
 
-  // Expand the Advanced section first to access certified by
-  const advancedPanel = screen.getByText('Advanced').closest('[role="tab"]');
-  if (advancedPanel) {
-    await userEvent.click(advancedPanel);
-  }
+  const certifiedBy = screen.getByRole('textbox', { name: 'Certified by' });
 
-  const certifiedBy = await screen.findByRole('textbox', {
-    name: 'Certified by',
-  });
-  await userEvent.clear(certifiedBy);
-  await userEvent.type(certifiedBy, 'Test certified by');
+  userEvent.clear(certifiedBy);
+  userEvent.type(certifiedBy, 'Test certified by');
+
   expect(certifiedBy).toHaveValue('Test certified by');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await waitFor(() => {
     expect(props.onSave).toHaveBeenCalledTimes(1);
@@ -424,20 +405,16 @@ test('"Certification details" should not be empty when saved', async () => {
   const props = createProps();
   renderModal(props);
 
-  // Expand the Advanced section first to access certification details
-  const advancedPanel = screen.getByText('Advanced').closest('[role="tab"]');
-  if (advancedPanel) {
-    await userEvent.click(advancedPanel);
-  }
-
-  const certificationDetails = await screen.findByRole('textbox', {
+  const certificationDetails = screen.getByRole('textbox', {
     name: 'Certification details',
   });
-  await userEvent.clear(certificationDetails);
-  await userEvent.type(certificationDetails, 'Test certification details');
+
+  userEvent.clear(certificationDetails);
+  userEvent.type(certificationDetails, 'Test certification details');
+
   expect(certificationDetails).toHaveValue('Test certification details');
 
-  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
   await waitFor(() => {
     expect(props.onSave).toHaveBeenCalledTimes(1);
@@ -460,14 +437,20 @@ test('Should display only custom tags when tagging system is enabled', async () 
   const props = createProps();
   renderModal(props);
 
-  expect(await screen.findByText('Tags')).toBeInTheDocument();
-  expect(
-    await screen.findByRole('combobox', { name: 'Tags' }),
-  ).toBeInTheDocument();
+  await waitFor(async () => {
+    expect(
+      await screen.findByRole('heading', { name: 'Tags' }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('combobox', { name: 'Tags' }),
+    ).toBeInTheDocument();
+  });
 
-  expect(await screen.findByText('my test tag')).toBeInTheDocument();
-  expect(screen.queryByText('type:chart')).not.toBeInTheDocument();
-  expect(screen.queryByText('owner:1')).not.toBeInTheDocument();
+  await waitFor(async () => {
+    expect(await screen.findByText('my test tag')).toBeInTheDocument();
+    expect(screen.queryByText('type:chart')).not.toBeInTheDocument();
+    expect(screen.queryByText('owner:1')).not.toBeInTheDocument();
+  });
 
   mockIsFeatureEnabled.mockRestore();
 });

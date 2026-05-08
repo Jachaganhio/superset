@@ -24,13 +24,12 @@ import {
   useMemo,
   useState,
 } from 'react';
-import {} from '@superset-ui/core';
 import {
   type AnyThemeConfig,
   type ThemeContextType,
   Theme,
   ThemeMode,
-} from '@apache-superset/core/ui';
+} from '@superset-ui/core';
 import { ThemeController } from './ThemeController';
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -118,11 +117,6 @@ export function SupersetThemeProvider({
     [themeController],
   );
 
-  const getAppliedThemeId = useCallback(
-    () => themeController.getAppliedThemeId(),
-    [themeController],
-  );
-
   const contextValue = useMemo(
     () => ({
       theme: currentTheme,
@@ -138,7 +132,6 @@ export function SupersetThemeProvider({
       canSetTheme,
       canDetectOSPreference,
       createDashboardThemeProvider,
-      getAppliedThemeId,
     }),
     [
       currentTheme,
@@ -154,7 +147,6 @@ export function SupersetThemeProvider({
       canSetTheme,
       canDetectOSPreference,
       createDashboardThemeProvider,
-      getAppliedThemeId,
     ],
   );
 

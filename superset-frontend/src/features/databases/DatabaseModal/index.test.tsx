@@ -29,7 +29,7 @@ import {
   fireEvent,
 } from 'spec/helpers/testing-library';
 import { getExtensionsRegistry } from '@superset-ui/core';
-import setupCodeOverrides from 'src/setup/setupCodeOverrides';
+import setupExtensions from 'src/setup/setupExtensions';
 import * as hooks from 'src/views/CRUD/hooks';
 import { DatabaseObject, ConfigurationMethod } from '../types';
 import DatabaseModal, {
@@ -74,7 +74,6 @@ const databaseFixture: DatabaseObject = {
   driver: 'psycopg2',
 };
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('DatabaseModal', () => {
   beforeEach(() => {
     fetchMock.post(DATABASE_CONNECT_ENDPOINT, {
@@ -328,7 +327,6 @@ describe('DatabaseModal', () => {
       useRedux: true,
     });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('Visual: New database connection', () => {
     test('renders the initial load of Step 1 correctly', async () => {
       setup();
@@ -931,7 +929,7 @@ describe('DatabaseModal', () => {
       expect(schemasForFileUploadText).not.toBeInTheDocument();
     });
 
-    test('renders the "Advanced" - SECURITY tab correctly after selecting Allow file uploads', async () => {
+    it('renders the "Advanced" - SECURITY tab correctly after selecting Allow file uploads', async () => {
       setup();
 
       // ---------- Components ----------
@@ -1086,7 +1084,6 @@ describe('DatabaseModal', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('Functional: Create new database', () => {
     test('directs databases to the appropriate form (dynamic vs. SQL Alchemy)', async () => {
       setup();
@@ -1121,7 +1118,6 @@ describe('DatabaseModal', () => {
       expect(sqlAlchemyFormStepText).toBeInTheDocument();
     });
 
-    // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
     describe('SQL Alchemy form flow', () => {
       test('enters step 2 of 2 when proper database is selected', async () => {
         setup();
@@ -1152,7 +1148,6 @@ describe('DatabaseModal', () => {
         expect.anything();
       });
 
-      // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
       describe('step 2 component interaction', () => {
         test('properly interacts with textboxes', async () => {
           setup();
@@ -1199,7 +1194,6 @@ describe('DatabaseModal', () => {
         });
       });
 
-      // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
       describe('SSH Tunnel Form interaction', () => {
         test('properly interacts with SSH Tunnel form textboxes for dynamic form', async () => {
           setup();
@@ -1345,7 +1339,6 @@ describe('DatabaseModal', () => {
       });
     });
 
-    // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
     describe('Dynamic form flow', () => {
       test('enters step 2 of 3 when proper database is selected', async () => {
         setup();
@@ -1407,7 +1400,6 @@ describe('DatabaseModal', () => {
       });
     });
 
-    // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
     describe('Import database flow', () => {
       test('imports a file', async () => {
         setup();
@@ -1431,7 +1423,6 @@ describe('DatabaseModal', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('DatabaseModal w/ Deeplinking Engine', () => {
     test('enters step 2 of 3 when proper database is selected', async () => {
       setup({ dbEngine: 'PostgreSQL' });
@@ -1440,15 +1431,14 @@ describe('DatabaseModal', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('DatabaseModal w/ GSheet Engine', () => {
-    test('enters step 2 of 2 when proper database is selected', async () => {
+    it('enters step 2 of 2 when proper database is selected', async () => {
       setup({ dbEngine: 'Google Sheets' });
       const step2of2text = await screen.findByText(/step 2 of 2/i);
       expect(step2of2text).toBeInTheDocument();
     });
 
-    test('renders the "Advanced" - SECURITY tab without Allow File Upload Checkbox', async () => {
+    it('renders the "Advanced" - SECURITY tab without Allow File Upload Checkbox', async () => {
       setup({ dbEngine: 'Google Sheets' });
 
       // Click the "Advanced" tab
@@ -1486,7 +1476,7 @@ describe('DatabaseModal', () => {
       expect(schemasForFileUploadText).not.toBeInTheDocument();
     });
 
-    test('if the SSH Tunneling toggle is not displayed, nothing should get displayed', async () => {
+    it('if the SSH Tunneling toggle is not displayed, nothing should get displayed', async () => {
       setup({ dbEngine: 'Google Sheets' });
 
       const SSHTunnelingToggle = screen.queryByTestId('ssh-tunnel-switch');
@@ -1510,7 +1500,6 @@ describe('DatabaseModal', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('DatabaseModal w errors as objects', () => {
     jest.mock('src/views/CRUD/hooks', () => ({
       ...jest.requireActual('src/views/CRUD/hooks'),
@@ -1526,7 +1515,6 @@ describe('DatabaseModal', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('DatabaseModal w errors as strings', () => {
     jest.mock('src/views/CRUD/hooks', () => ({
       ...jest.requireActual('src/views/CRUD/hooks'),
@@ -1564,7 +1552,6 @@ describe('DatabaseModal', () => {
     });
   });
 
-  // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
   describe('DatabaseModal w Extensions', () => {
     beforeAll(() => {
       const extensionsRegistry = getExtensionsRegistry();
@@ -1573,7 +1560,7 @@ describe('DatabaseModal', () => {
         <>ssh_tunnel.form.switch extension component</>
       ));
 
-      setupCodeOverrides();
+      setupExtensions();
     });
 
     test('should render an extension component if one is supplied', async () => {
@@ -1585,7 +1572,6 @@ describe('DatabaseModal', () => {
   });
 });
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('dbReducer', () => {
   test('it will reset state to null', () => {
     const action: DBReducerActionType = { type: ActionType.Reset };

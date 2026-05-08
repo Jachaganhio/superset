@@ -21,7 +21,6 @@ import buildQuery from './buildQuery';
 import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from './images/thumbnail.png';
-import thumbnailDark from './images/thumbnail-dark.png';
 
 export default class PopKPIPlugin extends ChartPlugin {
   constructor() {
@@ -39,7 +38,6 @@ export default class PopKPIPlugin extends ChartPlugin {
         t('Advanced-Analytics'),
       ],
       thumbnail,
-      thumbnailDark,
     });
 
     super({

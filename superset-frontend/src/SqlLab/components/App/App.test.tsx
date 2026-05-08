@@ -47,7 +47,6 @@ const sqlLabReducer = combineReducers({
 });
 const mockAction = {} as AnyAction;
 
-// eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks
 describe('SqlLab App', () => {
   const middlewares = [thunk];
   const mockStore = configureStore(middlewares);
@@ -61,23 +60,23 @@ describe('SqlLab App', () => {
     jest.useRealTimers();
   });
 
-  test('is valid', () => {
+  it('is valid', () => {
     expect(isValidElement(<App />)).toBe(true);
   });
 
-  test('should render', () => {
+  it('should render', () => {
     const { getByTestId } = render(<App />, { useRedux: true, store });
     expect(getByTestId('SqlLabApp')).toBeInTheDocument();
     expect(getByTestId('mock-tabbed-sql-editors')).toBeInTheDocument();
   });
 
-  test('reset hotkey events on unmount', () => {
+  it('reset hotkey events on unmount', () => {
     const { unmount } = render(<App />, { useRedux: true, store });
     unmount();
     expect(Mousetrap.reset).toHaveBeenCalled();
   });
 
-  test('logs current usage warning', () => {
+  it('logs current usage warning', () => {
     const localStorageUsageInKilobytes = LOCALSTORAGE_MAX_USAGE_KB + 10;
     const initialState = {
       localStorageUsageInKilobytes,
@@ -101,7 +100,7 @@ describe('SqlLab App', () => {
     );
   });
 
-  test('logs current local storage usage', async () => {
+  it('logs current local storage usage', async () => {
     const localStorageUsageInKilobytes = LOCALSTORAGE_MAX_USAGE_KB - 10;
     const storeExceedLocalStorage = mockStore(
       sqlLabReducer(

@@ -16,8 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
-// Mock isMatrixifyEnabled before loading any modules
 import fetchMock from 'fetch-mock';
 import {
   getChartControlPanelRegistry,
@@ -34,12 +32,6 @@ import {
   waitFor,
 } from 'spec/helpers/testing-library';
 import ExploreViewContainer from '.';
-
-jest.doMock('@superset-ui/core', () => ({
-  __esModule: true,
-  ...jest.requireActual('@superset-ui/core'),
-  isMatrixifyEnabled: jest.fn(() => false),
-}));
 
 const reduxState = {
   explore: {

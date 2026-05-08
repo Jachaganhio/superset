@@ -18,8 +18,7 @@
  */
 import { FunctionComponent, useState, useEffect, ChangeEvent } from 'react';
 
-import { t } from '@superset-ui/core';
-import { styled } from '@apache-superset/core/ui';
+import { styled, t } from '@superset-ui/core';
 import { useSingleViewResource } from 'src/views/CRUD/hooks';
 import { ModalTitleWithIcon } from 'src/components/ModalTitleWithIcon';
 import { Typography } from '@superset-ui/core/components/Typography';
@@ -252,9 +251,7 @@ const AnnotationLayerModal: FunctionComponent<AnnotationLayerModalProps> = ({
       }
     >
       <StyledAnnotationLayerTitle>
-        <Typography.Title level={4}>
-          {t('General information')}
-        </Typography.Title>
+        <Typography.Title level={4}>{t('Basic information')}</Typography.Title>
       </StyledAnnotationLayerTitle>
       <LayerContainer>
         <div className="control-label">

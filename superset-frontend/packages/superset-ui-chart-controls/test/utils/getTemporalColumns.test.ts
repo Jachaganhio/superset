@@ -16,8 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { testQueryResponse, testQueryResults } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
+import {
+  GenericDataType,
+  testQueryResponse,
+  testQueryResults,
+} from '@superset-ui/core';
 import {
   Dataset,
   getTemporalColumns,
@@ -76,9 +79,10 @@ test('should accept empty Dataset or queryResponse', () => {
   expect(
     getTemporalColumns({
       ...TestDataset,
-
-      columns: [],
-      main_dttm_col: undefined,
+      ...{
+        columns: [],
+        main_dttm_col: undefined,
+      },
     } as any as Dataset),
   ).toEqual({
     temporalColumns: [],
@@ -88,9 +92,10 @@ test('should accept empty Dataset or queryResponse', () => {
   expect(
     getTemporalColumns({
       ...testQueryResponse,
-
-      columns: [],
-      results: { ...testQueryResults.results, columns: [] },
+      ...{
+        columns: [],
+        results: { ...testQueryResults.results, ...{ columns: [] } },
+      },
     }),
   ).toEqual({
     temporalColumns: [],

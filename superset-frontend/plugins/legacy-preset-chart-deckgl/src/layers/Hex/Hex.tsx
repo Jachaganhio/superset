@@ -17,11 +17,7 @@
  * under the License.
  */
 import { HexagonLayer } from '@deck.gl/aggregation-layers';
-import {
-  CategoricalColorNamespace,
-  JsonObject,
-  QueryFormData,
-} from '@superset-ui/core';
+import { t, CategoricalColorNamespace, JsonObject } from '@superset-ui/core';
 
 import { COLOR_SCHEME_TYPES } from '../../utilities/utils';
 import {
@@ -32,22 +28,20 @@ import {
 } from '../common';
 import sandboxedEval from '../../utils/sandbox';
 import { GetLayerType, createDeckGLComponent } from '../../factory';
-import {
-  createTooltipContent,
-  CommonTooltipRows,
-} from '../../utilities/tooltipUtils';
 import TooltipRow from '../../TooltipRow';
 import { HIGHLIGHT_COLOR_ARRAY, TRANSPARENT_COLOR_ARRAY } from '../../utils';
 
-function defaultTooltipGenerator(o: JsonObject, formData: QueryFormData) {
-  const metricLabel = formData.size?.label || formData.size?.value || 'Height';
-
+function setTooltipContent(o: JsonObject) {
   return (
     <div className="deckgl-tooltip">
-      {CommonTooltipRows.centroid(o)}
       <TooltipRow
-        label={`${metricLabel}: `}
-        value={`${o.object?.elevationValue}`}
+        label={t('Centroid (Longitude and Latitude): ')}
+        value={`(${o.coordinate[0]}, ${o.coordinate[1]})`}
+      />
+      <TooltipRow
+        // eslint-disable-next-line prefer-template
+        label={t('Height') + ': '}
+        value={`${o.object.elevationValue}`}
       />
     </div>
   );
@@ -75,7 +69,7 @@ export const getLayer: GetLayerType<HexagonLayer> = function ({
 
   const colorSchemeType = fd.color_scheme_type;
   const colorRange = getColorRange({
-    defaultBreakpointsColor: fd.default_breakpoint_color,
+    defaultBreakpointsColor: fd.deafult_breakpoint_color,
     colorBreakpoints: fd.color_breakpoints,
     fixedColor: fd.color_picker,
     colorSchemeType,
@@ -90,10 +84,6 @@ export const getLayer: GetLayerType<HexagonLayer> = function ({
     colorSchemeType === COLOR_SCHEME_TYPES.color_breakpoints
       ? (p: number[]) => getColorForBreakpoints(aggFunc, p, colorBreakpoints)
       : aggFunc;
-
-  const tooltipContent = createTooltipContent(fd, (o: JsonObject) =>
-    defaultTooltipGenerator(o, fd),
-  );
 
   return new HexagonLayer({
     id: `hex-layer-${fd.slice_id}-${JSON.stringify(colorBreakpoints)}` as const,
@@ -113,7 +103,7 @@ export const getLayer: GetLayerType<HexagonLayer> = function ({
     ...commonLayerProps({
       formData: fd,
       setTooltip,
-      setTooltipContent: tooltipContent,
+      setTooltipContent,
       setDataMask,
       filterState,
       onContextMenu,

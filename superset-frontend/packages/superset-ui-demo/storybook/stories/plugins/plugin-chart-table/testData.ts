@@ -16,8 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChartDataResponseResult, VizType } from '@superset-ui/core';
-import { GenericDataType } from '@apache-superset/core/api/core';
+import {
+  ChartDataResponseResult,
+  GenericDataType,
+  VizType,
+} from '@superset-ui/core';
 import {
   TableChartFormData,
   TableChartProps,
@@ -26,7 +29,7 @@ import {
 // eslint-disable-next-line import/extensions
 import birthNamesJson from './birthNames.json';
 
-export const birthNames = birthNamesJson as unknown as TableChartProps;
+export const birthNames = birthNamesJson as TableChartProps;
 
 export const basicFormData: TableChartFormData = {
   datasource: '1__table',
