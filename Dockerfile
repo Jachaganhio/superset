@@ -64,11 +64,7 @@ RUN --mount=type=bind,source=./superset-frontend/package.json,target=./package.j
     --mount=type=bind,source=./superset-frontend/package-lock.json,target=./package-lock.json \
     --mount=type=cache,target=/root/.cache \
     --mount=type=cache,target=/root/.npm \
-    if [ "$DEV_MODE" = "false" ]; then \
-        npm ci; \
-    else \
-        echo "Skipping 'npm ci' in dev mode"; \
-    fi
+    PUPPETEER_SKIP_DOWNLOAD=true npm ci --legacy-peer-deps
 
 # Runs the webpack build process
 COPY superset-frontend /app/superset-frontend
@@ -145,6 +141,9 @@ RUN if [ "$BUILD_TRANSLATIONS" = "true" ]; then \
 ######################################################################
 FROM python-base AS python-common
 
+# Re-declare build arg to receive it in this stage
+ARG LOAD_EXAMPLES_DUCKDB
+# TODO: remove these proxy settings if not needed
 ENV SUPERSET_HOME="/app/superset_home" \
     HOME="/app/superset_home" \
     SUPERSET_ENV="production" \
