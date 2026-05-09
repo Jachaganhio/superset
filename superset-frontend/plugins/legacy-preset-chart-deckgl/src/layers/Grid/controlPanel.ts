@@ -83,7 +83,7 @@ const config: ControlPanelConfig = {
       validators: [validateNonEmpty],
     },
   },
-  formDataOverrides: (formData: Record<string, unknown>) => ({
+  formDataOverrides: (formData) => ({
     ...formData,
     size: getStandardizedControls().shiftMetric(),
   }),

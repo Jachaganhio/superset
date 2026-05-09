@@ -23,8 +23,8 @@ import { FallbackProps } from 'react-error-boundary';
 
 import FallbackComponent from '../../../src/chart/components/FallbackComponent';
 
-const setup = (props: Partial<FallbackProps> & FallbackProps['error']) =>
-  render(<FallbackComponent {...props} />);
+const setup = (props: Partial<FallbackProps>) =>
+  render(<FallbackComponent {...(props as FallbackProps)} />);
 
 const ERROR = new Error('CaffeineOverLoadException');
 

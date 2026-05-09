@@ -30,6 +30,11 @@ import TooltipRow from '../../TooltipRow';
 import { unitToRadius } from '../../utils/geo';
 import { HIGHLIGHT_COLOR_ARRAY } from '../../utils';
 
+type ScatterDataItem = JsonObject & {
+  radius: number;
+  color?: [number, number, number, number];
+};
+
 export function getPoints(data: JsonObject[]) {
   return data.map(d => d.position);
 }

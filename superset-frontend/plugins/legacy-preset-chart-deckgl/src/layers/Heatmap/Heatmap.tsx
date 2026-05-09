@@ -71,7 +71,7 @@ export const getLayer: GetLayerType<HeatmapLayer> = ({
     colorBreakpoints: fd.color_breakpoints,
     fixedColor: fd.color_picker,
     colorSchemeType,
-    colorScale,
+    colorScale: colorScale as Parameters<typeof getColorRange>[0]['colorScale'],
   })?.reverse();
 
   return new HeatmapLayer({

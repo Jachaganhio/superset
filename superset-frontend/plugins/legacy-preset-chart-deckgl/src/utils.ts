@@ -18,7 +18,7 @@
  * under the License.
  */
 import { extent } from 'd3-array';
-import { ScaleLinear, ScaleThreshold, scaleThreshold } from 'd3-scale';
+import { ScaleThreshold, scaleThreshold } from 'd3-scale';
 import {
   getSequentialSchemeRegistry,
   JsonObject,
@@ -141,7 +141,9 @@ export function getBreakPointColorScaler(
   if (!colorScheme) {
     return () => TRANSPARENT_COLOR_ARRAY;
   }
-  let scaler: ScaleLinear<string, string> | ScaleThreshold<number, string>;
+  let scaler:
+    | ReturnType<SequentialScheme['createLinearScale']>
+    | ScaleThreshold<number, string>;
   let maskPoint: (v: number | undefined) => boolean;
   if (breakPoints !== null) {
     // bucket colors into discrete colors
