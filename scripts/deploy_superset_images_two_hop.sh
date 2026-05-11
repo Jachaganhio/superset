@@ -20,15 +20,13 @@
 set -euo pipefail
 
 readonly IMAGES=(
-  "redis:7"
-  "postgres:16"
   "superset-superset-init:latest"
   "superset-superset-worker-beat:latest"
   "superset-superset-worker:latest"
   "superset-superset:latest"
 )
 
-REMOTE_HOST="14.103.69.217"
+REMOTE_HOST="172.22.100.108"
 REMOTE_USER="pc-01"
 REMOTE_DIR="/tmp"
 
