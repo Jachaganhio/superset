@@ -70,6 +70,57 @@ Don't forget to reload the page to take the new frontend into account though.
 
 It is possible to run Superset in non-development mode by using [`docker-compose-non-dev.yml`](../docker-compose-non-dev.yml). This file excludes the volumes needed for development.
 
+## Offline Build (Air-gapped Environments)
+
+If you need to build Superset on a machine without internet access, you can use the base image approach:
+
+### When to Rebuild Base Image
+
+Rebuild the base image (via `./scripts/build-base.sh`) when:
+- `package.json` or `package-lock.json` changes (frontend dependencies)
+- `requirements/base.txt` changes (Python dependencies)
+- You want to update to a new Superset version
+
+The base image contains all external dependencies and can be built once, then reused for many incremental builds.
+
+### How to Build Offline
+
+1. **On a machine with internet**, build the base images:
+   ```bash
+   ./scripts/build-base.sh
+   ```
+
+   This produces two images:
+   - `superset-node-base:latest` — Node.js + npm + all frontend dependencies
+   - `superset-base:latest` — Python + pip packages + system libraries
+
+2. **Save and transfer** to your offline machine:
+   ```bash
+   docker save superset-node-base:latest -o superset-node-base.tar
+   docker save superset-base:latest -o superset-base.tar
+   # Transfer both .tar files to offline machine (via scp, USB, etc.)
+   ```
+
+3. **On the offline machine**, load the base image:
+   ```bash
+   docker load -i superset-base.tar
+   ```
+
+4. **Build the app** (no network needed):
+   ```bash
+   docker compose -f docker-compose-non-dev.yml build
+   ```
+
+The incremental build will:
+- Copy updated source code
+- Run `npm run build` (local frontend compilation)
+- Run `uv pip install --no-deps .` (local Python package install)
+- All without accessing any network resources
+
+### Deploying to Offline Servers
+
+The deployment script (`scripts/deploy_superset_images_two_hop.sh`) now includes Redis and PostgreSQL images. Run it after building to transfer all required images to your offline target server.
+
 ## Resource Constraints
 
 If you are attempting to build on macOS and it exits with 137 you need to increase your Docker resources. See instructions [here](https://docs.docker.com/docker-for-mac/#advanced) (search for memory)

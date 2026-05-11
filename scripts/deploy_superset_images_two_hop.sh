@@ -20,6 +20,8 @@
 set -euo pipefail
 
 readonly IMAGES=(
+  "redis:7"
+  "postgres:16"
   "superset-superset-init:latest"
   "superset-superset-worker-beat:latest"
   "superset-superset-worker:latest"
