@@ -55,6 +55,23 @@ function isDefined<T>(value: T | undefined | null): boolean {
   return value !== undefined && value !== null;
 }
 
+function getTimeAxisSortValue(value: DataRecordValue | undefined) {
+  if (value === undefined || value === null) {
+    return Number.POSITIVE_INFINITY;
+  }
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsedValue = Date.parse(normalizeTimestamp(value));
+    return Number.isNaN(parsedValue) ? Number.POSITIVE_INFINITY : parsedValue;
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
 export function extractDataTotalValues(
   data: DataRecord[],
   opts: {
@@ -304,19 +321,26 @@ export function extractSeries(
     sortSeriesType,
     sortSeriesAscending,
   );
+  const rowEntries = rows.map((row, idx) => ({
+    row,
+    totalStackedValue: totalStackedValues[idx],
+  }));
   const sortedRows =
-    isDefined(xAxisSortSeries) && isDefined(xAxisSortSeriesAscending)
-      ? sortRows(
-          rows,
-          totalStackedValues,
-          xAxis,
-          xAxisSortSeries!,
-          xAxisSortSeriesAscending!,
+    xAxisType === AxisType.Time
+      ? orderBy(
+          rowEntries,
+          [({ row }) => getTimeAxisSortValue(row[xAxis])],
+          ['asc'],
         )
-      : rows.map((row, idx) => ({
-          row,
-          totalStackedValue: totalStackedValues[idx],
-        }));
+      : isDefined(xAxisSortSeries) && isDefined(xAxisSortSeriesAscending)
+        ? sortRows(
+            rows,
+            totalStackedValues,
+            xAxis,
+            xAxisSortSeries!,
+            xAxisSortSeriesAscending!,
+          )
+        : rowEntries;
 
   let minPositiveValue: number | undefined;
   const finalSeries = sortedSeries.map(name => ({
@@ -333,7 +357,8 @@ export function extractSeries(
           minPositiveValue = currentValue;
         }
         const isNextToDefinedValue =
-          isDefined(rows[idx - 1]?.[name]) || isDefined(rows[idx + 1]?.[name]);
+          isDefined(sortedRows[idx - 1]?.row[name]) ||
+          isDefined(sortedRows[idx + 1]?.row[name]);
         const isFillNeighborValue =
           !isDefined(currentValue) &&
           isNextToDefinedValue &&

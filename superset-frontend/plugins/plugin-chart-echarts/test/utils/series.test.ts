@@ -447,6 +447,42 @@ describe('extractSeries', () => {
     ]);
   });
 
+  it('should sort time axis points chronologically', () => {
+    const data = [
+      {
+        __timestamp: '2000-03-01',
+        abc: 3,
+      },
+      {
+        __timestamp: '2000-01-01',
+        abc: 1,
+      },
+      {
+        __timestamp: '2000-02-01',
+        abc: 2,
+      },
+    ];
+    const totalStackedValues = [3, 1, 2];
+
+    expect(
+      extractSeries(data, { totalStackedValues, xAxisType: AxisType.Time }),
+    ).toEqual([
+      [
+        {
+          id: 'abc',
+          name: 'abc',
+          data: [
+            ['2000-01-01', 1],
+            ['2000-02-01', 2],
+            ['2000-03-01', 3],
+          ],
+        },
+      ],
+      [1, 2, 3],
+      1,
+    ]);
+  });
+
   it('should remove rows that have a null x-value', () => {
     const data = [
       {

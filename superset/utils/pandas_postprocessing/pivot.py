@@ -98,6 +98,7 @@ def pivot(  # pylint: disable=too-many-arguments
         dropna=drop_missing_columns,
         margins=marginal_distributions,
         margins_name=marginal_distribution_name,
+        sort=False,
     )
 
     if not drop_missing_columns and len(series_set) > 0 and not df.empty:
