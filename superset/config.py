@@ -927,6 +927,9 @@ CORS_OPTIONS: dict[Any, Any] = {
     "origins": [
         "https://tile.openstreetmap.org",
         "https://tile.osm.ch",
+        "http://172.23.100.206",
+        "http://localhost",
+        "*"
     ]
 }
 
@@ -1872,6 +1875,7 @@ TALISMAN_CONFIG = {
     },
     "content_security_policy_nonce_in": ["script-src"],
     "force_https": False,
+    "frame_options": None,
     "session_cookie_secure": False,
 }
 # React requires `eval` to work correctly in dev mode
@@ -1925,6 +1929,7 @@ TALISMAN_DEV_CONFIG = {
     },
     "content_security_policy_nonce_in": ["script-src"],
     "force_https": False,
+    "frame_options": None,
     "session_cookie_secure": False,
 }
 
