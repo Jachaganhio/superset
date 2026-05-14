@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Superset Embedded Dashboard Verify Tool</title>
+<style>
+  :root {
+    --primary: #1FA3FF;
+    --green: #52C41A;
+    --red: #FF4D4F;
+    --amber: #FAAD14;
+    --bg: #F0F2F5;
+    --card: #FFFFFF;
+    --text: #1A1A2E;
+    --muted: #8C8C8C;
+    --radius: 8px;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 24px; }
+  header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+  header h1 span { color: var(--primary); }
+  header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 16px; }
+  .card h2 { font-size: 1.1rem; font-weight: 600; margin-bottom: 16px; }
+  details.help { cursor: pointer; }
+  details.help summary { font-weight: 600; color: var(--primary); padding: 4px 0; outline: none; }
+  details.help .help-content { padding: 12px 0 0 0; }
+  details.help .help-content h3 { font-size: 0.95rem; font-weight: 600; margin: 12px 0 4px; }
+  details.help .help-content p, details.help .help-content li { font-size: 0.85rem; color: #555; line-height: 1.7; }
+  details.help .help-content ul { padding-left: 20px; margin: 4px 0; }
+  details.help .help-content code { background: #F5F5F5; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; }
+  details.help .help-content pre { background: #F5F5F5; padding: 12px; border-radius: 6px; overflow-x: auto; font-size: 0.8rem; margin: 8px 0; }
+
+  .mode-toggle { display: flex; gap: 16px; margin-bottom: 20px; }
+  .mode-toggle label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9rem; }
+  .mode-toggle input[type="radio"] { accent-color: var(--primary); width: 16px; height: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; color: #555; }
+  .form-group input, .form-group textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid #D9D9D9; border-radius: 6px;
+    font-size: 0.9rem; font-family: inherit; transition: border-color 0.2s; background: #FAFAFA;
+  }
+  .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); background: #FFF; }
+  .form-group textarea { resize: vertical; min-height: 60px; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.8rem; }
+  .form-hint { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .btn {
+    display: block; width: 100%; padding: 12px 24px; font-size: 1rem; font-weight: 600;
+    border: none; border-radius: 6px; cursor: pointer; transition: background 0.2s, opacity 0.2s;
+    color: #FFF; background: var(--primary);
+  }
+  .btn:hover { background: #1890E6; }
+  .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn.loading { position: relative; color: transparent; }
+  .btn.loading::after {
+    content: ""; position: absolute; left: 50%; top: 50%;
+    width: 20px; height: 20px; margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255,255,255,0.3); border-top-color: #FFF; border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .stages { margin-top: 20px; }
+  .stage {
+    display: flex; flex-wrap: wrap; align-items: center; padding: 14px 16px;
+    border: 1px solid #E8E8E8; border-radius: 6px; margin-bottom: 8px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .stage.pass { border-color: var(--green); background: #F6FFED; }
+  .stage.fail { border-color: var(--red); background: #FFF2F0; }
+  .stage.loading { border-color: var(--primary); background: #E6F7FF; }
+  .stage.waiting { opacity: 0.6; }
+  .stage-number {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 50%; font-size: 0.8rem; font-weight: 700;
+    background: #F0F0F0; color: var(--muted); margin-right: 12px; flex-shrink: 0;
+  }
+  .stage.pass .stage-number { background: var(--green); color: #FFF; }
+  .stage.fail .stage-number { background: var(--red); color: #FFF; }
+  .stage.loading .stage-number { background: var(--primary); color: #FFF; animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+  .stage-label { flex: 1; font-size: 0.9rem; font-weight: 500; }
+  .stage-status { font-size: 0.8rem; font-weight: 600; padding: 3px 10px; border-radius: 10px; }
+  .stage.waiting .stage-status { background: #F0F0F0; color: var(--muted); }
+  .stage.loading .stage-status { background: #E6F7FF; color: var(--primary); }
+  .stage.pass .stage-status { background: #F6FFED; color: var(--green); }
+  .stage.fail .stage-status { background: #FFF2F0; color: var(--red); }
+  .stage-detail {
+    width: 100%; margin-top: 8px; padding-top: 8px; border-top: 1px solid #E8E8E8;
+    font-size: 0.82rem; display: none; overflow-x: auto;
+  }
+  .stage.fail .stage-detail, .stage.pass .stage-detail { display: block; }
+  .stage-detail .error-msg { color: var(--red); font-weight: 500; }
+  .stage-detail .success-msg { color: var(--green); font-weight: 500; }
+  .stage-detail pre {
+    background: #F5F5F5; padding: 10px; border-radius: 4px; margin-top: 6px;
+    font-size: 0.78rem; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+  }
+  .stage-detail .cors-hint { background: #FFF7E6; border: 1px solid #FFD591; border-radius: 4px; padding: 8px; margin-top: 6px; font-size: 0.8rem; }
+  .stage-detail .cors-hint strong { color: #D46B08; }
+
+  #tokenPayload { display: none; margin-top: 16px; }
+  #tokenPayload h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; }
+  #tokenPayload pre {
+    background: #F5F5F5; padding: 14px; border-radius: 6px; font-size: 0.78rem;
+    overflow-x: auto; white-space: pre-wrap; word-break: break-all; border: 1px solid #E8E8E8;
+  }
+
+  #mountPoint { margin-top: 16px; display: none; border: 2px dashed #D9D9D9; border-radius: 6px; min-height: 200px; }
+  #mountPoint.active { display: block; border-color: var(--primary); border-style: solid; }
+  #mountPoint iframe { width: 100%; min-height: 500px; border: none; border-radius: 4px; }
+
+  #errorBanner { display: none; background: #FFF2F0; border: 1px solid var(--red); border-radius: 6px; padding: 12px 16px; margin-bottom: 16px; }
+  #errorBanner h3 { color: var(--red); font-size: 0.9rem; margin-bottom: 4px; }
+  #errorBanner p { font-size: 0.85rem; color: #555; }
+
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    .card { padding: 16px; }
+    .mode-toggle { flex-direction: column; gap: 8px; }
+    .stage { padding: 10px 12px; }
+    .stage-number { width: 24px; height: 24px; font-size: 0.7rem; margin-right: 8px; }
+    #mountPoint iframe { min-height: 350px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Superset <span>Embedded</span> Verify</h1>
+    <p>Step-by-step verification of the embedded dashboard flow</p>
+  </header>
+
+  <div id="errorBanner"><h3 id="errorTitle"></h3><p id="errorMsg"></p></div>
+
+  <div class="card">
+    <details class="help" id="helpSection">
+      <summary>Help &amp; Troubleshooting</summary>
+      <div class="help-content">
+        <h3>Purpose</h3>
+        <p>This tool verifies that your Apache Superset instance is correctly configured for embedded dashboards. It walks through authentication, guest token generation, and dashboard embedding using <code>@superset-ui/embedded-sdk</code>.</p>
+
+        <h3>Prerequisites</h3>
+        <ul>
+          <li>Superset with <code>EMBEDDED_SUPERSET</code> feature flag enabled (default: <code>True</code>)</li>
+          <li>A dashboard with embedding configured: set <strong>Allowed Domains</strong> in the Embed Dashboard modal</li>
+          <li>A user with <code>can_grant_guest_token</code> permission (admin role by default)</li>
+          <li>CORS configured on Superset to allow requests from this tool's origin</li>
+        </ul>
+
+        <h3>Finding Your Dashboard ID</h3>
+        <p>Open a dashboard in Superset. The URL contains the dashboard ID: <code>/superset/dashboard/1/</code> — <code>1</code> is the ID. You can also use the API: <code>GET /api/v1/dashboard/</code></p>
+
+        <h3>CORS Configuration</h3>
+        <p>Add the following to <code>superset_config.py</code>:</p>
+        <pre>ENABLE_CORS = True
+CORS_OPTIONS = {
+  "origins": [
+    "http://localhost:8080",
+    "https://your-tool-domain.com",
+  ],
+  "supports_credentials": True,
+}</pre>
+
+        <h3>Mixed Content</h3>
+        <p>If your Superset instance uses HTTPS, this tool must also be served over HTTPS. Browsers block mixed content (HTTPS page loading HTTP iframes).</p>
+
+        <h3>Guest Token Expiration</h3>
+        <p>The default guest token TTL is 5 minutes (<code>GUEST_TOKEN_JWT_EXP_SECONDS</code>). The SDK automatically refreshes the token. If verification fails after initial success, the token may have expired — restart the verification.</p>
+
+        <h3>Checking Embed Configuration</h3>
+        <p>To verify a dashboard is configured for embedding via the API:</p>
+        <pre>curl -H "Authorization: Bearer &lt;token&gt;" \
+  http://localhost:8088/api/v1/dashboard/1/embedded</pre>
+        <p>The response includes <code>uuid</code> (the embedded dashboard UUID), <code>dashboard_id</code>, and <code>allowed_domains</code>.</p>
+
+        <h3>Troubleshooting Steps</h3>
+        <ul>
+          <li><strong>401 Unauthorized</strong> — Check your username and password</li>
+          <li><strong>403 Forbidden</strong> — User lacks <code>can_grant_guest_token</code> permission, or dashboard is not accessible</li>
+          <li><strong>404 Not Found</strong> — Dashboard ID does not exist or embedding is not configured</li>
+          <li><strong>Failed to fetch</strong> — Likely a CORS issue. Configure CORS on Superset or serve the tool from the same origin</li>
+          <li><strong>Iframe shows "Not Found"</strong> — The embedded UUID is incorrect. Check the Embed Dashboard modal</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>Configuration</h2>
+    <form id="configForm">
+      <div class="mode-toggle">
+        <label><input type="radio" name="authMode" value="password" checked> Username / Password</label>
+        <label><input type="radio" name="authMode" value="token"> Guest Token</label>
+      </div>
+      <div class="form-group">
+        <label for="supersetUrl">Superset URL</label>
+        <input type="url" id="supersetUrl" placeholder="https://superset.example.com" required>
+        <div class="form-hint">The base URL of your Superset instance (no trailing slash)</div>
+      </div>
+      <div id="passwordFields">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="admin" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+        </div>
+      </div>
+      <div id="tokenField" style="display:none">
+        <div class="form-group">
+          <label for="guestTokenInput">Guest Token (JWT)</label>
+          <textarea id="guestTokenInput" rows="3" placeholder="Paste your guest token here"></textarea>
+          <div class="form-hint">A pre-existing guest token from POST /api/v1/security/guest_token/</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="dashboardId">Dashboard ID / UUID</label>
+        <input type="text" id="dashboardId" placeholder="e.g. 1 or a UUID">
+        <div class="form-hint">The dashboard's numeric ID or UUID (from the URL or API)</div>
+      </div>
+      <button type="submit" class="btn" id="startBtn">Start Verification</button>
+    </form>
+  </div>
+
+  <div class="card stages" id="stages" style="display:none">
+    <div class="stage waiting" id="stageAuth">
+      <span class="stage-number">1</span>
+      <span class="stage-label">Authentication</span>
+      <span class="stage-status" id="statusAuth">WAITING</span>
+      <div class="stage-detail" id="detailAuth"></div>
+    </div>
+    <div class="stage waiting" id="stageEmbedConfig">
+      <span class="stage-number">2</span>
+      <span class="stage-label">Embed Configuration</span>
+      <span class="stage-status" id="statusEmbedConfig">WAITING</span>
+      <div class="stage-detail" id="detailEmbedConfig"></div>
+    </div>
+    <div class="stage waiting" id="stageGuestToken">
+      <span class="stage-number">3</span>
+      <span class="stage-label">Guest Token</span>
+      <span class="stage-status" id="statusGuestToken">WAITING</span>
+      <div class="stage-detail" id="detailGuestToken"></div>
+    </div>
+    <div class="stage waiting" id="stageEmbed">
+      <span class="stage-number">4</span>
+      <span class="stage-label">Dashboard Embed</span>
+      <span class="stage-status" id="statusEmbed">WAITING</span>
+      <div class="stage-detail" id="detailEmbed"></div>
+    </div>
+  </div>
+
+  <div id="tokenPayload" class="card">
+    <h3>Guest Token Payload</h3>
+    <pre id="tokenPayloadContent"></pre>
+  </div>
+
+  <div class="card" id="mountPointCard" style="display:none">
+    <h2>Embedded Dashboard</h2>
+    <div id="mountPoint"></div>
+  </div>
+</div>
+
+<script type="module">
+  let appState = {
+    accessToken: null,
+    guestToken: null,
+    embeddedUuid: null,
+    allowedDomains: [],
+  };
+
+  const els = {
+    form: document.getElementById('configForm'),
+    supersetUrl: document.getElementById('supersetUrl'),
+    username: document.getElementById('username'),
+    password: document.getElementById('password'),
+    dashboardId: document.getElementById('dashboardId'),
+    guestTokenInput: document.getElementById('guestTokenInput'),
+    passwordFields: document.getElementById('passwordFields'),
+    tokenField: document.getElementById('tokenField'),
+    startBtn: document.getElementById('startBtn'),
+    stages: document.getElementById('stages'),
+    stageAuth: document.getElementById('stageAuth'),
+    statusAuth: document.getElementById('statusAuth'),
+    detailAuth: document.getElementById('detailAuth'),
+    stageEmbedConfig: document.getElementById('stageEmbedConfig'),
+    statusEmbedConfig: document.getElementById('statusEmbedConfig'),
+    detailEmbedConfig: document.getElementById('detailEmbedConfig'),
+    stageGuestToken: document.getElementById('stageGuestToken'),
+    statusGuestToken: document.getElementById('statusGuestToken'),
+    detailGuestToken: document.getElementById('detailGuestToken'),
+    stageEmbed: document.getElementById('stageEmbed'),
+    statusEmbed: document.getElementById('statusEmbed'),
+    detailEmbed: document.getElementById('detailEmbed'),
+    tokenPayload: document.getElementById('tokenPayload'),
+    tokenPayloadContent: document.getElementById('tokenPayloadContent'),
+    mountPointCard: document.getElementById('mountPointCard'),
+    mountPoint: document.getElementById('mountPoint'),
+    errorBanner: document.getElementById('errorBanner'),
+    errorTitle: document.getElementById('errorTitle'),
+    errorMsg: document.getElementById('errorMsg'),
+  };
+
+  function qs(sel) { return document.querySelector(sel); }
+
+  document.querySelectorAll('input[name="authMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const mode = radio.value;
+      els.passwordFields.style.display = mode === 'password' ? '' : 'none';
+      els.tokenField.style.display = mode === 'token' ? '' : 'none';
+      els.dashboardId.closest('.form-group').style.display = mode === 'password' ? '' : 'none';
+    });
+  });
+
+  function showError(title, msg) {
+    els.errorBanner.style.display = 'block';
+    els.errorTitle.textContent = title;
+    els.errorMsg.textContent = msg;
+  }
+
+  function hideError() {
+    els.errorBanner.style.display = 'none';
+  }
+
+  function setStage(stageEl, statusEl, detailEl, state, label, detailHTML) {
+    stageEl.className = 'stage ' + state;
+    statusEl.textContent = state === 'loading' ? 'IN PROGRESS' : state.toUpperCase();
+    if (detailHTML) {
+      detailEl.innerHTML = detailHTML;
+    } else if (state === 'waiting') {
+      detailEl.innerHTML = '';
+    }
+  }
+
+  function setAllStagesWaiting() {
+    els.stages.style.display = 'block';
+    setStage(els.stageAuth, els.statusAuth, els.detailAuth, 'waiting');
+    setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'waiting');
+    setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'waiting');
+    setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'waiting');
+    els.tokenPayload.style.display = 'none';
+    els.mountPointCard.style.display = 'none';
+    els.mountPoint.classList.remove('active');
+  }
+
+  function decodeJWT(token) {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const payload = JSON.parse(atob(parts[1]));
+      const expDate = payload.exp ? new Date(payload.exp * 1000).toLocaleString() : 'N/A';
+      const remaining = payload.exp ? Math.round((payload.exp * 1000 - Date.now()) / 1000) + 's' : 'N/A';
+      return { ...payload, _expDate: expDate, _remaining: remaining };
+    } catch {
+      return null;
+    }
+  }
+
+  function formatJWT(payload) {
+    if (!payload) return 'Failed to decode JWT';
+    const lines = [];
+    for (const [k, v] of Object.entries(payload)) {
+      if (k.startsWith('_')) continue;
+      if (k === 'exp' || k === 'iat') {
+        lines.push(JSON.stringify(k) + ': ' + JSON.stringify(v) + ' (' + new Date(v * 1000).toLocaleString() + ')');
+      } else {
+        lines.push(JSON.stringify(k) + ': ' + JSON.stringify(v, null, 2));
+      }
+    }
+    lines.push('');
+    lines.push('// Expires: ' + payload._expDate + ' (' + payload._remaining + ' remaining)');
+    return lines.join('\n');
+  }
+
+  async function apiPost(url, body, headers) {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(headers || {}) },
+      body: JSON.stringify(body),
+    });
+    const contentType = resp.headers.get('content-type') || '';
+    const text = await resp.text();
+    let data;
+    try {
+      data = contentType.includes('json') ? JSON.parse(text) : text;
+    } catch {
+      data = text;
+    }
+    if (!resp.ok) {
+      let errMsg;
+      if (typeof data === 'object' && data.message) {
+        errMsg = typeof data.message === 'string' ? data.message : JSON.stringify(data.message);
+      } else if (typeof data === 'string' && data) {
+        errMsg = data;
+      } else {
+        errMsg = `HTTP ${resp.status} ${resp.statusText}`;
+      }
+      const err = new Error(errMsg);
+      err.status = resp.status;
+      err.data = data;
+      throw err;
+    }
+    return { status: resp.status, data };
+  }
+
+  async function apiGet(url, headers) {
+    const resp = await fetch(url, {
+      method: 'GET',
+      headers: { ...(headers || {}) },
+    });
+    const text = await resp.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = text; }
+    if (!resp.ok) {
+      let errMsg;
+      if (typeof data === 'object' && data.message) {
+        errMsg = typeof data.message === 'string' ? data.message : JSON.stringify(data.message);
+      } else {
+        errMsg = `HTTP ${resp.status}`;
+      }
+      const err = new Error(errMsg);
+      err.status = resp.status;
+      err.data = data;
+      throw err;
+    }
+    return { status: resp.status, data };
+  }
+
+  function handleFetchError(err) {
+    if (err instanceof TypeError && err.message === 'Failed to fetch') {
+      return 'Possible CORS error or network issue. Ensure CORS is configured on Superset and the URL is reachable.';
+    }
+    if (err.status === 0 || err.message === 'Failed to fetch') {
+      return 'Network error. Check that the Superset URL is correct and reachable from this browser. CORS may need to be configured.';
+    }
+    return err.message || String(err);
+  }
+
+  function corsHint() {
+    return '<div class="cors-hint"><strong>CORS tip:</strong> Serve this tool from the same origin as Superset (e.g., behind a reverse proxy) or configure CORS in <code>superset_config.py</code> with <code>ENABLE_CORS = True</code> and the appropriate origins.</div>';
+  }
+
+  els.form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError();
+    setAllStagesWaiting();
+
+    const baseUrl = els.supersetUrl.value.replace(/\/+$/, '');
+    const dashboardId = els.dashboardId.value.trim();
+    const mode = document.querySelector('input[name="authMode"]:checked').value;
+
+    if (!baseUrl) { showError('Missing URL', 'Please enter the Superset URL.'); return; }
+    if (mode === 'password' && !dashboardId) { showError('Missing Dashboard ID', 'Please enter the dashboard ID or UUID.'); return; }
+
+    els.startBtn.disabled = true;
+    els.startBtn.classList.add('loading');
+
+    try {
+      if (mode === 'password') {
+        await runPasswordFlow(baseUrl, dashboardId);
+      } else {
+        await runTokenFlow(baseUrl);
+      }
+    } catch (err) {
+      if (err.status && err.status >= 400) {
+        showError('Verification Failed', err.message);
+      } else {
+        showError('Error', handleFetchError(err));
+        if (err instanceof TypeError && err.message === 'Failed to fetch') {
+          const activeStage = els.stages.querySelector('.stage.loading');
+          if (activeStage) {
+            const detail = activeStage.querySelector('.stage-detail');
+            detail.innerHTML = '<div class="error-msg">' + handleFetchError(err) + '</div>' + corsHint();
+          }
+        }
+      }
+    } finally {
+      els.startBtn.disabled = false;
+      els.startBtn.classList.remove('loading');
+    }
+  });
+
+  async function runPasswordFlow(baseUrl, dashboardId) {
+    appState = { accessToken: null, guestToken: null, embeddedUuid: null, allowedDomains: [] };
+
+    // Stage 1: Authentication
+    setStage(els.stageAuth, els.statusAuth, els.detailAuth, 'loading', 'Authentication');
+    try {
+      const loginResp = await apiPost(baseUrl + '/api/v1/security/login', {
+        username: els.username.value,
+        password: els.password.value,
+        refresh: true,
+        provider: 'db',
+      });
+      appState.accessToken = loginResp.data.access_token;
+      setStage(els.stageAuth, els.statusAuth, els.detailAuth, 'pass', 'Authentication',
+        '<div class="success-msg">JWT access token obtained successfully</div>');
+    } catch (err) {
+      const msg = handleFetchError(err);
+      const hint = (err instanceof TypeError && err.message === 'Failed to fetch') ? corsHint() : '';
+      setStage(els.stageAuth, els.statusAuth, els.detailAuth, 'fail', 'Authentication',
+        '<div class="error-msg">' + msg + '</div>' + hint);
+      throw err;
+    }
+
+    const authHeader = { 'Authorization': 'Bearer ' + appState.accessToken };
+
+    // Stage 2: Resolve embed configuration
+    setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'loading', 'Embed Configuration');
+    try {
+      const embedResp = await apiGet(baseUrl + '/api/v1/dashboard/' + encodeURIComponent(dashboardId) + '/embedded', authHeader);
+      const embedData = embedResp.data.result || embedResp.data;
+      appState.embeddedUuid = embedData.uuid;
+      appState.allowedDomains = embedData.allowed_domains || [];
+      if (!appState.embeddedUuid) {
+        setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'fail', 'Embed Configuration',
+          '<div class="error-msg">No embedded dashboard found. Configure embedding first: <code>POST /api/v1/dashboard/' + encodeURIComponent(dashboardId) + '/embedded</code> with allowed domains.</div>');
+        throw new Error('Embedding not configured for dashboard ' + dashboardId);
+      }
+      const domainInfo = appState.allowedDomains.length
+        ? 'Allowed domains: ' + appState.allowedDomains.join(', ')
+        : 'No allowed domains configured — the dashboard may not render until domains are set';
+      setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'pass', 'Embed Configuration',
+        '<div class="success-msg">Embedded UUID: <code>' + appState.embeddedUuid + '</code></div><div style="margin-top:4px;font-size:0.8rem;color:#555">' + domainInfo + '</div>');
+    } catch (err) {
+      const msg = handleFetchError(err);
+      if (err.status === 404) {
+        setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'fail', 'Embed Configuration',
+          '<div class="error-msg">Dashboard not found or embedding not configured. Ensure the dashboard ID is correct and embedding is enabled (set allowed domains in the Embed Dashboard modal).</div>');
+      } else if (err.status === 403) {
+        setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'fail', 'Embed Configuration',
+          '<div class="error-msg">Access denied. The token or user does not have permission to view this dashboard\'s embed configuration.</div>');
+      } else {
+        setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'fail', 'Embed Configuration',
+          '<div class="error-msg">' + msg + '</div>' + ((err instanceof TypeError) ? corsHint() : ''));
+      }
+      throw err;
+    }
+
+    // Stage 3: Guest token acquisition
+    setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'loading', 'Guest Token');
+    try {
+      const guestResp = await apiPost(baseUrl + '/api/v1/security/guest_token/', {
+        user: { username: 'embedded_verify' },
+        resources: [{ type: 'dashboard', id: dashboardId }],
+        rls: [],
+      }, authHeader);
+      appState.guestToken = typeof guestResp.data === 'string' ? guestResp.data : guestResp.data.token;
+
+      const decoded = decodeJWT(appState.guestToken);
+      if (decoded) {
+        els.tokenPayloadContent.textContent = formatJWT(decoded);
+        els.tokenPayload.style.display = 'block';
+        setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'pass', 'Guest Token',
+          '<div class="success-msg">Guest token obtained successfully</div>');
+      } else {
+        setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'pass', 'Guest Token',
+          '<div class="success-msg">Guest token obtained (unable to decode payload)</div>');
+      }
+    } catch (err) {
+      const msg = handleFetchError(err);
+      if (err.status === 403) {
+        setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'fail', 'Guest Token',
+          '<div class="error-msg">Forbidden: The user does not have <code>can_grant_guest_token</code> permission. Grant this permission or use an admin account.</div>');
+      } else if (err.status === 404) {
+        setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'fail', 'Guest Token',
+          '<div class="error-msg">Dashboard not found. Verify the dashboard ID exists.</div>');
+      } else {
+        setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'fail', 'Guest Token',
+          '<div class="error-msg">' + msg + '</div>');
+      }
+      throw err;
+    }
+
+    // Stage 4: Embed dashboard
+    await runEmbedStage(baseUrl, appState.embeddedUuid);
+  }
+
+  async function runTokenFlow(baseUrl) {
+    appState = { accessToken: null, guestToken: null, embeddedUuid: null, allowedDomains: [] };
+
+    const rawToken = els.guestTokenInput.value.trim();
+    if (!rawToken) { showError('Missing Guest Token', 'Please paste a guest token.'); return; }
+    appState.guestToken = rawToken;
+
+    const decoded = decodeJWT(appState.guestToken);
+    if (decoded) {
+      els.tokenPayloadContent.textContent = formatJWT(decoded);
+      els.tokenPayload.style.display = 'block';
+    }
+
+    setStage(els.stageAuth, els.statusAuth, els.detailAuth, 'pass', 'Authentication',
+      '<div class="success-msg">Skipped — using direct guest token</div>');
+    setStage(els.stageEmbedConfig, els.statusEmbedConfig, els.detailEmbedConfig, 'pass', 'Embed Configuration',
+      '<div class="success-msg">Skipped — using direct guest token</div>');
+    setStage(els.stageGuestToken, els.statusGuestToken, els.detailGuestToken, 'pass', 'Guest Token',
+      '<div class="success-msg">Using provided guest token</div>');
+
+    // For token mode, we need the embedded UUID. Try to guess from resources if available.
+    const embeddedId = decoded && decoded.resources && decoded.resources[0]
+      ? decoded.resources[0].id : null;
+
+    if (embeddedId) {
+      await runEmbedStage(baseUrl, embeddedId);
+    } else {
+      setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'fail', 'Dashboard Embed',
+        '<div class="error-msg">Cannot determine embedded dashboard UUID from the guest token. Provide the Embedded Dashboard UUID in the configuration.</div>');
+    }
+  }
+
+  async function runEmbedStage(baseUrl, embeddedId) {
+    setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'loading', 'Dashboard Embed');
+
+    if (!embeddedId) {
+      setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'fail', 'Dashboard Embed',
+        '<div class="error-msg">No embedded dashboard UUID available. Set allowed domains in the Embed Dashboard modal for this dashboard first.</div>');
+      return;
+    }
+
+    try {
+      const mod = await import('https://esm.sh/@superset-ui/embedded-sdk@0.2.0');
+      const embedDashboard = mod.embedDashboard;
+
+      els.mountPointCard.style.display = 'block';
+      els.mountPoint.classList.add('active');
+
+      const result = await embedDashboard({
+        id: embeddedId,
+        supersetDomain: baseUrl,
+        mountPoint: els.mountPoint,
+        fetchGuestToken: () => Promise.resolve(appState.guestToken),
+        debug: true,
+      });
+
+      setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'pass', 'Dashboard Embed',
+        '<div class="success-msg">Dashboard embedded successfully</div>');
+
+    } catch (err) {
+      if (err.message && err.message.includes('Failed to load')) {
+        setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'fail', 'Dashboard Embed',
+          '<div class="error-msg">' + err.message + '</div><div style="margin-top:6px;font-size:0.8rem">Ensure you have internet access to load the SDK from esm.sh, or download the SDK locally and update the import URL.</div>');
+      } else {
+        const msg = err.message || String(err);
+        setStage(els.stageEmbed, els.statusEmbed, els.detailEmbed, 'fail', 'Dashboard Embed',
+          '<div class="error-msg">' + msg + '</div>');
+      }
+    }
+  }
+</script>
+</body>
+</html>
