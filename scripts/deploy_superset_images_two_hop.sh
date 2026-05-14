@@ -49,7 +49,7 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 ARTIFACT_DIR="${PROJECT_ROOT}/tmp/superset-image-deploy-$(date +%Y%m%d%H%M%S)"
 CHECKSUM_FILE="${ARTIFACT_DIR}/sha256sum.txt"
 
-ARCHIVES=()
+ARCHIVE=""
 
 log() {
   printf '[%s] %s\n' "$(date +'%F %T')" "$*"
@@ -68,10 +68,10 @@ print_help() {
   cat <<EOF
 Usage: ./scripts/deploy_superset_images_two_hop.sh [options]
 
-Save+compress images locally, upload to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR},
+Save+compress all images into a single archive, upload to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR},
 re-upload from ${REMOTE_HOST} to ${SECOND_USER}@${SECOND_HOST}:${SECOND_DIR}, then run docker load on host2.
 
-Images:
+Images (saved as one combined archive to share layers):
   - superset-superset-init:latest
   - superset-superset-worker-beat:latest
   - superset-superset-worker:latest
@@ -156,33 +156,23 @@ precheck() {
 }
 
 build_archives() {
-  local image file_name out_file
-
   mkdir -p "$ARTIFACT_DIR"
-  : > "$CHECKSUM_FILE"
 
-  for image in "${IMAGES[@]}"; do
-    file_name="$(sanitize_image_name "$image").tar.gz"
-    out_file="${ARTIFACT_DIR}/${file_name}"
-    ARCHIVES+=("$file_name")
+  ARCHIVE="superset-all.tar.gz"
+  local archive_path="${ARTIFACT_DIR}/${ARCHIVE}"
 
-    log "Saving and compressing ${image} -> ${out_file}"
-    docker save "$image" | gzip > "$out_file"
-    (cd "$ARTIFACT_DIR" && sha256sum "$file_name" >> "$(basename "$CHECKSUM_FILE")")
-  done
+  log "Saving and compressing all images -> ${archive_path}"
+  docker save "${IMAGES[@]}" | gzip > "$archive_path"
+  (cd "$ARTIFACT_DIR" && sha256sum "$ARCHIVE" > "$CHECKSUM_FILE")
 
   log "Artifacts ready in ${ARTIFACT_DIR}"
 }
 
 upload_to_host1() {
-  local file
-
-  log "Uploading archives to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}"
+  log "Uploading archive to ${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}"
   ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" "mkdir -p '${REMOTE_DIR}'"
 
-  for file in "${ARCHIVES[@]}"; do
-    scp "${SSH_OPTS[@]}" "${ARTIFACT_DIR}/${file}" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
-  done
+  scp "${SSH_OPTS[@]}" "${ARTIFACT_DIR}/${ARCHIVE}" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
   scp "${SSH_OPTS[@]}" "$CHECKSUM_FILE" "${REMOTE_USER}@${REMOTE_HOST}:${REMOTE_DIR}/"
 
   ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
@@ -190,59 +180,45 @@ upload_to_host1() {
 }
 
 relay_to_host2() {
-  local file
-
-  log "Relaying archives from host1 to ${SECOND_USER}@${SECOND_HOST}:${SECOND_DIR}"
+  log "Relaying archive from host1 to ${SECOND_USER}@${SECOND_HOST}:${SECOND_DIR}"
+  ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
+    "scp ${SSH_OPTS[*]} '${REMOTE_DIR}/${ARCHIVE}' '${SECOND_USER}@${SECOND_HOST}:${SECOND_DIR}/'"
   ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
     "scp ${SSH_OPTS[*]} '${REMOTE_DIR}/$(basename "$CHECKSUM_FILE")' '${SECOND_USER}@${SECOND_HOST}:${SECOND_DIR}/'"
-
-  for file in "${ARCHIVES[@]}"; do
-    ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
-      "scp ${SSH_OPTS[*]} '${REMOTE_DIR}/${file}' '${SECOND_USER}@${SECOND_HOST}:${SECOND_DIR}/'"
-  done
 
   ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
     "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'cd ~ && sha256sum -c $(basename "$CHECKSUM_FILE")'"
 }
 
 load_images_on_host2() {
-  local i image file
+  local image
 
   log "Loading images on ${SECOND_USER}@${SECOND_HOST}"
-  for i in "${!IMAGES[@]}"; do
-    image="${IMAGES[$i]}"
-    file="${ARCHIVES[$i]}"
+  ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
+    "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'cd ~ && docker load -i ${ARCHIVE}'"
 
-    ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
-      "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'cd ~ && docker load -i ${file}'"
-
+  for image in "${IMAGES[@]}"; do
     ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
       "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'docker image inspect ${image} >/dev/null'"
   done
 }
 
 cleanup_artifacts() {
-  local file
-
   if [[ "$CLEANUP_LOCAL" -eq 1 ]]; then
     log "Cleaning local artifacts"
     rm -f "$CHECKSUM_FILE"
-    for file in "${ARCHIVES[@]}"; do
-      rm -f "${ARTIFACT_DIR}/${file}"
-    done
+    rm -f "${ARTIFACT_DIR}/${ARCHIVE}"
     rmdir "$ARTIFACT_DIR" 2>/dev/null || true
   fi
 
   if [[ "$CLEANUP_REMOTE" -eq 1 ]]; then
     log "Cleaning remote artifacts"
     ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
+      "rm -f '${REMOTE_DIR}/${ARCHIVE}'"
+    ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
       "rm -f '${REMOTE_DIR}/$(basename "$CHECKSUM_FILE")'"
-    for file in "${ARCHIVES[@]}"; do
-      ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
-        "rm -f '${REMOTE_DIR}/${file}'"
-      ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
-        "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'cd ~ && rm -f ${file}'"
-    done
+    ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
+      "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'cd ~ && rm -f ${ARCHIVE}'"
     ssh "${SSH_OPTS[@]}" "${REMOTE_USER}@${REMOTE_HOST}" \
       "ssh ${SSH_OPTS[*]} ${SECOND_USER}@${SECOND_HOST} 'cd ~ && rm -f $(basename "$CHECKSUM_FILE")'"
   fi
